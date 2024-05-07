@@ -1,3 +1,16 @@
-# Breaking plus
-Open https://raw.githubusercontent.com/NaikoScript/Breaking-plus/main/Script and run the script with a executor
-![image](https://github.com/NaikoScript/Breaking-Plus/assets/107273752/90ba41aa-1852-427f-8581-728ce450a256)
+# Breaking Plus
+> [!IMPORTANT]
+> **Join my [discord server](https://discord.gg/vAWJMYJYcR) if you find any bugs**
+## Script thumbnail
+![BreakingPlus4](https://github.com/NaikoScript/Breaking-Plus/assets/107273752/68352ab9-d209-460d-b394-ec873341403d)
+## Script version
+`Version 3.2`
+## Shortened Script
+```
+loadstring(game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script"))()
+```
+## Game information
+`Last seen update : 30D/12M/2019`
+```
+https://www.roblox.com/games/648362523
+```
