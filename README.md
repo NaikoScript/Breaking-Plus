@@ -6,7 +6,7 @@
 ## Script version
 `Version 3.2`
 ## Shortened Script
-```
+```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script"))()
 ```
 ## Game information
