@@ -1162,7 +1162,7 @@ if game:GetService("CoreGui"):FindFirstChild("Plus") then
     Layout.Padding = UDim.new(0,-3)
     Padding.Parent = PlayerButtons
     Padding.PaddingLeft = UDim.new(1,0)
-    game:GetService("TweenService"):Create(Padding,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{PaddingLeft = UDim.new(0,0)}):Play()
+    game:GetService("TweenService"):Create(Padding,TweenInfo.new(0.15, Enum.EasingStyle.Linear),{PaddingLeft = UDim.new(0,0)}):Play()
     end
     end)
     
@@ -1176,7 +1176,7 @@ if game:GetService("CoreGui"):FindFirstChild("Plus") then
     Layout.Padding = UDim.new(0,-3)
     Padding.Parent = PlayerButtons
     Padding.PaddingLeft = UDim.new(1,0)
-    game:GetService("TweenService"):Create(Padding,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{PaddingLeft = UDim.new(0,0)}):Play()
+    game:GetService("TweenService"):Create(Padding,TweenInfo.new(0.15, Enum.EasingStyle.Linear),{PaddingLeft = UDim.new(0,0)}):Play()
     end
     end)
     
@@ -1214,7 +1214,7 @@ if game:GetService("CoreGui"):FindFirstChild("Plus") then
             end)
             Cloned.MouseButton1Click:Connect(function()
             PlayerButtons.Visible = false
-			LocalPlayer.Character.Torso.Neck.C1 = CFrame.new(math.huge,math.huge,math.huge) * CFrame.Angles(-1.6130179166793823, 0, 3)
+			LocalPlayer.Character.Torso.Neck.C0 = CFrame.new(math.huge,math.huge,math.huge) * CFrame.Angles(50, 50, 50)
             game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",(CFrame.new(math.huge,math.huge,math.huge) * CFrame.Angles(-1.6130179166793823, 0, 3)))
             end)
             end
