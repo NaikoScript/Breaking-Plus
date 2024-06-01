@@ -53,19 +53,19 @@ end
 
 function ChangeData(Path,Option,WithFolder)
 if WithFolder == false then
-if readfile(Path) ~= nil then
-return writefile(Path,Option)
+if isfile(Path) ~= false then
+writefile(Path,Option)
 end
 else 
-if readfile("NaikoScript/BreakingPlus/" .. Path) ~= nil then
-return writefile("NaikoScript/BreakingPlus/" .. Path,Option)
+if isfile("NaikoScript/BreakingPlus/" .. Path) ~= false then
+writefile("NaikoScript/BreakingPlus/" .. Path,Option)
 end
 end
 end
 
 function ReturnData(Path,WithFolder)
 if WithFolder == false then
-if readfile(Path) ~= nil then
+if isfile(Path) ~= false then
 return readfile(Path)
 end
 else
