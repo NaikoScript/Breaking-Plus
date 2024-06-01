@@ -1,3 +1,5 @@
+-- Breaking Plus Made by Naiko Exploits --
+
 if game:GetService("CoreGui"):FindFirstChild("Plus") then
 return warn("Script already running")
 else
@@ -85,8 +87,14 @@ DefaultData("Feature6.txt","false")
 UserType = 1
 elseif isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 UserType = 2
+DefaultData("Feature1.txt","false")
+DefaultData("Feature2.txt","false")
+DefaultData("Feature3.txt","false")
+DefaultData("Feature4.txt","false")
+DefaultData("Feature5.txt","false")
+DefaultData("Feature6.txt","false")
 print("This user has not executed this before but has used other naiko exploit script projects")
-makefolder("NaikoScript/PlayerRngPlus")
+makefolder("NaikoScript/BreakingPlus")
 elseif isfolder("NaikoScript") and isfolder("NaikoScript/BreakingPlus") then
 UserType = 3
 print("This script has been executed before")
