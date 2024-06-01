@@ -1160,6 +1160,7 @@ local Layout = Instance.new("UIListLayout")
 Layout.Parent = PlayerButtons
 Layout.Padding = UDim.new(0,-3)
 end
+end)
 
 local function PlayerExecute(Player)
 if Player ~= LocalPlayer then
@@ -1212,6 +1213,7 @@ if v:IsA("Frame") and v:FindFirstChild("name") and v.name:FindFirstChild("TextBu
 		SelectedPlayer = game.Players:FindFirstChild(v.name:FindFirstChild("TextLabel").Text)
 		PlayerExecute(SelectedPlayer)
 	end)
+	end
 end)
 
 CustomMenu.top.TextButton.MouseButton1Click:Connect(function()
