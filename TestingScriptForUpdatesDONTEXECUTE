@@ -9,7 +9,7 @@ end
 game:GetService("Players").LocalPlayer.Idled:connect(function()
 game:GetService("VirtualUser"):ClickButton2(Vector2.new())
 end)
-print("test1")
+
 -- General variables --
 
 local Version = 3.4
@@ -21,6 +21,10 @@ local UI = LocalPlayer.PlayerGui.ScreenGui
 local CustomButton = UI.buttons.log
 local CustomMenu = UI.credits
 local ClassicCredits = UI.shop.top.credits
+local PlayerList = LocalPlayer.PlayerGui.PlayerList
+local SelectedPlayer = nil
+local PlayerButtons = PlayerList.Buttons
+local PlayersList = PlayerList.PlayerList
 local ClonedCredits = ClassicCredits:Clone()
 local FirstPurchasable = nil
 local SecondPurchasable = nil
@@ -1148,6 +1152,67 @@ CustomButton.Name = "Breaking+"
 CustomButton.Visible = true
 game:GetService("TweenService"):Create(CustomButton,TweenInfo.new(0.5),{Position = UDim2.new(0, 0, 0, 140)}):Play()
 
+PlayerButtons.Changed:Connect(function()
+if PlayerButtons:FindFirstChildOfClass("UIListLayout") then
+
+else
+local Layout = Instance.new("UIListLayout")
+Layout.Parent = PlayerButtons
+Layout.Padding = UDim.new(0,-3)
+end
+
+local function PlayerExecute(Player)
+if Player ~= LocalPlayer then
+	local Cloned = PlayerButtons:FindFirstChild("button"):Clone()
+		Cloned.Parent = PlayerButtons
+		Cloned.TextLabel.Text = "Send Trade Request"
+		Cloned.ImageColor3 = Color3.fromRGB(14, 35, 14)
+		Cloned.button.ImageColor3 = Color3.fromRGB(85, 170, 0)
+		Cloned.MouseEnter:Connect(function()
+			game:GetService("TweenService"):Create(Cloned.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear,{ImageTransparency = 0.8})):Play()
+		end)
+		Cloned.MouseLeave:Connect(function()
+			game:GetService("TweenService"):Create(Cloned.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear,{ImageTransparency = 1})):Play()
+		end)
+		Cloned.MouseButton1Click:Connect(function()
+		PlayerButtons.Visible = false
+		game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(73,Player)
+		end)
+		else
+			local Cloned = PlayerButtons:FindFirstChild("button"):Clone()
+		Cloned.Parent = PlayerButtons
+		Cloned.TextLabel.Text = "Headless"
+		Cloned.ImageColor3 = Color3.fromRGB(38, 11, 11)
+		Cloned.button.ImageColor3 = Color3.fromRGB(125, 15, 15)
+		Cloned.MouseEnter:Connect(function()
+			game:GetService("TweenService"):Create(Cloned.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear,{ImageTransparency = 0.8})):Play()
+		end)
+		Cloned.MouseLeave:Connect(function()
+			game:GetService("TweenService"):Create(Cloned.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear,{ImageTransparency = 1})):Play()
+		end)
+		Cloned.MouseButton1Click:Connect(function()
+		PlayerButtons.Visible = false
+		LocalPlayer.Character.Torso.Neck.C0 = CFrame.new(math.huge,math.huge,math.huge) * CFrame.Angles(-1.6130179166793823, 0, 3)
+		game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",CFrame.new(math.huge,math.huge,math.huge) * CFrame.Angles(-1.6130179166793823, 0, 3))
+		end)
+		end
+end
+
+for i,v in pairs(PlayersList:GetChildren()) do
+	if v:IsA("Frame") and v:FindFirstChild("name") and v.name:FindFirstChild("TextButton") then
+		v.name:FindFirstChild("TextButton").MouseButton1Click:Connect(function()
+		SelectedPlayer = game.Players:FindFirstChild(v.name:FindFirstChild("TextLabel").Text)
+		PlayerExecute(SelectedPlayer)
+	end)
+end
+end
+PlayersList.ChildAdded:Connect(function(v)
+if v:IsA("Frame") and v:FindFirstChild("name") and v.name:FindFirstChild("TextButton") then
+		v.name:FindFirstChild("TextButton").MouseButton1Click:Connect(function()
+		SelectedPlayer = game.Players:FindFirstChild(v.name:FindFirstChild("TextLabel").Text)
+		PlayerExecute(SelectedPlayer)
+	end)
+end)
 
 CustomMenu.top.TextButton.MouseButton1Click:Connect(function()
 CustomMenu.Visible = not CustomMenu.Visible
