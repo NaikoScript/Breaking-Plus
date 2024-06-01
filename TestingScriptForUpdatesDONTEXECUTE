@@ -9,7 +9,7 @@ end
 game:GetService("Players").LocalPlayer.Idled:connect(function()
 game:GetService("VirtualUser"):ClickButton2(Vector2.new())
 end)
-
+print("test1")
 -- General variables --
 
 local Version = 3.4
