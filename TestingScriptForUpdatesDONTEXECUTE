@@ -69,14 +69,10 @@ if readfile(Path) ~= nil then
 return readfile(Path)
 end
 else
-local suc,err = pcall(function()
-if readfile("NaikoScript/BreakingPlus/" .. Path) ~= nil then
+if isfile("NaikoScript/BreakingPlus/" .. Path) ~= false then
 return readfile("NaikoScript/BreakingPlus/" .. Path)
 end
-end)
-if suc == false then
-	return nil
-end
+return nil
 end
 end
 
