@@ -1278,4 +1278,3 @@ game.StarterGui:SetCore(
     Notify("You need to teleport to the correct mode to autofarm")
     --game:GetService("TeleportService"):Teleport(NeededPlaceId, LocalPlayer)
 end
-end
