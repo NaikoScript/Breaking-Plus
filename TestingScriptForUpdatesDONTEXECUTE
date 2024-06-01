@@ -246,7 +246,6 @@ end
 end)
 end)
 
-
 local LoadingPurchase = UI.shop.load:Clone()
 LoadingPurchase.Visible = false
 LoadingPurchase.Parent = CustomMenu
@@ -749,7 +748,6 @@ until nil
     CheckFile("BreakingPlus/Feature5.txt","false")
     CheckFile("BreakingPlus/Feature6.txt","false")
 	]]
-  	end
   	Feature.TextLabel.Text = "Hide Blood"
 	Feature2.TextLabel.Text = "Improve UI"
   	Feature3.TextLabel.Text = "FullBright"
