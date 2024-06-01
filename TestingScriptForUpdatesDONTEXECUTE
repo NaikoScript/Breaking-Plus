@@ -1214,7 +1214,7 @@ if game:GetService("CoreGui"):FindFirstChild("Plus") then
             end)
             Cloned.MouseButton1Click:Connect(function()
             PlayerButtons.Visible = false
-			LocalPlayer.Character.Torso.Neck.C0 = CFrame.new(math.huge,math.huge,math.huge) * CFrame.Angles(-1.6130179166793823, 0, 3)
+			LocalPlayer.Character.Torso.Neck.C1 = CFrame.new(math.huge,math.huge,math.huge) * CFrame.Angles(-1.6130179166793823, 0, 3)
             game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",(CFrame.new(math.huge,math.huge,math.huge) * CFrame.Angles(-1.6130179166793823, 0, 3)))
             end)
             end
