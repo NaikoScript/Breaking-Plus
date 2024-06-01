@@ -15,6 +15,7 @@ end)
 local Version = 3.4
 local NeededPlaceId = nil
 local RoundMode = nil
+local UserType = 0
 local LocalPlayer = game.Players.LocalPlayer
 local UI = LocalPlayer.PlayerGui.ScreenGui
 local CustomButton = UI.buttons.log
