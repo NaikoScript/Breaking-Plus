@@ -1157,16 +1157,35 @@ if PlayerButtons:FindFirstChildOfClass("UIListLayout") then
 
 else
 local Layout = Instance.new("UIListLayout")
+local Padding = Instance.new("UIPadding")
 Layout.Parent = PlayerButtons
 Layout.Padding = UDim.new(0,-3)
+Padding.Parent = PlayerButtons
+Padding.PaddingLeft = UDim.new(1,0)
+game:GetService("TweenService"):Create(Padding,TweenInfo.new(1, Enum.EasingStyle.Linear,{PaddingLeft = UDim.new(0,0)})):Play()
 end
 end)
 
-local function PlayerExecute(Player)
+PlayerButtons.ChildAdded:Connect(function()
+if PlayerButtons:FindFirstChildOfClass("UIListLayout") then
+
+else
+local Layout = Instance.new("UIListLayout")
+local Padding = Instance.new("UIPadding")
+Layout.Parent = PlayerButtons
+Layout.Padding = UDim.new(0,-3)
+Padding.Parent = PlayerButtons
+Padding.PaddingLeft = UDim.new(1,0)
+game:GetService("TweenService"):Create(Padding,TweenInfo.new(1, Enum.EasingStyle.Linear,{PaddingLeft = UDim.new(0,0)})):Play()
+end
+end)
+
+function PlayerExecute(Player)
 if Player ~= LocalPlayer then
+	PlayerButtons.Size = UDim2.new(0,130,0,120)
 	local Cloned = PlayerButtons:FindFirstChild("button"):Clone()
 		Cloned.Parent = PlayerButtons
-		Cloned.TextLabel.Text = "Send Trade Request"
+		Cloned.TextLabel.Text = "Trade"
 		Cloned.ImageColor3 = Color3.fromRGB(14, 35, 14)
 		Cloned.button.ImageColor3 = Color3.fromRGB(85, 170, 0)
 		Cloned.MouseEnter:Connect(function()
@@ -1180,6 +1199,7 @@ if Player ~= LocalPlayer then
 		game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(73,Player)
 		end)
 		else
+		PlayerButtons.Size = UDim2.new(0,130,0,60)
 			local Cloned = PlayerButtons:FindFirstChild("button"):Clone()
 		Cloned.Parent = PlayerButtons
 		Cloned.TextLabel.Text = "Headless"
@@ -1193,8 +1213,7 @@ if Player ~= LocalPlayer then
 		end)
 		Cloned.MouseButton1Click:Connect(function()
 		PlayerButtons.Visible = false
-		LocalPlayer.Character.Torso.Neck.C0 = CFrame.new(math.huge,math.huge,math.huge) * CFrame.Angles(-1.6130179166793823, 0, 3)
-		game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",CFrame.new(math.huge,math.huge,math.huge) * CFrame.Angles(-1.6130179166793823, 0, 3))
+		game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",(CFrame.new(math.huge,math.huge,math.huge) * CFrame.Angles(-1.6130179166793823, 0, 3)))
 		end)
 		end
 end
