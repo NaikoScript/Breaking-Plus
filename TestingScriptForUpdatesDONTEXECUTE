@@ -973,7 +973,6 @@ Feature3Function = function()
     end
     Debug("Removed the improvements to the UI")
     end
-    pcall(function()
         if ReturnData("Feature2.txt") == "false" then
     Feature2.Autosave.ImageButton.fill.Visible = false
     Feature2.Autosave.ImageButton.fill.ImageTransparency = 0
@@ -990,7 +989,6 @@ Feature3Function = function()
 	warn("IF THIS MESSAGE APPEARS YOUR SCRIPT HAS A BUG AND IM STILL TRYING TO FIX THIS")
 
     end
-        end)
     SettingsToggleButton(Feature2,Feature2Function,Feature2UnFunction)
     SettingScroll.CanvasSize = UDim2.new(0, 0, 0, 800)
     UI.buttons.shop.ImageButton.Position = UDim2.new(1.025,0,0,35)
