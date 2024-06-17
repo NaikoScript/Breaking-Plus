@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 3.5
+local Version = 3.7
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -88,6 +88,8 @@ if not isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	DefaultData("Feature4.txt","false")
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
+	DefaultData("Feature7.txt","true")
+	DefaultData("TutSettings","false")
 	UserType = 1
 elseif isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	UserType = 2
@@ -97,8 +99,18 @@ elseif isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	DefaultData("Feature4.txt","false")
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
+	DefaultData("Feature7.txt","true")
+	DefaultData("TutSettings","false")
 	makefolder("NaikoScript/BreakingPlus")
 elseif isfolder("NaikoScript") and isfolder("NaikoScript/BreakingPlus") then
+		DefaultData("Feature1.txt","false")
+	DefaultData("Feature2.txt","false")
+	DefaultData("Feature3.txt","false")
+	DefaultData("Feature4.txt","false")
+	DefaultData("Feature5.txt","false")
+	DefaultData("Feature6.txt","false")
+	DefaultData("Feature7.txt","true")
+	DefaultData("TutSettings","false")
 	UserType = 3
 end
 local ValueUser = Instance.new("NumberValue")
@@ -618,7 +630,7 @@ task.spawn(function()
 			if NotDisabled3 == true then
 				NotDisabled3 = false
 				if Credits < 10000 then
-					NotDisabled3 = false
+					NotDisabled3 = true
 					Notify("Not enough credits to purchase this.")
 				else
 					ThirdPurchasable.type.Text = "Loading..."
@@ -663,7 +675,7 @@ task.spawn(function()
 				NotDisabled3 = false
 				if Credits < 10000 then
 					Notify("Not enough credits to purchase this.")
-					NotDisabled3 = false
+					NotDisabled3 = true
 				else
 					ThirdPurchasable.type.Text = "Loading..."
 					task.spawn(function()
@@ -706,7 +718,7 @@ task.spawn(function()
 			if NotDisabled4 == true then
 				NotDisabled4 = false
 				if Credits < 10000 then
-					NotDisabled4 = false
+					NotDisabled4 = true
 					Notify("Not enough credits to purchase this.")
 				else
 					FourthPurchasable.type.Text = "Loading..."
@@ -725,7 +737,7 @@ task.spawn(function()
 					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
 					wait(7)
 					FourthPurchasable.type.Text = "10000"
-					NotDisabled3 = true
+					NotDisabled4 = true
 				end
 			else
 
@@ -751,7 +763,7 @@ task.spawn(function()
 				NotDisabled4 = false
 				if Credits < 10000 then
 					Notify("Not enough credits to purchase this.")
-					NotDisabled4 = false
+					NotDisabled4 = true
 				else
 					FourthPurchasable.type.Text = "Loading..."
 					task.spawn(function()
@@ -902,7 +914,7 @@ local Feature3 = Feature:Clone()
 local Feature4 = Feature:Clone()
 local Feature5 = Feature:Clone()
 local Feature6 = Feature:Clone()
-
+local Feature7 = Feature:Clone()
 --[[
   CheckFile("BreakingPlus/Feature1.txt","false")
   CheckFile("BreakingPlus/Feature2.txt","false")
@@ -917,22 +929,33 @@ Feature3.TextLabel.Text = "FullBright"
 Feature4.TextLabel.Text = "Instant Respawn"
 Feature5.TextLabel.Text = "Play Loud Noise"
 Feature6.TextLabel.Text = "Debug messages"
+Feature7.TextLabel.Text = "Legacy autofarm"
 Feature5.Parent = Settings
 Feature6.Parent = Settings
 Feature4.Parent = Settings
 Feature3.Parent = Settings
 Feature2.Parent = Settings
+Feature7.Parent = Settings
 Feature2.Position = UDim2.new(0,0,0,55)
 Feature3.Position = UDim2.new(0,0,0,85)
 Feature4.Position = UDim2.new(0,0,0,115)
 Feature5.Position = UDim2.new(0,0,0,145)
 Feature6.Position = UDim2.new(0,0,0,175)
+Feature7.Position = UDim2.new(0,0,0,205)
 Settings.Parent = SettingScroll
 Settings.Name = "breakingplus"
+local UIGradient = Instance.new("UIGradient")
+UIGradient.Parent = Settings:FindFirstChild("TextLabel")
+UIGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0,255,174)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 160, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 160, 255))
+})
 Settings:FindFirstChild("TextLabel").Text = "Breaking +"
 Settings.Position = UDim2.new(0, 0, 0, 600)
 
 local UIBluring = false
+local Legacy = true
 local BindEvent = Instance.new("BindableEvent")
 
 local function CreateBlurHitbox(Origin,Position,Size,Radius,Anchor)
@@ -977,6 +1000,32 @@ for i,v in pairs(UI:GetChildren()) do
 end
 
 game.CoreGui.TopBarApp.TopBarFrame.RightFrame.Visible = false -- disables the annoying button from roblox
+
+Feature7Function = function()
+	Legacy = true
+	ChangeData("Feature7.txt","true")
+end
+Feature7UnFunction = function()
+	Legacy = false
+	ChangeData("Feature7.txt","false")
+end
+SettingsToggleButton(Feature7,Feature7Function,Feature7UnFunction)
+pcall(function()
+	if ReturnData("Feature7.txt") == "false" then
+		Feature7.Autosave.ImageButton.fill.Visible = false
+		Feature7.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature7UnFunction()
+	elseif ReturnData("Feature7.txt") == "true" then
+		Feature7.Autosave.ImageButton.fill.Visible = true
+		Feature7.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature7Function()
+	else
+		Feature7.Autosave.ImageButton.fill.Visible = false
+		Feature7.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature5Function()
+		DefaultData("Feature7.txt","true")
+	end
+end)
 
 Feature6Function = function()
 	ChangeData("Feature6.txt","true")
@@ -1222,7 +1271,7 @@ else
 	DefaultData("Feature2.txt","false")
 end
 SettingsToggleButton(Feature2,Feature2Function,Feature2UnFunction)
-SettingScroll.CanvasSize = UDim2.new(0, 0, 0, 800)
+SettingScroll.CanvasSize = UDim2.new(0, 0, 0, 830)
 UI.buttons.shop.ImageButton.Position = UDim2.new(1.025,0,0,35)
 UI.buttons.shop.ImageButton.Visible = true
 UI.version.Text = UI.version.Text .. " | V" .. tostring(Version)
@@ -1485,6 +1534,24 @@ PlayersList.ChildAdded:Connect(function(v)
 	end
 end)
 
+task.spawn(function()
+for i,v in pairs(UI.trade.Frame.ScrollingFrame:GetChildren()) do
+	if game.Players:FindFirstChild(v.Name) and game.Players:FindFirstChild(v.Name).tradebanned.Value == true then
+	v.grad.ImageColor3 = Color3.fromRGB(255, 195, 195)
+	v.TextLabel.TextColor3 = Color3.fromRGB(133, 47, 47)
+	v.ImageLabel.ImageColor3 = Color3.fromRGB(35, 27, 27)
+	end
+end
+end)
+
+UI.trade.Frame.ScrollingFrame.ChildAdded:Connect(function(v)
+	if game.Players:FindFirstChild(v.Name) and game.Players:FindFirstChild(v.Name).tradebanned.Value == true then
+		v.grad.ImageColor3 = Color3.fromRGB(255, 195, 195)
+		v.TextLabel.TextColor3 = Color3.fromRGB(133, 47, 47)
+		v.ImageLabel.ImageColor3 = Color3.fromRGB(35, 27, 27)
+		end
+	end)
+
 CustomMenu.top.TextButton.MouseButton1Click:Connect(function()
 	CustomMenu.Visible = not CustomMenu.Visible
 end)
@@ -1541,48 +1608,29 @@ if game.PlaceId == NeededPlaceId then
 			Title = "Notification",
 			Text = "Breaking + | V" .. tostring(Version) .. " | loaded successfully.",
 			Icon = "rbxassetid://10698497706"
-		}
-
-
-	)
-	-- Clone = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart:Clone()
-	--  game:GetService("Players").LocalPlayer.Character.HumanoidRootPart:Destroy()
-	-- Clone.Parent = game:GetService("Players").LocalPlayer.Character
-	game.Players.LocalPlayer.settings["Display Gun"].Value = true
-	game.Players.LocalPlayer.settings["Show Round Stats"].Value = false
-	game.Players.LocalPlayer.CharacterAdded:Connect(
-		function()
-			if RoundMode ~= nil then
-				RoundMode = nil
-			end
-			if Sent2 == true then
-				pcall(function()
-					game.Players.LocalPlayer.settings["Display Gun"].Value = true
-					wait(4)
-					if RoundMode ~= "Breaking Point"  then
-						-- Clone = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart:Clone()
-						--  game:GetService("Players").LocalPlayer.Character.HumanoidRootPart:Destroy()
-						-- Clone.Parent = game:GetService("Players").LocalPlayer.Character
-					elseif  RoundMode == "Breaking Point" then
-						wait(2)
-						Clone = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart:Clone()
-						game:GetService("Players").LocalPlayer.Character.HumanoidRootPart:Destroy()
-						Clone.Parent = game:GetService("Players").LocalPlayer.Character
-					end
-				end)
-			end
-		end
-	)
+		})
 	while true do
 		if Sent2 == true then
 			task.wait()
-
+			if Legacy == true then
+				pcall(function()
+					game:GetService("ReplicatedStorage").RemoteEvent:FireServer(16, "public")
+				end)
+				spawn(function()
+					for i, v in pairs(game.Players:GetPlayers()) do
+						if v.Name == game.Players.LocalPlayer.Name then
+						else
+							pcall(function()
+								game:GetService("ReplicatedStorage").RemoteEvent:FireServer(30, v)
+							end)
+						end
+					end
+				end)
+			else
 			if RoundMode == "Breaking Point" or RoundMode == "Who Did It" then
 				pcall(function()
 					game:GetService("ReplicatedStorage").RemoteEvent:FireServer(16, "public")
 				end)
-				wait()
-				for i = 1,2 do
 					spawn(function()
 						for i, v in pairs(game.Players:GetPlayers()) do
 							if v.Name == game.Players.LocalPlayer.Name then
@@ -1593,8 +1641,8 @@ if game.PlaceId == NeededPlaceId then
 							end
 						end
 					end)
-				end
 			end
+		end
 		else
 			task.wait(0.5)
 		end
