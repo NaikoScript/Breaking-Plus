@@ -999,8 +999,6 @@ for i,v in pairs(UI:GetChildren()) do
 	end
 end
 
-game.CoreGui.TopBarApp.TopBarFrame.RightFrame.Visible = false -- disables the annoying button from roblox
-
 Feature7Function = function()
 	Legacy = true
 	ChangeData("Feature7.txt","true")
