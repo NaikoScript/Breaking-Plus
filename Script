@@ -1536,7 +1536,8 @@ end)
 
 task.spawn(function()
 for i,v in pairs(UI.trade.Frame.ScrollingFrame:GetChildren()) do
-	if game.Players:FindFirstChild(v.Name) and game.Players:FindFirstChild(v.Name).tradebanned.Value == true then
+	repeat task.wait() until game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned") or task.wait(3)
+	if game.Players:FindFirstChild(v.Name) and game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned").Value == true then
 	v.grad.ImageColor3 = Color3.fromRGB(255, 195, 195)
 	v.TextLabel.TextColor3 = Color3.fromRGB(133, 47, 47)
 	v.ImageLabel.ImageColor3 = Color3.fromRGB(35, 27, 27)
@@ -1545,7 +1546,8 @@ end
 end)
 
 UI.trade.Frame.ScrollingFrame.ChildAdded:Connect(function(v)
-	if game.Players:FindFirstChild(v.Name) and game.Players:FindFirstChild(v.Name).tradebanned.Value == true then
+	repeat task.wait() until game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned") or task.wait(3)
+	if game.Players:FindFirstChild(v.Name) and game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned").Value == true then
 		v.grad.ImageColor3 = Color3.fromRGB(255, 195, 195)
 		v.TextLabel.TextColor3 = Color3.fromRGB(133, 47, 47)
 		v.ImageLabel.ImageColor3 = Color3.fromRGB(35, 27, 27)
@@ -1575,7 +1577,7 @@ NeededPlaceId = 648362523
 local queue_on_teleport = syn and syn.queue_on_teleport or queue_on_teleport
 if queue_on_teleport ~= nil then
 	--print(type(queue_on_teleport),queue_on_teleport)
-	queue_on_teleport("loadstring(game:HttpGet(('https://pastebin.com/raw/YN3yy7PP')))()")
+	queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
 else
 	Notify("Your exploit does not support teleport execution")
 end
