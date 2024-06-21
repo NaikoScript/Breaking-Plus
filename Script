@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 3.7
+local Version = 3.8
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -29,6 +29,7 @@ local PlayerList = LocalPlayer.PlayerGui.PlayerList
 local SelectedPlayer = nil
 local PlayerButtons = PlayerList.Buttons
 local PlayersList = PlayerList.PlayerList
+local SettingButton = UI.buttons.setting
 local ClonedCredits = ClassicCredits:Clone()
 local FirstPurchasable = nil
 local SecondPurchasable = nil
@@ -89,7 +90,7 @@ if not isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
 	DefaultData("Feature7.txt","true")
-	DefaultData("TutSettings","false")
+	DefaultData("TutSettings.txt","false")
 	UserType = 1
 elseif isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	UserType = 2
@@ -100,7 +101,7 @@ elseif isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
 	DefaultData("Feature7.txt","true")
-	DefaultData("TutSettings","false")
+	DefaultData("TutSettings.txt","false")
 	makefolder("NaikoScript/BreakingPlus")
 elseif isfolder("NaikoScript") and isfolder("NaikoScript/BreakingPlus") then
 		DefaultData("Feature1.txt","false")
@@ -110,7 +111,7 @@ elseif isfolder("NaikoScript") and isfolder("NaikoScript/BreakingPlus") then
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
 	DefaultData("Feature7.txt","true")
-	DefaultData("TutSettings","false")
+	DefaultData("TutSettings.txt","false")
 	UserType = 3
 end
 local ValueUser = Instance.new("NumberValue")
@@ -958,6 +959,51 @@ local UIBluring = false
 local Legacy = true
 local BindEvent = Instance.new("BindableEvent")
 
+task.spawn(function()
+if ReturnData("TutSettings.txt") == "false" then
+	UI.setting.Visible = false
+local Tween = game:GetService("TweenService"):Create(SettingButton,TweenInfo.new(0.75,Enum.EasingStyle.Linear),{ImageColor3 = Color3.fromRGB(100,15,15)})
+local Tween2 = game:GetService("TweenService"):Create(SettingButton,TweenInfo.new(0.75,Enum.EasingStyle.Linear),{ImageColor3 = Color3.fromRGB(255, 255, 255)})
+Tween:Play()
+local Connection
+local OpenedSettings = false
+local Connection2
+Connection2 = Tween2.Completed:Connect(function()
+if OpenedSettings == false then
+Tween:Play()
+else
+Connection2:Disconnect()
+end
+end)
+Connection = Tween.Completed:Connect(function()
+if OpenedSettings == false then
+Tween2:Play()
+else
+Connection2:Disconnect()
+end
+end)
+SettingButton.MouseButton1Click:Once(function()
+OpenedSettings = true
+ChangeData("TutSettings.txt","true")
+Tween:Pause()
+Tween2:Play()
+UI.setting.ScrollingFrame.CanvasPosition = Vector2.new(0,0)
+UI.setting.ScrollingFrame.ScrollingEnabled = false
+task.wait(0.25)
+game:GetService("TweenService"):Create(UI.setting.ScrollingFrame,TweenInfo.new(4,Enum.EasingStyle.Sine),{CanvasPosition = Vector2.new(0,662)}):Play()
+task.wait(4)
+UI.setting.ScrollingFrame.ScrollingEnabled = true
+end)
+end
+end)
+
+task.spawn(function()
+	repeat
+		task.wait()
+	until UI.loading.Text == ""
+	UI.loading.Text = "discord.gg/vAWJMYJYcR"
+end)
+
 local function CreateBlurHitbox(Origin,Position,Size,Radius,Anchor)
 local UICorner = Instance.new("UICorner")
 	local Frame = Instance.new("Frame")
@@ -996,6 +1042,8 @@ for i,v in pairs(UI:GetChildren()) do
 	CreateBlurHitbox(v,UDim2.new(0.5,0,0.5,0),UDim2.new(0.95,0,0.91,0),UDim.new(0,12),Vector2.new(0.5,0.5))
 	elseif v.Name == "server1" then
 	CreateBlurHitbox(v,UDim2.new(0.5,0,0.025,0),UDim2.new(0.94,0,0.86,0),UDim.new(0,12),Vector2.new(0.5,0))
+	elseif v.Name == "decision" then
+	CreateBlurHitbox(v,UDim2.new(0,0,0,0),UDim2.new(1,0,1,0),UDim.new(0,10),Vector2.new(0,0))
 	end
 end
 
