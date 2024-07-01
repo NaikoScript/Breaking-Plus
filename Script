@@ -1,3 +1,4 @@
+local Workspace = game:GetService("Workspace")
 -- Breaking Plus Made by Naiko Exploits --
 
 repeat task.wait() until game:IsLoaded() and task.wait(1.5)
@@ -1352,7 +1353,7 @@ Respawn.Position = UDim2.new(0.65, 0, 0.625, 35)
 Respawn.ImageColor3 = Color3.fromRGB(255, 255, 255)
 Respawn.TextLabel.Text = "Respawn"
 Respawn.MouseButton1Click:Connect(function()
-	lag(2,true)
+	respawn(false)
 end)
 Respawn.MouseEnter:Connect(function()
 	game:GetService("TweenService"):Create(Respawn,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
@@ -1369,13 +1370,25 @@ Refresh.TextLabel.Text = "Refresh"
 Refresh.MouseButton1Click:Connect(function()
 	if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
 		local OldPos = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame
-		task.wait(0.25)
-		game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = OldPos
+		local CamPos = workspace.CurrentCamera.CFrame
+		respawn(false)
+		LocalPlayer.CharacterAdded:Once(function(char)
+			task.wait()
+			game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = OldPos
+			wait()
+			workspace.CurrentCamera.CFrame = CamPos
+			
+		end)
 	elseif game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Torso") then
 		local OldPos = game.Players.LocalPlayer.Character:FindFirstChild("Torso").CFrame
-		lag(2,true)
-		task.wait(0.25)
-		game.Players.LocalPlayer.Character:FindFirstChild("Torso").CFrame = OldPos
+		local CamPos = workspace.CurrentCamera.CFrame
+		respawn(false)
+		LocalPlayer.CharacterAdded:Once(function(char)
+			task.wait()
+			game.Players.LocalPlayer.Character:FindFirstChild("Torso").CFrame = OldPos
+			wait()
+			workspace.CurrentCamera.CFrame = CamPos
+		end)
 	else
 		Notify("Could not refresh | Did not find torso/root. (Suggest to respawn)")
 	end
@@ -1450,7 +1463,7 @@ AutoFarm.MouseButton1Click:Connect(function()
 
 		AutoFarm.ImageColor3 = Color3.fromRGB(0, 225, 225)
 		AutoFarm.TextLabel.Text = "Enable autofarm"
-		lag(2,true)
+		respawn(false)
 	else
 		Sent2 = true 
 		AutoFarm.ImageColor3 = Color3.fromRGB(255, 60, 0)
