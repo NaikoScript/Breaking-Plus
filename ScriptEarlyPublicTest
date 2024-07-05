@@ -360,9 +360,16 @@ function NotifyButtons(Message,Button,Button2,Function1,Function2)
 				CustomLoad.TextLabel.Text = tostring(Returned[2])
 				CustomLoad.TextLabel.Position = UDim2.new(0, 0, 0.21, 0)
 				local ShadowImage = CustomNotify.ImageLabel:Clone()
+				local AntiClick = Instance.new("TextButton",CustomNotify)
+				AntiClick.ZIndex = 2000
+				AntiClick.Active = true
+				AntiClick.BackgroundTransparency = 1
+				AntiClick.Size = UDim2.new(1,0,1,0)
+				AntiClick.Text = ""
 				ShadowImage:ClearAllChildren()
 				ShadowImage.ZIndex = 50
 				ShadowImage.Parent = CustomNotify
+				ShadowImage.Active = true
 				ShadowImage.ImageTransparency = 0.4
 				ShadowImage.ImageColor3 = Color3.fromRGB(150,150,150)
 				game:GetService("TweenService"):Create(ShadowImage,TweenInfo.new(0.25),{ImageColor3 = Color3.fromRGB(0,0,0)}):Play()
@@ -388,8 +395,15 @@ function NotifyButtons(Message,Button,Button2,Function1,Function2)
 				CustomLoad.TextLabel.Text = tostring(Returned[2])
 				CustomLoad.TextLabel.Position = UDim2.new(0, 0, 0.21, 0)
 				local ShadowImage = CustomNotify.ImageLabel:Clone()
+				local AntiClick = Instance.new("TextButton",CustomNotify)
+				AntiClick.ZIndex = 2000
+				AntiClick.Active = true
+				AntiClick.BackgroundTransparency = 1
+				AntiClick.Size = UDim2.new(1,0,1,0)
+				AntiClick.Text = ""
 				ShadowImage:ClearAllChildren()
 				ShadowImage.ZIndex = 50
+				ShadowImage.Active = true
 				ShadowImage.Parent = CustomNotify
 				ShadowImage.ImageTransparency = 0.4
 				ShadowImage.ImageColor3 = Color3.fromRGB(150,150,150)
