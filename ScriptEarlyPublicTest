@@ -86,7 +86,7 @@ if not isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	DefaultData("Feature1.txt","false")
 	DefaultData("Feature2.txt","false")
 	DefaultData("Feature3.txt","false")
-	DefaultData("Feature4.txt","false")
+	DefaultData("Feature4.txt","true")
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
 	DefaultData("Feature7.txt","true")
@@ -97,7 +97,7 @@ elseif isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	DefaultData("Feature1.txt","false")
 	DefaultData("Feature2.txt","false")
 	DefaultData("Feature3.txt","false")
-	DefaultData("Feature4.txt","false")
+	DefaultData("Feature4.txt","true")
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
 	DefaultData("Feature7.txt","true")
@@ -107,7 +107,7 @@ elseif isfolder("NaikoScript") and isfolder("NaikoScript/BreakingPlus") then
 		DefaultData("Feature1.txt","false")
 	DefaultData("Feature2.txt","false")
 	DefaultData("Feature3.txt","false")
-	DefaultData("Feature4.txt","false")
+	DefaultData("Feature4.txt","true")
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
 	DefaultData("Feature7.txt","true")
@@ -1056,7 +1056,7 @@ CheckFile("BreakingPlus/Feature6.txt","false")
 Feature.TextLabel.Text = "Hide Blood"
 Feature2.TextLabel.Text = "Improve UI"
 Feature3.TextLabel.Text = "FullBright"
-Feature4.TextLabel.Text = "Instant Respawn"
+Feature4.TextLabel.Text = "Auto ServerHop"
 Feature5.TextLabel.Text = "Play Loud Noise"
 Feature6.TextLabel.Text = "Debug messages"
 Feature7.TextLabel.Text = "Legacy autofarm"
@@ -1086,6 +1086,7 @@ Settings.Position = UDim2.new(0, 0, 0, 600)
 
 local UIBluring = false
 local Legacy = true
+local AutoServerHop = true
 local BindEvent = Instance.new("BindableEvent")
 
 task.spawn(function()
@@ -1264,13 +1265,13 @@ end)
 
 Feature4Function = function()
 	ChangeData("Feature4.txt","true")
-	Die = true
-	Debug("Started instant respawning")
+	AutoServerHop = true
+	Debug("Started automatily server hopping")
 end
 Feature4UnFunction = function()
 	ChangeData("Feature4.txt","false")
-	Die = false
-	Debug("Stopped instant respawning")
+	AutoServerHop = false
+	Debug("Stopped automatily server hopping")
 end
 SettingsToggleButton(Feature4,Feature4Function,Feature4UnFunction)
 pcall(function()
@@ -1283,10 +1284,10 @@ pcall(function()
 		Feature4.Autosave.ImageButton.fill.ImageTransparency = 0
 		Feature4Function()
 	else
-		Feature4.Autosave.ImageButton.fill.Visible = true
+		Feature4.Autosave.ImageButton.fill.Visible = false
 		Feature4.Autosave.ImageButton.fill.ImageTransparency = 0
-		Feature4UnFunction()
-		DefaultData("Feature4.txt","false")
+		Feature4Function()
+		DefaultData("Feature4.txt","true")
 		
 	end
 end)
@@ -1787,7 +1788,7 @@ end
 
 task.spawn(function()
 	while task.wait(0.1) do
-		if #game.Players:GetPlayers() < 8 and Sent2 == true then
+		if #game.Players:GetPlayers() < 8 and Sent2 == true and AutoServerHop == true then
 
 			game.StarterGui:SetCore(
 				"SendNotification",
