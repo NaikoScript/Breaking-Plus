@@ -344,7 +344,7 @@ function NotifyButtons(Message,Button,Button2,Function1,Function2)
 			But2.Position = UDim2.new(0.725, 0, 1, -50)
 			CustomNotify.Visible = true
 			CustomNotify.ImageLabel.TextLabel.Text = Message
-			But1.MouseButton1Click:Connect(function()
+			But1.MouseButton1Click:Once(function()
 			local Returned = Function1()
 			if Returned[1] == "Load" then
 				local CustomLoad = UI.shop.load:Clone()
@@ -379,7 +379,7 @@ function NotifyButtons(Message,Button,Button2,Function1,Function2)
 			CustomNotify:Destroy()
 			end
 			end)
-			But2.MouseButton1Click:Connect(function()
+			But2.MouseButton1Click:Once(function()
 			local Returned = Function2()
 			if Returned[1] == "Load" then
 				local CustomLoad = UI.shop.load:Clone()
@@ -587,7 +587,7 @@ task.spawn(function()
 			if NotDisabled == true then
 				NotDisabled = false
 				if Credits < 3 then
-					NotDisabled = false
+					NotDisabled = true
 					Notify("Not enough credits to purchase this.")
 				else
 					FirstPurchasable.type.Text = "Loading..."
@@ -631,8 +631,8 @@ task.spawn(function()
 			if NotDisabled == true then
 				NotDisabled = false
 				if Credits < 3 then
+					NotDisabled = true
 					Notify("Not enough credits to purchase this.")
-					NotDisabled = false
 				else
 					FirstPurchasable.type.Text = "Loading..."
 					task.spawn(function()
