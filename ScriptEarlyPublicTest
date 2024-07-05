@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 3.82
+local Version = 3.85
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -364,7 +364,8 @@ function NotifyButtons(Message,Button,Button2,Function1,Function2)
 				ShadowImage.ZIndex = 50
 				ShadowImage.Parent = CustomNotify
 				ShadowImage.ImageTransparency = 0.4
-				ShadowImage.ImageColor3 = Color3.fromRGB(0,0,0)
+				ShadowImage.ImageColor3 = Color3.fromRGB(150,150,150)
+				game:GetService("TweenService"):Create(ShadowImage,TweenInfo.new(0.25),{ImageColor3 = Color3.fromRGB(0,0,0)}):Play()
 				task.wait(Returned[3])
 				CustomNotify:Destroy()
 			else
@@ -391,7 +392,8 @@ function NotifyButtons(Message,Button,Button2,Function1,Function2)
 				ShadowImage.ZIndex = 50
 				ShadowImage.Parent = CustomNotify
 				ShadowImage.ImageTransparency = 0.4
-				ShadowImage.ImageColor3 = Color3.fromRGB(0,0,0)
+				ShadowImage.ImageColor3 = Color3.fromRGB(150,150,150)
+				game:GetService("TweenService"):Create(ShadowImage,TweenInfo.new(0.25),{ImageColor3 = Color3.fromRGB(0,0,0)}):Play()
 				task.wait(Returned[3])
 				CustomNotify:Destroy()
 			else
@@ -1731,7 +1733,23 @@ end)
 
 CustomButton.MouseButton1Click:Connect(function()
 	if CustomMenu.Visible == false and FirstPurchasable == nil and SecondPurchasable == nil and ThirdPurchasable == nil and FourthPurchasable == nil then
-		Notify("Couldn't load dupe methods to fix this open the shop to update it")
+	local	function fun1()
+		task.spawn(function()
+		local X = UI.buttons.shop.AbsolutePosition.X + 2
+		local Y = UI.buttons.shop.AbsolutePosition.Y + 50
+		local X2 = CustomButton.AbsolutePosition.X + 2
+		local Y2 = CustomButton.AbsolutePosition.Y + 50
+		local VirtualInputManager = game:GetService("VirtualInputManager")
+		VirtualInputManager:SendMouseButtonEvent(X,Y,0,true,workspace,1)
+		VirtualInputManager:SendMouseButtonEvent(X,Y,0,false,workspace,1)
+		task.wait()
+		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,true,workspace,1)
+		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,false,workspace,1)
+		end)
+		return {"Load","Fixing",1}
+	end
+	
+		NotifyButtons("Couldn't load dupe methods. Would you like to fix this automaticly?","Fix","Cancel",fun1,function() return {} end)
 	end
 	CustomMenu.Visible = not CustomMenu.Visible
 	for i,v in pairs(UI:GetChildren()) do
