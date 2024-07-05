@@ -1742,11 +1742,11 @@ CustomButton.MouseButton1Click:Connect(function()
 		local VirtualInputManager = game:GetService("VirtualInputManager")
 		VirtualInputManager:SendMouseButtonEvent(X,Y,0,true,workspace,1)
 		VirtualInputManager:SendMouseButtonEvent(X,Y,0,false,workspace,1)
-		task.wait()
+		task.wait(1.5)
 		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,true,workspace,1)
 		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,false,workspace,1)
 		end)
-		return {"Load","Fixing",1}
+		return {"Load","Fixing",2.5}
 	end
 	
 		NotifyButtons("Couldn't load dupe methods. Would you like to fix this automaticly?","Fix","Cancel",fun1,function() return {} end)
