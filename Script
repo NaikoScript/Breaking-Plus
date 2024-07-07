@@ -1,4 +1,3 @@
-local Workspace = game:GetService("Workspace")
 -- Breaking Plus Made by Naiko Exploits --
 
 repeat task.wait() until game:IsLoaded() and task.wait(1.5)
@@ -17,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 3.8
+local Version = 3.85
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -87,7 +86,7 @@ if not isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	DefaultData("Feature1.txt","false")
 	DefaultData("Feature2.txt","false")
 	DefaultData("Feature3.txt","false")
-	DefaultData("Feature4.txt","false")
+	DefaultData("Feature4.txt","true")
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
 	DefaultData("Feature7.txt","true")
@@ -98,7 +97,7 @@ elseif isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	DefaultData("Feature1.txt","false")
 	DefaultData("Feature2.txt","false")
 	DefaultData("Feature3.txt","false")
-	DefaultData("Feature4.txt","false")
+	DefaultData("Feature4.txt","true")
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
 	DefaultData("Feature7.txt","true")
@@ -108,7 +107,7 @@ elseif isfolder("NaikoScript") and isfolder("NaikoScript/BreakingPlus") then
 		DefaultData("Feature1.txt","false")
 	DefaultData("Feature2.txt","false")
 	DefaultData("Feature3.txt","false")
-	DefaultData("Feature4.txt","false")
+	DefaultData("Feature4.txt","true")
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
 	DefaultData("Feature7.txt","true")
@@ -320,6 +319,105 @@ function Notify(Message,Button)
 	end)
 end
 
+function NotifyButtons(Message,Button,Button2,Function1,Function2)
+	pcall(function()
+		if Message == nil then
+			return
+		else
+			if Button == nil then
+				Button = "Ok"
+			end
+			if Button2 == nil then
+				Button2 = "Cancel"
+			end
+			local CustomNotify = UI.msgbox:Clone()
+			local But1 = CustomNotify.ok
+			local But2 = CustomNotify.ok:Clone()
+			CustomNotify.Parent = UI
+			CustomNotify.Name = "ButtonMsg"
+			But1.Text = Button
+			But1.AnchorPoint = Vector2.new(0.5,0)
+			But1.Position = UDim2.new(0.275, 0, 1, -50)
+			But2.Text = Button2
+			But2.Parent = CustomNotify
+			But2.AnchorPoint = Vector2.new(0.5,0)
+			But2.Position = UDim2.new(0.725, 0, 1, -50)
+			CustomNotify.Visible = true
+			CustomNotify.ImageLabel.TextLabel.Text = Message
+			But1.MouseButton1Click:Once(function()
+			local Returned = Function1()
+			if Returned[1] == "Load" then
+				local CustomLoad = UI.shop.load:Clone()
+				CustomLoad.Parent = CustomNotify
+				CustomLoad.Visible = true
+				CustomLoad.Position = UDim2.new(0, -3, 0, -22)
+				CustomLoad.BackgroundTransparency = 1
+				CustomLoad.ZIndex = 100
+				CustomLoad.Folder["1"].ZIndex = 100
+				CustomLoad.Folder["2"].ZIndex = 100
+				CustomLoad.Folder["3"].ZIndex = 100
+				CustomLoad.TextLabel.ZIndex = 100
+				CustomLoad.TextLabel.Text = tostring(Returned[2])
+				CustomLoad.TextLabel.Position = UDim2.new(0, 0, 0.21, 0)
+				local ShadowImage = CustomNotify.ImageLabel:Clone()
+				local AntiClick = Instance.new("TextButton",CustomNotify)
+				AntiClick.ZIndex = 2000
+				AntiClick.Active = true
+				AntiClick.BackgroundTransparency = 1
+				AntiClick.Size = UDim2.new(1,0,1,0)
+				AntiClick.Text = ""
+				ShadowImage:ClearAllChildren()
+				ShadowImage.ZIndex = 50
+				ShadowImage.Parent = CustomNotify
+				ShadowImage.Active = true
+				ShadowImage.ImageTransparency = 0.4
+				ShadowImage.ImageColor3 = Color3.fromRGB(150,150,150)
+				game:GetService("TweenService"):Create(ShadowImage,TweenInfo.new(0.25),{ImageColor3 = Color3.fromRGB(0,0,0)}):Play()
+				task.wait(tonumber(Returned[3]))
+				CustomNotify:Destroy()
+			else
+			CustomNotify:Destroy()
+			end
+			end)
+			But2.MouseButton1Click:Once(function()
+			local Returned = Function2()
+			if Returned[1] == "Load" then
+				local CustomLoad = UI.shop.load:Clone()
+				CustomLoad.Parent = CustomNotify
+				CustomLoad.Visible = true
+				CustomLoad.Position = UDim2.new(0, -3, 0, -22)
+				CustomLoad.BackgroundTransparency = 1
+				CustomLoad.ZIndex = 100
+				CustomLoad.Folder["1"].ZIndex = 100
+				CustomLoad.Folder["2"].ZIndex = 100
+				CustomLoad.Folder["3"].ZIndex = 100
+				CustomLoad.TextLabel.ZIndex = 100
+				CustomLoad.TextLabel.Text = tostring(Returned[2])
+				CustomLoad.TextLabel.Position = UDim2.new(0, 0, 0.21, 0)
+				local ShadowImage = CustomNotify.ImageLabel:Clone()
+				local AntiClick = Instance.new("TextButton",CustomNotify)
+				AntiClick.ZIndex = 2000
+				AntiClick.Active = true
+				AntiClick.BackgroundTransparency = 1
+				AntiClick.Size = UDim2.new(1,0,1,0)
+				AntiClick.Text = ""
+				ShadowImage:ClearAllChildren()
+				ShadowImage.ZIndex = 50
+				ShadowImage.Active = true
+				ShadowImage.Parent = CustomNotify
+				ShadowImage.ImageTransparency = 0.4
+				ShadowImage.ImageColor3 = Color3.fromRGB(150,150,150)
+				game:GetService("TweenService"):Create(ShadowImage,TweenInfo.new(0.25),{ImageColor3 = Color3.fromRGB(0,0,0)}):Play()
+				task.wait(tonumber(Returned[3]))
+				CustomNotify:Destroy()
+			else
+			CustomNotify:Destroy()
+			end
+			end)
+		end
+	end)
+end
+
 function respawn(disguised) -- better way
 	local args = {
 		[1] = 42,
@@ -431,7 +529,37 @@ AnimationOnStart = function()
 	LoadingPurchase.BackgroundColor3 = Color3.fromRGB(150,150,150)
 	game:GetService("TweenService"):Create(LoadingPurchase,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
 end
-Notify("Script made by Naiko Exploits")
+local f1 = function()
+	if httprequest then
+		task.spawn(function()
+		httprequest({
+			Url = 'http://127.0.0.1:6463/rpc?v=1',
+			Method = 'POST',
+			Headers = {
+				['Content-Type'] = 'application/json',
+				Origin = 'https://discord.com'
+			},
+			Body = game:GetService("HttpService"):JSONEncode({
+				cmd = 'INVITE_BROWSER',
+				nonce = game:GetService("HttpService"):GenerateGUID(false),
+				args = {code = 'vAWJMYJYcR'}
+			})
+		})
+	end)
+	return {"Load","Joining server",3}
+	elseif setclipboard then
+		setclipboard("discord.gg/vAWJMYJYcR")
+		Notify("Failed to join automaticly. Copied the server invite link instead")
+		return {}
+
+	else
+		Notify("Failed to automaticly join or copy the server invite link. join by manually typing it discord.gg/vAWJMYJYcR")
+		return {}
+	end
+end
+task.spawn(function()
+NotifyButtons("The script has been made by naiko exploits. Join discord server?","Join server","Cancel",f1,function() return {} end)
+end)
 for i,v in pairs(UI.shop:GetDescendants()) do
 	if v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077224108" then
 		FirstPurchasable = v:Clone()
@@ -459,7 +587,7 @@ task.spawn(function()
 			if NotDisabled == true then
 				NotDisabled = false
 				if Credits < 3 then
-					NotDisabled = false
+					NotDisabled = true
 					Notify("Not enough credits to purchase this.")
 				else
 					FirstPurchasable.type.Text = "Loading..."
@@ -503,8 +631,8 @@ task.spawn(function()
 			if NotDisabled == true then
 				NotDisabled = false
 				if Credits < 3 then
+					NotDisabled = true
 					Notify("Not enough credits to purchase this.")
-					NotDisabled = false
 				else
 					FirstPurchasable.type.Text = "Loading..."
 					task.spawn(function()
@@ -928,7 +1056,7 @@ CheckFile("BreakingPlus/Feature6.txt","false")
 Feature.TextLabel.Text = "Hide Blood"
 Feature2.TextLabel.Text = "Improve UI"
 Feature3.TextLabel.Text = "FullBright"
-Feature4.TextLabel.Text = "Instant Respawn"
+Feature4.TextLabel.Text = "Auto ServerHop"
 Feature5.TextLabel.Text = "Play Loud Noise"
 Feature6.TextLabel.Text = "Debug messages"
 Feature7.TextLabel.Text = "Legacy autofarm"
@@ -958,6 +1086,7 @@ Settings.Position = UDim2.new(0, 0, 0, 600)
 
 local UIBluring = false
 local Legacy = true
+local AutoServerHop = true
 local BindEvent = Instance.new("BindableEvent")
 
 task.spawn(function()
@@ -1136,13 +1265,13 @@ end)
 
 Feature4Function = function()
 	ChangeData("Feature4.txt","true")
-	Die = true
-	Debug("Started instant respawning")
+	AutoServerHop = true
+	Debug("Started automatily server hopping")
 end
 Feature4UnFunction = function()
 	ChangeData("Feature4.txt","false")
-	Die = false
-	Debug("Stopped instant respawning")
+	AutoServerHop = false
+	Debug("Stopped automatily server hopping")
 end
 SettingsToggleButton(Feature4,Feature4Function,Feature4UnFunction)
 pcall(function()
@@ -1155,10 +1284,10 @@ pcall(function()
 		Feature4.Autosave.ImageButton.fill.ImageTransparency = 0
 		Feature4Function()
 	else
-		Feature4.Autosave.ImageButton.fill.Visible = true
+		Feature4.Autosave.ImageButton.fill.Visible = false
 		Feature4.Autosave.ImageButton.fill.ImageTransparency = 0
-		Feature4UnFunction()
-		DefaultData("Feature4.txt","false")
+		Feature4Function()
+		DefaultData("Feature4.txt","true")
 		
 	end
 end)
@@ -1619,7 +1748,23 @@ end)
 
 CustomButton.MouseButton1Click:Connect(function()
 	if CustomMenu.Visible == false and FirstPurchasable == nil and SecondPurchasable == nil and ThirdPurchasable == nil and FourthPurchasable == nil then
-		Notify("Couldn't load dupe methods to fix this open the shop to update it")
+	local	function fun1()
+		task.spawn(function()
+		local X = UI.buttons.shop.AbsolutePosition.X + 2
+		local Y = UI.buttons.shop.AbsolutePosition.Y + 50
+		local X2 = CustomButton.AbsolutePosition.X + 2
+		local Y2 = CustomButton.AbsolutePosition.Y + 50
+		local VirtualInputManager = game:GetService("VirtualInputManager")
+		VirtualInputManager:SendMouseButtonEvent(X,Y,0,true,workspace,1)
+		VirtualInputManager:SendMouseButtonEvent(X,Y,0,false,workspace,1)
+		task.wait(2.9)
+		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,true,workspace,1)
+		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,false,workspace,1)
+		end)
+		return {"Load","Fixing",3}
+	end
+	
+		NotifyButtons("Couldn't load dupe methods. Would you like to fix this automaticly?","Fix","Cancel",fun1,function() return {} end)
 	end
 	CustomMenu.Visible = not CustomMenu.Visible
 	for i,v in pairs(UI:GetChildren()) do
@@ -1636,14 +1781,14 @@ NeededPlaceId = 648362523
 local queue_on_teleport = syn and syn.queue_on_teleport or queue_on_teleport
 if queue_on_teleport ~= nil then
 	--print(type(queue_on_teleport),queue_on_teleport)
-	queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
+	queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/ScriptEarlyPublicTest'))()")
 else
 	Notify("Your exploit does not support teleport execution")
 end
 
 task.spawn(function()
 	while task.wait(0.1) do
-		if #game.Players:GetPlayers() < 8 and Sent2 == true then
+		if #game.Players:GetPlayers() < 8 and Sent2 == true and AutoServerHop == true then
 
 			game.StarterGui:SetCore(
 				"SendNotification",
