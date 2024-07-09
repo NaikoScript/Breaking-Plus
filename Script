@@ -1315,6 +1315,8 @@ pcall(function()
 		Feature3.Autosave.ImageButton.fill.ImageTransparency = 0
 		Feature3Function()
 	else
+		Feature3.Autosave.ImageButton.fill.Visible = false
+		Feature3.Autosave.ImageButton.fill.ImageTransparency = 0
 		Feature3UnFunction()
 		DefaultData("Feature3.txt","false")
 	end
@@ -1341,6 +1343,8 @@ pcall(function()
 		Feature.Autosave.ImageButton.fill.ImageTransparency = 0
 		FeatureFunction()
 	else
+		Feature.Autosave.ImageButton.fill.Visible = false
+		Feature.Autosave.ImageButton.fill.ImageTransparency = 0
 		FeatureUnFunction()
 		DefaultData("Feature1.txt","false")
 	end
@@ -1781,7 +1785,7 @@ NeededPlaceId = 648362523
 local queue_on_teleport = syn and syn.queue_on_teleport or queue_on_teleport
 if queue_on_teleport ~= nil then
 	--print(type(queue_on_teleport),queue_on_teleport)
-	queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/ScriptEarlyPublicTest'))()")
+	queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
 else
 	Notify("Your exploit does not support teleport execution")
 end
