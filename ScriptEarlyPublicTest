@@ -1654,6 +1654,7 @@ end)
 ]]
 
 task.spawn(function()
+	task.wait(0.75)
 for i,v in pairs(UI.inv.sectionframes:GetChildren()) do
     local MainFrame = Instance.new("Frame")
     local GridLayout = Instance.new("UIGridLayout")
@@ -1700,6 +1701,7 @@ end
 end)
 
 task.spawn(function()
+	task.wait(2)
 invbut.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=3422633744"
 invbut.name.Text = "Stellar"
 invbut.type.Text = "Legendary"
@@ -1721,6 +1723,7 @@ end)
 end)
 
 task.spawn(function()
+	task.wait(2)
 	invbut2.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077205771"
 	invbut2.name.Text = "Blue Galaxy"
 	invbut2.type.Text = "Legendary"
@@ -1883,7 +1886,7 @@ else
 end
 
 task.spawn(function()
-	while task.wait(0.1) do
+	while task.wait(1) do
 		if #game.Players:GetPlayers() < 8 and Sent2 == true and AutoServerHop == true then
 
 			game.StarterGui:SetCore(
