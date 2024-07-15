@@ -4,7 +4,7 @@ repeat task.wait() until game:IsLoaded() and task.wait(1.5)
 
 if game:GetService("CoreGui"):FindFirstChild("Plus") then
 	return warn("Script already running")
-elseif tostring(game.GameId == "271119130") then
+elseif tostring(game.GameId) == "271119130" then
 	Instance.new("BoolValue",game:GetService("CoreGui")).Name = "Plus"
 else
 	return warn("Incorrect game")
@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 3.85
+local Version = 3.9
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -37,6 +37,8 @@ local ThirdPurchasable = nil
 local FourthPurchasable = nil
 local TeleportingProc = nil
 local Credits = tonumber(ClassicCredits.Text:sub(-ClassicCredits.Text:len(),-8))
+local invbut = game.ReplicatedStorage.model.invbut:Clone()
+local invbut2 = game.ReplicatedStorage.model.invbut:Clone()
 local NotDisabled = true
 local NotDisabled2 = true
 local NotDisabled3 = true
@@ -1650,6 +1652,99 @@ PlayerButtons.ChildAdded:Connect(function()
 	end
 end)
 ]]
+
+task.spawn(function()
+	task.wait(0.75)
+for i,v in pairs(UI.inv.sectionframes:GetChildren()) do
+    local MainFrame = Instance.new("Frame")
+    local GridLayout = Instance.new("UIGridLayout")
+    local Padding = Instance.new("UIPadding")
+    local RarityOrder = {Divine = -5,Legendary = -4,Rare = -3,Uncommon = -2,Common = -1}
+    MainFrame.Parent = v
+    MainFrame.BackgroundTransparency = 1
+    MainFrame.Size = UDim2.new(1,0,1,0)
+    MainFrame.Name = "GridOrder"
+    Padding.Parent = MainFrame
+    Padding.PaddingTop = UDim.new(0,5)
+    Padding.PaddingLeft = UDim.new(0,20)
+    GridLayout.CellPadding = UDim2.new(0,18,0,10)
+    GridLayout.Parent = MainFrame
+    GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    for i,v in pairs(v:GetChildren()) do
+        if v:IsA("ImageButton") then
+            v.LayoutOrder = RarityOrder[tostring(v.type.Text)]
+            v.Parent = MainFrame
+			v.MouseButton1Down:Connect(function()
+				for i,v3 in pairs(MainFrame:GetChildren()) do
+					if v3 ~= v and v3:IsA("ImageButton") then
+						v3.BorderSizePixel = 0
+					end
+				end
+				end)
+        end
+    end
+    v.ChildAdded:Connect(function(v2)
+        task.wait()
+        if v2:IsA("ImageButton") then
+            v2.LayoutOrder = RarityOrder[tostring(v2.type.Text)]
+            v2.Parent = MainFrame
+			v2.MouseButton1Down:Connect(function()
+			for i,v3 in pairs(MainFrame:GetChildren()) do
+				if v3 ~= v2 and v3:IsA("ImageButton") then
+					v3.BorderSizePixel = 0
+				end
+			end
+			end)
+        end
+    end)
+end
+end)
+
+task.spawn(function()
+	task.wait(2)
+invbut.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=3422633744"
+invbut.name.Text = "Stellar"
+invbut.type.Text = "Legendary"
+invbut.type.TextColor3 = Color3.fromRGB(255, 79, 82)
+invbut.Parent = UI.inv.sectionframes:GetChildren()[3]
+invbut.MouseButton1Down:Connect(function()
+    if invbut.BorderSizePixel == 0 then
+    invbut.BorderSizePixel = 2
+	game:GetService("ReplicatedStorage").RemoteEvent:FireServer(55,"Chair Skins","Space","Stellar")
+for i,v in pairs(UI.inv.sectionframes:GetChildren()[3].GridOrder:GetChildren()) do
+    if v ~= invbut and v:IsA("ImageButton") then
+        v.BorderSizePixel = 0
+    end
+end
+else
+    invbut.BorderSizePixel = 0
+end
+end)
+end)
+
+task.spawn(function()
+	task.wait(2)
+	invbut2.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077205771"
+	invbut2.name.Text = "Blue Galaxy"
+	invbut2.type.Text = "Legendary"
+	invbut2.type.TextColor3 = Color3.fromRGB(255, 79, 82)
+	invbut2.Parent = UI.inv.sectionframes:GetChildren()[3]
+	invbut2.MouseButton1Down:Connect(function()
+		if invbut2.BorderSizePixel == 0 then
+		invbut2.BorderSizePixel = 2
+		game:GetService("ReplicatedStorage").RemoteEvent:FireServer(55,"Chair Skins","Space","Blue Galaxy")
+	for i,v in pairs(UI.inv.sectionframes:GetChildren()[3].GridOrder:GetChildren()) do
+		if v ~= invbut2 and v:IsA("ImageButton") then
+			v.BorderSizePixel = 0
+		end
+	end
+	else
+		invbut2.BorderSizePixel = 0
+	end
+	end)
+	end)
+	
+
 function PlayerExecute(Player)
 	task.wait()
 	if Player ~= LocalPlayer then
@@ -1785,13 +1880,13 @@ NeededPlaceId = 648362523
 local queue_on_teleport = syn and syn.queue_on_teleport or queue_on_teleport
 if queue_on_teleport ~= nil then
 	--print(type(queue_on_teleport),queue_on_teleport)
-	queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
+	queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/ScriptEarlyPublicTest'))()")
 else
 	Notify("Your exploit does not support teleport execution")
 end
 
 task.spawn(function()
-	while task.wait(0.1) do
+	while task.wait(1) do
 		if #game.Players:GetPlayers() < 8 and Sent2 == true and AutoServerHop == true then
 
 			game.StarterGui:SetCore(
