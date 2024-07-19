@@ -1627,9 +1627,9 @@ game:GetService("TweenService"):Create(CustomButton,TweenInfo.new(0.5),{Position
 
 local gridloaded = false
 task.spawn(function()
-	repeat task.wait(1.1) until UI.inv.Visible == true
+	repeat task.wait(0.25) until UI.inv.Visible == true
 	task.spawn(function()
-		task.wait(0.75)
+		task.wait(0.4)
 		gridloaded = true
 	end)
 for i,v in pairs(UI.inv.sectionframes:GetChildren()) do
