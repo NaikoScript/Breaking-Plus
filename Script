@@ -1635,12 +1635,15 @@ task.spawn(function()
 		local VirtualInputManager = game:GetService("VirtualInputManager")
 		VirtualInputManager:SendMouseButtonEvent(X,Y,0,true,workspace,1)
 		VirtualInputManager:SendMouseButtonEvent(X,Y,0,false,workspace,1)
-		task.wait()
+		task.wait(0.05)
 		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,true,workspace,1)
 		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,false,workspace,1)
 		task.wait(0.05)
 		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,true,workspace,1)
 		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,false,workspace,1)
+		task.wait(0.05)
+		UI.buttons.inv.ImageTransparency = 0.5
+		UI.buttons.shop.ImageTransparency = 0.5
 	end)
 	repeat task.wait() until UI.inv.Visible == true
 	task.wait(0.35)
