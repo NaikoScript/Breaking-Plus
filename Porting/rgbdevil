@@ -1,0 +1,33 @@
+                       local LocalPlayer = game.Players.LocalPlayer
+            local UI = LocalPlayer.PlayerGui.ScreenGui
+            if UI.inv.sectionframes:GetChildren()[3]:FindFirstChild("GridOrder") then
+            local invbut = game.ReplicatedStorage.model.invbut:Clone()
+            local CurrentImage = 1
+            local Images = {18404976733,18404977503,18404977995,18404978465,18404978925,18404979494,18404980019,18404980521,18404981074,18404981608,18404982255,18404983008,18404983599,18404984076,18404984422,18404985167,18404985800,18404986570,18404987025,18404987749,18404988181,18404988947,18404989760,18404990349}
+            task.spawn(function()
+                while true do
+                    wait()
+                    if CurrentImage > #Images or CurrentImage == #Images then
+                        CurrentImage = 0
+                    end
+                    CurrentImage = CurrentImage + 1
+                    invbut.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. Images[CurrentImage]
+                end
+            end)
+            invbut.name.Text = "RGB Devil"
+            invbut.type.Text = "Divine"
+            invbut.type.TextColor3 = Color3.fromRGB(255, 204, 0)
+            invbut.Parent = UI.inv.sectionframes:GetChildren()[3]
+            invbut.MouseButton1Down:Connect(function()
+                if invbut.BorderSizePixel == 0 then
+                invbut.BorderSizePixel = 2
+            for i,v in pairs(UI.inv.sectionframes:GetChildren()[3].GridOrder:GetChildren()) do
+                if v ~= invbut and v:IsA("ImageButton") then
+                    v.BorderSizePixel = 0
+                end
+            end
+            else
+                invbut.BorderSizePixel = 0
+            end
+            end)
+        end
