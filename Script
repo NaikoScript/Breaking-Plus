@@ -1627,6 +1627,21 @@ game:GetService("TweenService"):Create(CustomButton,TweenInfo.new(0.5),{Position
 
 local gridloaded = false
 task.spawn(function()
+	pcall(function()
+		local X = UI.buttons.shop.AbsolutePosition.X + 2
+		local Y = UI.buttons.shop.AbsolutePosition.Y + 50
+		local X2 = UI.buttons.inv.AbsolutePosition.X + 2
+		local Y2 = UI.buttons.inv.AbsolutePosition.Y + 50
+		local VirtualInputManager = game:GetService("VirtualInputManager")
+		VirtualInputManager:SendMouseButtonEvent(X,Y,0,true,workspace,1)
+		VirtualInputManager:SendMouseButtonEvent(X,Y,0,false,workspace,1)
+		task.wait()
+		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,true,workspace,1)
+		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,false,workspace,1)
+		task.wait(0.05)
+		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,true,workspace,1)
+		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,false,workspace,1)
+	end)
 	repeat task.wait() until UI.inv.Visible == true
 	task.wait(0.35)
 	task.spawn(function()
