@@ -1,6 +1,6 @@
 -- Breaking Plus Made by Naiko Exploits --
 
-repeat task.wait() until game:IsLoaded() and task.wait(1.5) and workspace.DistributedGameTime > 6.5
+repeat task.wait() until game:IsLoaded() and task.wait(0.5) and workspace.DistributedGameTime > 5
 
 if game:GetService("CoreGui"):FindFirstChild("Plus") then
 	return warn("Script already running")
@@ -1709,6 +1709,7 @@ for i,v in pairs(UI.inv.sectionframes:GetChildren()) do
 				end)
         end
     end
+	v.CanvasSize = UDim2.new(0, 0, 0, GridLayout.AbsoluteContentSize.Y + 10)
     v.ChildAdded:Connect(function(v2)
         task.wait()
         if v2:IsA("ImageButton") then
@@ -1722,6 +1723,7 @@ for i,v in pairs(UI.inv.sectionframes:GetChildren()) do
 			end
 			end)
         end
+		v.CanvasSize = UDim2.new(0, 0, 0, GridLayout.AbsoluteContentSize.Y + 10)
     end)
 end
 end
