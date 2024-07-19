@@ -1626,7 +1626,9 @@ CustomButton.Visible = true
 game:GetService("TweenService"):Create(CustomButton,TweenInfo.new(0.5),{Position = UDim2.new(0, 0, 0, 140)}):Play()
 
 local function addvipchairs()
+	task.wait(1.25)
 	task.spawn(function()
+		local invbut = invbut:Clone()
 		UI.inv.sectionframes:GetChildren()[3].TextLabel.Visible = false
 	invbut.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=3422633744"
 	invbut.name.Text = "Stellar"
@@ -1649,6 +1651,7 @@ local function addvipchairs()
 	end)
 	
 	task.spawn(function()
+		local invbut2 = invbut2:Clone()
 		invbut2.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077205771"
 		invbut2.name.Text = "Blue Galaxy"
 		invbut2.type.Text = "Legendary"
@@ -1675,7 +1678,9 @@ task.spawn(function()
 	while task.wait(0.75) do
 		if not UI.inv.sectionframes:GetChildren()[2]:FindFirstChild("GridOrder") then
 	task.wait(0.35)
+	task.spawn(function()
 	addvipchairs()
+	end)
 for i,v in pairs(UI.inv.sectionframes:GetChildren()) do
     local MainFrame = Instance.new("Frame")
     local GridLayout = Instance.new("UIGridLayout")
