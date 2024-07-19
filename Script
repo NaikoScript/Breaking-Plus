@@ -1,6 +1,6 @@
 -- Breaking Plus Made by Naiko Exploits --
 
-repeat task.wait() until game:IsLoaded() and task.wait(1.5)
+repeat task.wait() until game:IsLoaded() and task.wait(1.5) and workspace.DistributedGameTime > 6.5
 
 if game:GetService("CoreGui"):FindFirstChild("Plus") then
 	return warn("Script already running")
