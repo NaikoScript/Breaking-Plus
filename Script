@@ -522,13 +522,7 @@ task.spawn(function()
 		end
 	end)
 end)
--- temporary fix for executors issue 
-for i,v in pairs(UI.shop.load:GetDescendants()) do
-if v:IsA("LocalScript") then
-v:Destroy()
-print("removed localscript for temporary fix")
-end
-end
+
 local LoadingPurchase = UI.shop.load:Clone()
 LoadingPurchase.Visible = false
 LoadingPurchase.Parent = CustomMenu
