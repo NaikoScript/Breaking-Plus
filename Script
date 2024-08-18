@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 3.92
+local Version = 3.95
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -299,6 +299,174 @@ function Debug(Message)
 	end
 end
 
+function fling(subject) -- Credits to Nameless' fling
+    pcall(function()
+        subject = game.Players:FindFirstChild(subject)
+
+        local old, fpdh = nil, workspace.FallenPartsDestroyHeight
+        local player = game.Players.LocalPlayer
+
+        local char = player.Character or player.CharacterAdded:Wait()
+        local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+
+        local root = humanoid and humanoid.RootPart
+
+        local tchar = subject.Character or subject.CharacterAdded:Wait()
+        local thumanoid
+        local troot
+        local thead
+
+        local accessory = nil
+        local handle
+
+        if tchar:FindFirstChildOfClass("Humanoid") then
+            thumanoid = tchar:FindFirstChildOfClass("Humanoid")
+        end
+
+        if thumanoid and thumanoid.RootPart then
+            troot = thumanoid.RootPart
+        end
+
+        if tchar:FindFirstChild("Head") then
+            thead = tchar.Head
+        end
+
+        if accessory and accessory:FindFirstChild("Handle") then
+            handle = accessory.Handle
+        end
+
+        if char and humanoid and root then
+            if root.Velocity.Magnitude < 50 then
+                old = root.CFrame
+            end
+
+            if thumanoid and thumanoid.Sit then end
+
+            if thead then
+                workspace.CurrentCamera.CameraSubject = thead
+            elseif not thead and handle then
+                workspace.CurrentCamera.CameraSubject = handle
+            elseif thumanoid and troot then
+                workspace.CurrentCamera.CameraSubject = thumanoid
+            end
+
+            if not tchar:FindFirstChildWhichIsA("BasePart") then
+                return
+            end
+
+            local fpos = function(basepart, vector, angle)
+                root.CFrame = CFrame.new(basepart.Position) * vector * angle
+                char:SetPrimaryPartCFrame(CFrame.new(basepart.Position) * vector * angle)
+                root.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
+                root.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+            end
+
+            local safebasepart = function(basepart)
+                local delay = 2
+                local time = tick()
+                local angle = 0
+
+                repeat
+                    if root and thumanoid then
+                        if basepart.Velocity.Magnitude < 50 then
+                            angle = angle + 100
+
+                            fpos(basepart, CFrame.new(0, 1.5, 0) + thumanoid.MoveDirection * basepart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(angle),0 ,0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(0, -1.5, 0) + thumanoid.MoveDirection * basepart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(angle), 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(2.25, 1.5, -2.25) + thumanoid.MoveDirection * basepart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(angle), 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(-2.25, -1.5, 2.25) + thumanoid.MoveDirection * basepart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(angle), 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(0, 1.5, 0) + thumanoid.MoveDirection,CFrame.Angles(math.rad(angle), 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(0, -1.5, 0) + thumanoid.MoveDirection,CFrame.Angles(math.rad(angle), 0, 0))
+                            task.wait()
+                        else
+                            fpos(basepart, CFrame.new(0, 1.5, thumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(0, -1.5, -thumanoid.WalkSpeed), CFrame.Angles(0, 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(0, 1.5, thumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(0, 1.5, troot.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(0, -1.5, -troot.Velocity.Magnitude / 1.25), CFrame.Angles(0, 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(0, 1.5, troot.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(90), 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(0, -1.5 ,0), CFrame.Angles(math.rad(-90), 0, 0))
+                            task.wait()
+
+                            fpos(basepart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                            task.wait()
+                        end
+                    else
+                        break
+                    end
+                until basepart.Velocity.Magnitude > 500 or basepart.Parent ~= subject.Character or subject.Parent ~= game.Players or (not subject.Character) == tchar or thumanoid.Sit or humanoid.Health <= 0 or tick() > time + delay
+            end
+
+            workspace.FallenPartsDestroyHeight = 0/0
+
+            local bv = Instance.new("BodyVelocity", root)
+            bv.Name = "fling"
+            bv.Velocity = Vector3.new(9e8, 9e8, 9e8)
+            bv.MaxForce = Vector3.new(1/0, 1/0, 1/0)
+
+            humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+
+            if troot and thead then
+                if (troot.CFrame.p - thead.CFrame.p).Magnitude > 5 then
+                    safebasepart(thead)
+                else
+                    safebasepart(troot)
+                end
+            elseif troot and not thead then
+                safebasepart(thead)
+            elseif not troot and not thead and accessory and handle then
+                safebasepart(handle)
+            end
+
+            bv:Destroy()
+
+            humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+            workspace.CurrentCamera.CameraSubject = humanoid
+
+            repeat
+                root.CFrame = old * CFrame.new(0, 0.5, 0)
+                char:SetPrimaryPartCFrame(old * CFrame.new(0, 0.5, 0))
+                humanoid:ChangeState("GettingUp")
+                for _, x in ipairs(char:GetChildren()) do
+                    if x:IsA("BasePart") then
+                        x.Velocity, x.RotVelocity = Vector3.new(), Vector3.new()
+                    end
+                end
+                task.wait()
+            until (root.Position - old.p).Magnitude < 25
+
+            workspace.FallenPartsDestroyHeight = fpdh
+        end
+    end)
+end
 
 function Notify(Message,Button)
 	pcall(function()
@@ -1735,17 +1903,25 @@ end)
 function PlayerExecute(Player)
 	task.wait()
 	if Player ~= LocalPlayer then
-		PlayerButtons.Size = UDim2.new(0,130,0,120)
+		PlayerButtons.Size = UDim2.new(0,130,0,140)
 		local Cloned = PlayerButtons:FindFirstChild("button"):Clone()
+		local Cloned2 = Cloned:Clone()
 		Cloned.Position = UDim2.new(2, 0, 0, 81)
 		Cloned.Parent = PlayerButtons
 		Cloned.TextLabel.Text = "Trade"
 		Cloned.ImageColor3 = Color3.fromRGB(14, 35, 14)
 		Cloned.button.ImageColor3 = Color3.fromRGB(85, 170, 0)
+		-- Button 2 
+		Cloned2.Position = UDim2.new(2, 0, 0, 108)
+		Cloned2.Parent = PlayerButtons
+		Cloned2.TextLabel.Text = "Fling"
+		Cloned2.ImageColor3 = Color3.fromRGB(41, 24, 24)
+		Cloned2.button.ImageColor3 = Color3.fromRGB(58, 31, 31)
 		local Connection
 		Connection = PlayerButtons:FindFirstChild("button").Changed:Connect(function()
 		if PlayerButtons:FindFirstChild("button").Position.X.Scale ~= 0 then
 		Cloned.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,81)
+		Cloned2.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,108)
 			else
 				Connection:Disconnect()
 		end
@@ -1759,6 +1935,17 @@ function PlayerExecute(Player)
 		Cloned.MouseButton1Click:Connect(function()
 			PlayerButtons.Visible = false
 			game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(73,Player)
+		end)
+
+		Cloned2.MouseEnter:Connect(function()
+			game:GetService("TweenService"):Create(Cloned2.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 0.8}):Play()
+		end)
+		Cloned2.MouseLeave:Connect(function()
+			game:GetService("TweenService"):Create(Cloned2.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 1}):Play()
+		end)
+		Cloned2.MouseButton1Click:Connect(function()
+			PlayerButtons.Visible = false
+			fling(Player.Name)
 		end)
 	else
 		PlayerButtons.Size = UDim2.new(0,130,0,60)
@@ -1786,7 +1973,7 @@ function PlayerExecute(Player)
 		Cloned.MouseButton1Click:Connect(function()
 			PlayerButtons.Visible = false
 			LocalPlayer.Character.Torso.Neck.C1 = CFrame.new(0,0,100)
-			game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",(CFrame.new(0,100,0) * CFrame.Angles(-1.6130179166793823, 0, 3)))
+			game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",(CFrame.new(0,-100,0) * CFrame.Angles(-1.6130179166793823, 0, 3)))
 		end)
 	end
 end
