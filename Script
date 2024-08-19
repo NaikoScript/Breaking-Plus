@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 3.95
+local Version = 3.96
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -29,7 +29,6 @@ local PlayerList = LocalPlayer.PlayerGui.PlayerList
 local SelectedPlayer = nil
 local PlayerButtons = PlayerList.Buttons
 local PlayersList = PlayerList.PlayerList
-local SettingButton = UI.buttons.setting
 local ClonedCredits = ClassicCredits:Clone()
 local FirstPurchasable = nil
 local SecondPurchasable = nil
@@ -1107,13 +1106,6 @@ end
 for i,v in pairs(CustomMenu.sectionframes:GetChildren()) do
 	v:Destroy()
 end
-for i,v in pairs(UI.buttons:GetChildren()) do
-	if v ~= CustomButton then
-		v.MouseButton1Click:Connect(function()
-			CustomMenu.Visible = false
-		end)
-	end
-end
 Die = nil
 SpamSound = nil
 HideBlood = nil
@@ -1255,15 +1247,163 @@ Settings:FindFirstChild("TextLabel").Text = "Breaking +"
 Settings.Position = UDim2.new(0, 0, 0, 600)
 
 local UIBluring = false
+local Animations = false
+local DoingAnimation = false
 local Legacy = true
 local AutoServerHop = true
+local SavedPosition = Vector2.new(0,0)
+local SavedPosition2 = Vector2.new(0,0)
 local BindEvent = Instance.new("BindableEvent")
+
+local server = UI.server1
+local Scale = Instance.new("UIScale")
+Scale.Parent = server
+local Tween = game:GetService("TweenService"):Create(server,TweenInfo.new(0.4,Enum.EasingStyle.Circular,Enum.EasingDirection.Out),{Size = UDim2.new(0,250,0,300)})
+local Tween2 = game:GetService("TweenService"):Create(server,TweenInfo.new(0.2,Enum.EasingStyle.Circular,Enum.EasingDirection.Out),{Size = UDim2.new(0,250,0,0)})
+local Tween3 = game:GetService("TweenService"):Create(Scale,TweenInfo.new(0.8,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{Scale = 0})
+game:GetService("Workspace").disguise.SurfaceGui.noother.Part.ClickDetector.MouseClick:Connect(function()
+	CustomMenu.Visible = false
+	if Animations == true then
+server.Size = UDim2.new(0,250,0,0)
+Scale.Scale = 1
+Tween3:Cancel()
+Tween2:Cancel()
+Tween:Play()
+server.ScrollingFrame.CanvasPosition = SavedPosition2
+	end
+end)
+
+local Clone3 = server.TextButton:Clone()
+server.TextButton:Destroy()
+Clone3.Parent = server
+Clone3.MouseButton1Click:Connect(function()
+	if Animations == true then
+		SavedPosition2 = server.ScrollingFrame.CanvasPosition
+server.Size = UDim2.new(0,250,0,300)
+Scale.Scale = 1
+Tween:Cancel()
+Tween2:Play()
+Tween3:Play()
+task.wait(0.2)
+server.Visible = false
+	end
+end)
+
+local setting = UI.setting
+local Scale = Instance.new("UIScale")
+Scale.Parent = setting
+local Tween = game:GetService("TweenService"):Create(setting,TweenInfo.new(0.4,Enum.EasingStyle.Circular,Enum.EasingDirection.Out),{Size = UDim2.new(0,250,0,240)})
+local Tween2 = game:GetService("TweenService"):Create(setting,TweenInfo.new(0.2,Enum.EasingStyle.Circular,Enum.EasingDirection.Out),{Size = UDim2.new(0,250,0,0)})
+local Tween3 = game:GetService("TweenService"):Create(Scale,TweenInfo.new(0.8,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{Scale = 0})
+DoingAnimation = false
+local Clone = UI.buttons.setting:Clone()
+UI.buttons.setting:Destroy()
+Clone.Parent = UI.buttons
+
+Clone.MouseEnter:Connect(function()
+	game:GetService("TweenService"):Create(Clone,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
+end)
+Clone.MouseLeave:Connect(function()
+	game:GetService("TweenService"):Create(Clone,TweenInfo.new(0.25),{ImageTransparency = 0.5}):Play()
+end)
+
+Clone.MouseButton1Click:Connect(function()
+	for i,v in pairs(UI:GetChildren()) do
+		if v.Name == "Breaking+" or v.Name == "trade" or v.Name == "shop" or v.Name == "inv" or v.Name == "tradelog" then
+			v.Visible = false
+		end
+	end
+	if Animations == true then
+		if DoingAnimation == true then
+			return
+		end
+	local	normal = not setting.Visible
+		setting.Visible = not setting.Visible
+if normal == true then
+	DoingAnimation = true
+setting.Size = UDim2.new(0,250,0,0)
+Scale.Scale = 1
+Tween3:Cancel()
+Tween2:Cancel()
+--local Tween4 = game:GetService("TweenService"):Create(setting.ScrollingFrame,TweenInfo.new(0.6,Enum.EasingStyle.Circular,Enum.EasingDirection.Out),{CanvasPosition = SavedPosition})
+Tween:Play()
+setting.ScrollingFrame.CanvasPosition = SavedPosition
+--Tween4:Play()
+task.wait(0.4)
+DoingAnimation = false
+elseif normal == false then
+	SavedPosition = setting.ScrollingFrame.CanvasPosition
+	DoingAnimation = true
+	setting.Visible = true
+	setting.Size = UDim2.new(0,250,0,240)
+	Scale.Scale = 1
+	Tween:Cancel()
+	Tween2:Play()
+	Tween3:Play()
+	task.wait(0.2)
+	DoingAnimation = false
+	setting.Visible = false
+end
+else
+	setting.Visible = not setting.Visible
+end
+end)
+
+local Clone2 = setting.TextButton:Clone()
+setting.TextButton:Destroy()
+Clone2.Parent = setting
+Clone2.MouseButton1Click:Connect(function()
+	if Animations == true then
+	DoingAnimation = true
+	SavedPosition = setting.ScrollingFrame.CanvasPosition
+setting.Size = UDim2.new(0,250,0,240)
+Scale.Scale = 1
+Tween:Cancel()
+Tween2:Play()
+Tween3:Play()
+task.wait(0.2)
+DoingAnimation = false
+setting.Visible = false
+	else
+		setting.Visible = false
+	end
+end)
+
+	
+	for _, Selection in pairs (setting:GetChildren()) do
+		if Selection:IsA("GuiBase2d") then
+			local Parent = Selection:FindFirstAncestorWhichIsA("GuiBase")
+			if Parent ~= nil then
+			Selection.Size = UDim2.new(Selection.Size.X.Offset/Parent.AbsoluteSize.X + Selection.Size.X.Scale, 0, Selection.Size.Y.Offset/Parent.AbsoluteSize.Y + Selection.Size.Y.Scale, 0)
+			Selection.Position = UDim2.new(Selection.Position.X.Offset/Parent.AbsoluteSize.X + Selection.Position.X.Scale, 0, Selection.Position.Y.Offset/Parent.AbsoluteSize.Y  + Selection.Position.Y.Scale, 0)
+			end	
+			end
+	end
+
+	
+	for _, Selection in pairs (server:GetChildren()) do
+		if Selection:IsA("GuiBase2d") then
+			local Parent = Selection:FindFirstAncestorWhichIsA("GuiBase")
+			if Parent ~= nil then
+			Selection.Size = UDim2.new(Selection.Size.X.Offset/Parent.AbsoluteSize.X + Selection.Size.X.Scale, 0, Selection.Size.Y.Offset/Parent.AbsoluteSize.Y + Selection.Size.Y.Scale, 0)
+			Selection.Position = UDim2.new(Selection.Position.X.Offset/Parent.AbsoluteSize.X + Selection.Position.X.Scale, 0, Selection.Position.Y.Offset/Parent.AbsoluteSize.Y  + Selection.Position.Y.Scale, 0)
+			end	
+			end
+	end
+
+	for i,v in pairs(UI.buttons:GetChildren()) do
+		if v ~= CustomButton then
+			v.MouseButton1Click:Connect(function()
+				CustomMenu.Visible = false
+			end)
+		end
+	end
 
 task.spawn(function()
 if ReturnData("TutSettings.txt") == "false" then
 	UI.setting.Visible = false
-local Tween = game:GetService("TweenService"):Create(SettingButton,TweenInfo.new(0.75,Enum.EasingStyle.Linear),{ImageColor3 = Color3.fromRGB(100,15,15)})
-local Tween2 = game:GetService("TweenService"):Create(SettingButton,TweenInfo.new(0.75,Enum.EasingStyle.Linear),{ImageColor3 = Color3.fromRGB(255, 255, 255)})
+local Tween = game:GetService("TweenService"):Create(Clone,TweenInfo.new(0.75,Enum.EasingStyle.Linear),{ImageColor3 = Color3.fromRGB(100,15,15)})
+local Tween2 = game:GetService("TweenService"):Create(Clone,TweenInfo.new(0.75,Enum.EasingStyle.Linear),{ImageColor3 = Color3.fromRGB(255, 255, 255)})
 Tween:Play()
 local Connection
 local OpenedSettings = false
@@ -1282,7 +1422,7 @@ else
 Connection2:Disconnect()
 end
 end)
-SettingButton.MouseButton1Click:Once(function()
+Clone.MouseButton1Click:Once(function()
 OpenedSettings = true
 ChangeData("TutSettings.txt","true")
 Tween:Pause()
@@ -1522,6 +1662,7 @@ end)
 Feature2Function = function()
 	ChangeData("Feature2.txt","true")
 	UIBluring = true
+	Animations = true
 	BindEvent:Fire()
 	local Value = Instance.new("Model",game.CoreGui)
 	Value.Name = "ImproveUI"
@@ -1569,6 +1710,7 @@ end
 Feature2UnFunction = function()
 	ChangeData("Feature2.txt","false")
 	UIBluring = false
+	Animations = false
 	BindEvent:Fire()
 	if game.CoreGui:FindFirstChild("ImproveUI") then
 		UI.decision.secret.BackgroundColor3 = Color3.fromRGB(27,27,27)
@@ -2042,7 +2184,7 @@ CustomButton.MouseButton1Click:Connect(function()
 	CustomMenu.Visible = not CustomMenu.Visible
 	for i,v in pairs(UI:GetChildren()) do
 		task.spawn(function()
-			if v.Name == "setting" or v.Name == "trade" or v.Name == "shop" or v.Name == "inv" or v.Name == "tradelog" then
+			if v.Name == "setting" or v.Name == "trade" or v.Name == "shop" or v.Name == "inv" or v.Name == "tradelog" or v.Name == "server1" then
 				v.Visible = false
 			end
 		end)
