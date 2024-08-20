@@ -1309,7 +1309,7 @@ end)
 
 Clone.MouseButton1Click:Connect(function()
 	for i,v in pairs(UI:GetChildren()) do
-		if v.Name == "Breaking+" or v.Name == "trade" or v.Name == "shop" or v.Name == "inv" or v.Name == "tradelog" then
+		if v.Name == "Breaking+" or v.Name == "trade" or v.Name == "shop" or v.Name == "inv" or v.Name == "tradelog" or v.Name == "server1"  then
 			v.Visible = false
 		end
 	end
@@ -1437,11 +1437,10 @@ end)
 end
 end)
 
-task.spawn(function()
-	repeat
-		task.wait()
-	until UI.loading.Text == ""
-	UI.loading.Text = "discord.gg/vAWJMYJYcR"
+UI.loading:GetPropertyChangedSignal("Text"):Connect(function()
+	if UI.loading.Text == "" then
+		UI.loading.Text = "discord.gg/vAWJMYJYcR"
+	end
 end)
 
 local function CreateBlurHitbox(Origin,Position,Size,Radius,Anchor)
@@ -2087,7 +2086,11 @@ function PlayerExecute(Player)
 		end)
 		Cloned2.MouseButton1Click:Connect(function()
 			PlayerButtons.Visible = false
+			if Player.Character ~= nil and Player.Character.Humanoid ~= nil and Player.Character.Humanoid.Seated == false then
 			fling(Player.Name)
+			else
+				Notify("Failed to fling user","ok")
+			end
 		end)
 	else
 		PlayerButtons.Size = UDim2.new(0,130,0,60)
