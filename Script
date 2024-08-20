@@ -2086,7 +2086,7 @@ function PlayerExecute(Player)
 		end)
 		Cloned2.MouseButton1Click:Connect(function()
 			PlayerButtons.Visible = false
-			if Player.Character ~= nil and Player.Character.Humanoid ~= nil and Player.Character.Humanoid.Seated == false then
+			if Player.Character ~= nil and Player.Character.Humanoid ~= nil and Player.Character.Humanoid.Sit == false then
 			fling(Player.Name)
 			else
 				Notify("Failed to fling user","ok")
