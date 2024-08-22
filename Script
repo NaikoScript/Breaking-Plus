@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 3.96
+local Version = "4.0🎉"
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -727,7 +727,7 @@ local f1 = function()
 	end
 end
 task.spawn(function()
-NotifyButtons("The script has been made by naiko exploits. Join discord server?","Join server","Cancel",f1,function() return {} end)
+NotifyButtons("The script has been made by naiko exploits. Join discord server? (Optional)","Join server","Cancel",f1,function() return {} end)
 end)
 for i,v in pairs(UI.shop:GetDescendants()) do
 	if v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077224108" then
@@ -1199,6 +1199,7 @@ end
 --
 local SettingScroll = UI.setting.ScrollingFrame
 local Settings = SettingScroll:FindFirstChild("performance"):Clone()
+local General = SettingScroll:FindFirstChild("general")
 repeat task.wait() until Settings:FindFirstChild("sframe") ~= nil
 local Feature = Settings:FindFirstChild("sframe")
 local Feature2 = Feature:Clone()
@@ -1207,6 +1208,7 @@ local Feature4 = Feature:Clone()
 local Feature5 = Feature:Clone()
 local Feature6 = Feature:Clone()
 local Feature7 = Feature:Clone()
+local Display2 = Feature:Clone()
 --[[
   CheckFile("BreakingPlus/Feature1.txt","false")
   CheckFile("BreakingPlus/Feature2.txt","false")
@@ -1222,18 +1224,21 @@ Feature4.TextLabel.Text = "Auto ServerHop"
 Feature5.TextLabel.Text = "Play Loud Noise"
 Feature6.TextLabel.Text = "Debug messages"
 Feature7.TextLabel.Text = "Legacy autofarm"
+Display2.TextLabel.Text = "Display Knife 2"
 Feature5.Parent = Settings
 Feature6.Parent = Settings
 Feature4.Parent = Settings
 Feature3.Parent = Settings
 Feature2.Parent = Settings
 Feature7.Parent = Settings
+Display2.Parent = General
 Feature2.Position = UDim2.new(0,0,0,55)
 Feature3.Position = UDim2.new(0,0,0,85)
 Feature4.Position = UDim2.new(0,0,0,115)
 Feature5.Position = UDim2.new(0,0,0,145)
 Feature6.Position = UDim2.new(0,0,0,175)
 Feature7.Position = UDim2.new(0,0,0,205)
+Display2.Position = UDim2.new(0,0,0,145)
 Settings.Parent = SettingScroll
 Settings.Name = "breakingplus"
 local UIGradient = Instance.new("UIGradient")
@@ -1246,6 +1251,21 @@ UIGradient.Color = ColorSequence.new({
 Settings:FindFirstChild("TextLabel").Text = "Breaking +"
 Settings.Position = UDim2.new(0, 0, 0, 600)
 
+-- Breaking Plus Anniversary august 22 | 2020 - 2024
+task.spawn(function()
+	task.wait(6.25)
+	if UserType == 3 then
+		local Sound = Instance.new("Sound")
+		Sound.SoundId = "rbxassetid://8894202402"
+		Sound.Parent = workspace
+		Sound.Name = "Yippe"
+		Sound.Volume = 2.5
+		Sound:Play()
+		task.wait(0.1)
+		Notify("Today is breaking plus anniversary🎉","yippe")
+	end
+end)
+
 local UIBluring = false
 local Animations = false
 local DoingAnimation = false
@@ -1253,7 +1273,25 @@ local Legacy = true
 local AutoServerHop = true
 local SavedPosition = Vector2.new(0,0)
 local SavedPosition2 = Vector2.new(0,0)
+local DisplayKnifeOrigin = nil
 local BindEvent = Instance.new("BindableEvent")
+
+for i,v in pairs(General:GetChildren()) do
+	if v.TextLabel.Text == "Display Knife" then
+		DisplayKnifeOrigin = v
+	end
+end
+
+for i,v in pairs(General:GetChildren()) do
+if v.Position.Y.Offset > 145 or v.Position.Y.Offset == 145 and v ~= Display2 then
+v.Position = v.Position + UDim2.new(0,0,0,30)
+end
+end
+for i,v in pairs(SettingScroll:GetChildren()) do
+	if v ~= General then
+		v.Position = v.Position + UDim2.new(0,0,0,30)
+	end
+	end
 
 local server = UI.server1
 local Scale = Instance.new("UIScale")
@@ -1430,7 +1468,7 @@ Tween2:Play()
 UI.setting.ScrollingFrame.CanvasPosition = Vector2.new(0,0)
 UI.setting.ScrollingFrame.ScrollingEnabled = false
 task.wait(0.25)
-game:GetService("TweenService"):Create(UI.setting.ScrollingFrame,TweenInfo.new(4,Enum.EasingStyle.Sine),{CanvasPosition = Vector2.new(0,662)}):Play()
+game:GetService("TweenService"):Create(UI.setting.ScrollingFrame,TweenInfo.new(4,Enum.EasingStyle.Sine),{CanvasPosition = Vector2.new(0,692)}):Play()
 task.wait(4)
 UI.setting.ScrollingFrame.ScrollingEnabled = true
 end)
@@ -1486,6 +1524,40 @@ for i,v in pairs(UI:GetChildren()) do
 	end
 end
 
+Display2Function = function()
+	DisplayKnifeOrigin.Autosave.ImageButton.fill.ImageTransparency = 1
+	DisplayKnifeOrigin.Autosave.ImageButton.ImageTransparency = 0
+	game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(53,"Display Knife",false)
+	game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(53,"Display Knife 2",true)
+end
+Display2UnFunction = function()
+	game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(53,"Display Knife 2",false)
+end
+SettingsToggleButton(Display2,Display2Function,Display2UnFunction)
+pcall(function()
+	if LocalPlayer.settings["Display Knife 2"].Value == false then
+		Display2.Autosave.ImageButton.fill.Visible = false
+		Display2.Autosave.ImageButton.fill.ImageTransparency = 0
+		Display2UnFunction()
+	elseif LocalPlayer.settings["Display Knife 2"].Value == true then
+		Display2.Autosave.ImageButton.fill.Visible = true
+		Display2.Autosave.ImageButton.fill.ImageTransparency = 0
+		Display2Function()
+	else
+		Display2.Autosave.ImageButton.fill.Visible = false
+		Display2.Autosave.ImageButton.fill.ImageTransparency = 0
+		Display2UnFunction()
+	end
+	LocalPlayer.settings["Display Knife"]:GetPropertyChangedSignal("Value"):Connect(function()
+		if LocalPlayer.settings["Display Knife"].Value == true then
+		Display2.Autosave.ImageButton.fill.Visible = false
+		Display2.Autosave.ImageButton.fill.ImageTransparency = 0
+		end
+	end)
+end)
+
+
+
 Feature7Function = function()
 	Legacy = true
 	ChangeData("Feature7.txt","true")
@@ -1507,7 +1579,7 @@ pcall(function()
 	else
 		Feature7.Autosave.ImageButton.fill.Visible = false
 		Feature7.Autosave.ImageButton.fill.ImageTransparency = 0
-		Feature5Function()
+		Feature7Function()
 		DefaultData("Feature7.txt","true")
 	end
 end)
@@ -1762,11 +1834,11 @@ else
 	DefaultData("Feature2.txt","false")
 end
 SettingsToggleButton(Feature2,Feature2Function,Feature2UnFunction)
-SettingScroll.CanvasSize = UDim2.new(0, 0, 0, 830)
+SettingScroll.CanvasSize = UDim2.new(0, 0, 0, 860)
 UI.buttons.shop.ImageButton.Position = UDim2.new(1.025,0,0,35)
 UI.buttons.shop.ImageButton.Visible = true
-UI.version.Text = UI.version.Text .. " | V" .. tostring(Version)
-UI.version.Size = UDim2.new(0, 100, 0, 25)
+UI.version.Text = UI.version.Text .. " | V" .. Version
+UI.version.Size = UDim2.new(0, 110, 0, 25)
 local BackgroundUI =   UI.mockinv.top.everydivine:Clone()
 BackgroundUI.Parent = CustomMenu.top 
 BackgroundUI.Visible = true
@@ -2089,7 +2161,7 @@ function PlayerExecute(Player)
 			if Player.Character ~= nil and Player.Character.Humanoid ~= nil and Player.Character.Humanoid.Sit == false then
 			fling(Player.Name)
 			else
-				Notify("Failed to fling user","ok")
+				Notify("Failed to fling user (they possibly are in the match)","ok")
 			end
 		end)
 	else
@@ -2201,7 +2273,10 @@ if queue_on_teleport ~= nil then
 	--print(type(queue_on_teleport),queue_on_teleport)
 	queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
 else
+	task.spawn(function()
+		task.wait(2.5)
 	Notify("Your exploit does not support teleport execution")
+	end)
 end
 
 task.spawn(function()
