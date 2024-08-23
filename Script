@@ -1520,17 +1520,14 @@ Display2UnFunction = function()
 end
 SettingsToggleButton(Display2,Display2Function,Display2UnFunction)
 	if LocalPlayer.settings:FindFirstChild("Display Knife 2").Value == false then
-		Notify("false ".. LocalPlayer.settings:FindFirstChild("Display Knife 2").Value)
 		Display2.Autosave.ImageButton.fill.Visible = false
 		Display2.Autosave.ImageButton.fill.ImageTransparency = 0
 		Display2UnFunction()
 	elseif LocalPlayer.settings:FindFirstChild("Display Knife 2").Value == true then
-		Notify("true ".. LocalPlayer.settings:FindFirstChild("Display Knife 2").Value)
 		Display2.Autosave.ImageButton.fill.Visible = true
 		Display2.Autosave.ImageButton.fill.ImageTransparency = 0
 		Display2Function()
 	else
-		Notify("Failed")
 		Display2.Autosave.ImageButton.fill.Visible = false
 		Display2.Autosave.ImageButton.fill.ImageTransparency = 0
 		Display2UnFunction()
