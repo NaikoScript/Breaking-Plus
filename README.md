@@ -1,8 +1,5 @@
 # Breaking Plus
 > [!IMPORTANT]
-> TODAY IS BREAKING PLUS ANNIVERSARY 🎉🎉!!
-
-> [!IMPORTANT]
 > **Join my [discord server](https://discord.gg/vAWJMYJYcR) if you find any bugs or have issues with the script**
 ## Script thumbnail
 ![BreakingPlus4](https://github.com/NaikoScript/Breaking-Plus/assets/107273752/68352ab9-d209-460d-b394-ec873341403d)

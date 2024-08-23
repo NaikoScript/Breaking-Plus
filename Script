@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = "4.0🎉"
+local Version = "4.0"
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -1251,21 +1251,6 @@ UIGradient.Color = ColorSequence.new({
 Settings:FindFirstChild("TextLabel").Text = "Breaking +"
 Settings.Position = UDim2.new(0, 0, 0, 600)
 
--- Breaking Plus Anniversary august 22 | 2020 - 2024
-task.spawn(function()
-	task.wait(6.25)
-	if UserType == 3 then
-		local Sound = Instance.new("Sound")
-		Sound.SoundId = "rbxassetid://8894202402"
-		Sound.Parent = workspace
-		Sound.Name = "Yippe"
-		Sound.Volume = 2.5
-		Sound:Play()
-		task.wait(0.1)
-		Notify("Today is breaking plus anniversary🎉","yippe")
-	end
-end)
-
 local UIBluring = false
 local Animations = false
 local DoingAnimation = false
@@ -1534,16 +1519,18 @@ Display2UnFunction = function()
 	game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(53,"Display Knife 2",false)
 end
 SettingsToggleButton(Display2,Display2Function,Display2UnFunction)
-pcall(function()
-	if LocalPlayer.settings["Display Knife 2"].Value == false then
+	if LocalPlayer.settings:FindFirstChild("Display Knife 2").Value == false then
+		Notify("false ".. LocalPlayer.settings:FindFirstChild("Display Knife 2").Value)
 		Display2.Autosave.ImageButton.fill.Visible = false
 		Display2.Autosave.ImageButton.fill.ImageTransparency = 0
 		Display2UnFunction()
-	elseif LocalPlayer.settings["Display Knife 2"].Value == true then
+	elseif LocalPlayer.settings:FindFirstChild("Display Knife 2").Value == true then
+		Notify("true ".. LocalPlayer.settings:FindFirstChild("Display Knife 2").Value)
 		Display2.Autosave.ImageButton.fill.Visible = true
 		Display2.Autosave.ImageButton.fill.ImageTransparency = 0
 		Display2Function()
 	else
+		Notify("Failed")
 		Display2.Autosave.ImageButton.fill.Visible = false
 		Display2.Autosave.ImageButton.fill.ImageTransparency = 0
 		Display2UnFunction()
@@ -1554,7 +1541,6 @@ pcall(function()
 		Display2.Autosave.ImageButton.fill.ImageTransparency = 0
 		end
 	end)
-end)
 
 
 
@@ -1837,7 +1823,7 @@ SettingsToggleButton(Feature2,Feature2Function,Feature2UnFunction)
 SettingScroll.CanvasSize = UDim2.new(0, 0, 0, 860)
 UI.buttons.shop.ImageButton.Position = UDim2.new(1.025,0,0,35)
 UI.buttons.shop.ImageButton.Visible = true
-UI.version.Text = UI.version.Text .. " | V" .. Version
+UI.version.Text = UI.version.Text .. " | V" .. tostring(Version)
 UI.version.Size = UDim2.new(0, 110, 0, 25)
 local BackgroundUI =   UI.mockinv.top.everydivine:Clone()
 BackgroundUI.Parent = CustomMenu.top 
