@@ -2042,8 +2042,10 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
 end)
 
 function AddEmote(ID,Name,Icon)
+	print(ID,Name,Icon)
 	task.spawn(function()
 		UI.inv.sectionframes:GetChildren()[4].TextLabel.Visible = false
+		local invbut = invbut:Clone()
 	invbut.Image = "rbxassetid://" .. Icon
 	invbut.name.Text = Name
 	invbut.type.Text = ""
@@ -2067,7 +2069,8 @@ function AddEmote(ID,Name,Icon)
 	end)
 end
 task.spawn(function()
-	task.wait(2)
+	repeat task.wait() until UI.inv.sectionframes:GetChildren()[4]:FindFirstChild("GridOrder")
+	task.wait(0.25)
 local AnimationNamesAvailable = {Sway = {3200586606,3200675416},Rebel = {3200332361,2104492097},Slouch = {2040237465,2036596243},Sleep = {2040220399,2039295925},Tuck = {1236272531,1234316036},L = {955953327,958005778},Lean = {936006882,942467432},Chill = {942556290,942467847}}
 
 for i,v in pairs(UI.inv.sectionframes:GetChildren()[4].GridOrder:GetChildren()) do
@@ -2077,6 +2080,7 @@ end
 for EmoteName,v in pairs(AnimationNamesAvailable) do
 	if v ~= false then
 		AddEmote(v[1],EmoteName,v[2])
+		task.wait()
 	end
 end
 end)
