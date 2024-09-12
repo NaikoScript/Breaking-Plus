@@ -2126,25 +2126,6 @@ CustomMenu.top.TextButton.MouseButton1Click:Connect(function()
 end)
 
 CustomButton.MouseButton1Click:Connect(function()
-	if CustomMenu.Visible == false and FirstPurchasable == nil and SecondPurchasable == nil and ThirdPurchasable == nil and FourthPurchasable == nil then
-	local	function fun1()
-		task.spawn(function()
-		local X = UI.buttons.shop.AbsolutePosition.X + 2
-		local Y = UI.buttons.shop.AbsolutePosition.Y + 50
-		local X2 = CustomButton.AbsolutePosition.X + 2
-		local Y2 = CustomButton.AbsolutePosition.Y + 50
-		local VirtualInputManager = game:GetService("VirtualInputManager")
-		VirtualInputManager:SendMouseButtonEvent(X,Y,0,true,workspace,1)
-		VirtualInputManager:SendMouseButtonEvent(X,Y,0,false,workspace,1)
-		task.wait(2.9)
-		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,true,workspace,1)
-		VirtualInputManager:SendMouseButtonEvent(X2,Y2,0,false,workspace,1)
-		end)
-		return {"Load","Fixing",3}
-	end
-	
-		NotifyButtons("Couldn't load dupe methods. Would you like to fix this automaticly?","Fix","Cancel",fun1,function() return {} end)
-	end
 	CustomMenu.Visible = not CustomMenu.Visible
 	for i,v in pairs(UI:GetChildren()) do
 		task.spawn(function()
