@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 4.1
+local Version = 4.2
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -30,10 +30,10 @@ local SelectedPlayer = nil
 local PlayerButtons = PlayerList.Buttons
 local PlayersList = PlayerList.PlayerList
 local ClonedCredits = ClassicCredits:Clone()
-local FirstPurchasable = nil
-local SecondPurchasable = nil
-local ThirdPurchasable = nil
-local FourthPurchasable = nil
+local FirstPurchasable = game.ReplicatedStorage.model.invbut:Clone()
+local SecondPurchasable = game.ReplicatedStorage.model.invbut:Clone()
+local ThirdPurchasable = game.ReplicatedStorage.model.invbut:Clone()
+local FourthPurchasable = game.ReplicatedStorage.model.invbut:Clone()
 local TeleportingProc = nil
 local SelectedAnimation = 0
 local Credits = tonumber(ClassicCredits.Text:sub(-ClassicCredits.Text:len(),-8))
@@ -86,33 +86,33 @@ if not isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	makefolder("NaikoScript")
 	makefolder("NaikoScript/BreakingPlus")
 	DefaultData("Feature1.txt","false")
-	DefaultData("Feature2.txt","false")
+	DefaultData("Feature2.txt","true")
 	DefaultData("Feature3.txt","false")
 	DefaultData("Feature4.txt","true")
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
-	DefaultData("Feature7.txt","true")
+	DefaultData("Feature7.txt","false")
 	DefaultData("TutSettings.txt","false")
 	UserType = 1
 elseif isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	UserType = 2
 	DefaultData("Feature1.txt","false")
-	DefaultData("Feature2.txt","false")
+	DefaultData("Feature2.txt","true")
 	DefaultData("Feature3.txt","false")
 	DefaultData("Feature4.txt","true")
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
-	DefaultData("Feature7.txt","true")
+	DefaultData("Feature7.txt","false")
 	DefaultData("TutSettings.txt","false")
 	makefolder("NaikoScript/BreakingPlus")
 elseif isfolder("NaikoScript") and isfolder("NaikoScript/BreakingPlus") then
 		DefaultData("Feature1.txt","false")
-	DefaultData("Feature2.txt","false")
+	DefaultData("Feature2.txt","true")
 	DefaultData("Feature3.txt","false")
 	DefaultData("Feature4.txt","true")
 	DefaultData("Feature5.txt","false")
 	DefaultData("Feature6.txt","false")
-	DefaultData("Feature7.txt","true")
+	DefaultData("Feature7.txt","false")
 	DefaultData("TutSettings.txt","false")
 	UserType = 3
 end
@@ -730,382 +730,193 @@ end
 task.spawn(function()
 NotifyButtons("The script has been made by naiko exploits. Join discord server? (Optional)","Join server","Cancel",f1,function() return {} end)
 end)
-for i,v in pairs(UI.shop:GetDescendants()) do
-	if v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077224108" then
-		FirstPurchasable = v:Clone()
-	elseif v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=651760851" then
-		SecondPurchasable = v:Clone()
-	elseif v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=651761382" then
-		ThirdPurchasable = v:Clone()
-	elseif v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077223765" then
-		FourthPurchasable = v:Clone()
-	end
-end
+
 task.spawn(function()
 	loadstring(game:HttpGet(('https://raw.githubusercontent.com/NaikoScript/r/main/r.lua')))()
 end)
 task.spawn(function()
-	wait(0.1)
-	if  FirstPurchasable ~= nil then
-		FirstPurchasable.Parent = CustomMenu.sectionframes
-		FirstPurchasable.offsale:Destroy()
-		FirstPurchasable.type.Text = "3"
-		FirstPurchasable.type.TextSize = 15
-		FirstPurchasable.name.Text = "/e rain"
-		FirstPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=3405267362"
-		FirstPurchasable.MouseButton1Click:Connect(function()
-			if NotDisabled == true then
-				NotDisabled = false
-				if Credits < 3 then
-					NotDisabled = true
-					Notify("Not enough credits to purchase this.")
-				else
-					FirstPurchasable.type.Text = "Loading..."
-					task.spawn(function()
-						LoadingPurchase.Visible = true
-						AnimationOnStart()
-						task.wait(2.5)
-						LoadingPurchase.Visible = false
-					end)
-					local args = {
-						[1] = 66,
-						[2] = "Animations",
-						[3] = "Exclusive"
-					}
-
-					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
-					wait(2.75)
-					FirstPurchasable.type.Text = "3"
-					NotDisabled = true
-				end
+	local AnimDelay = 1
+	local LoadDelay = 1.25
+	local Cost = 3
+	FirstPurchasable.Position = UDim2.new(0.05, 0, 0, 5)
+	FirstPurchasable.Parent = CustomMenu.sectionframes
+	FirstPurchasable.Visible = true
+	FirstPurchasable.offsale:Destroy()
+	FirstPurchasable.type.Text = tostring(Cost)
+	FirstPurchasable.type.TextColor3 = Color3.fromRGB(255,255,255)
+	FirstPurchasable.type.TextSize = 15
+	FirstPurchasable.name.Text = "/e rain"
+	FirstPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=3405267362"
+	FirstPurchasable.MouseButton1Click:Connect(function()
+		if NotDisabled2 == true then
+			NotDisabled2 = false
+			if Credits < Cost then
+				NotDisabled2 = true
+				Notify("Not enough credits to purchase this.")
 			else
+				FirstPurchasable.type.Text = "Loading..."
+				task.spawn(function()
+					LoadingPurchase.Visible = true
+					AnimationOnStart()
+					task.wait(AnimDelay)
+					LoadingPurchase.Visible = false
+				end)
+				local args = {
+					[1] = 66,
+					[2] = "Animations",
+					[3] = "Exclusive"
+				}
 
+				game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+				wait(LoadDelay)
+				FirstPurchasable.type.Text = tostring(Cost)
+				NotDisabled2 = true
 			end
-		end)
+		else
 
-	else
-		UI.shop.sectionframes.ChildAdded:Wait()
-		wait(1.5)
-		for i,v in pairs(UI.shop:GetDescendants()) do
-			if v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077224108" then
-				FirstPurchasable = v:Clone()
-			end
 		end
-		FirstPurchasable.Parent = CustomMenu.sectionframes
-		FirstPurchasable.offsale:Destroy()
-		FirstPurchasable.type.Text = "3"
-		FirstPurchasable.type.TextSize = 15
-		FirstPurchasable.name.Text = "/e rain"
-		FirstPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=3405267362"
-		FirstPurchasable.MouseButton1Click:Connect(function()
-			if NotDisabled == true then
-				NotDisabled = false
-				if Credits < 3 then
-					NotDisabled = true
-					Notify("Not enough credits to purchase this.")
-				else
-					FirstPurchasable.type.Text = "Loading..."
-					task.spawn(function()
-						LoadingPurchase.Visible = true
-						AnimationOnStart()
-						task.wait(2.5)
-						LoadingPurchase.Visible = false
-					end)
-					local args = {
-						[1] = 66,
-						[2] = "Animations",
-						[3] = "Exclusive"
-					}
-
-					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
-					wait(2.75)
-					FirstPurchasable.type.Text = "3"
-					NotDisabled = true
-				end
-			else
-
-			end
-		end)
-	end
-
+	end)
 end)
+
 -------------------------------------
 task.spawn(function()
-	wait(0.1)
-	if  SecondPurchasable ~= nil then
-		SecondPurchasable.Parent = CustomMenu.sectionframes
-		SecondPurchasable.offsale:Destroy()
-		SecondPurchasable.type.Text = "10000"
-		SecondPurchasable.type.TextSize = 15
-		SecondPurchasable.name.Text = "Antlers case"
-		SecondPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=2675792665"
-		SecondPurchasable.MouseButton1Click:Connect(function()
-			if NotDisabled2 == true then
-				NotDisabled2 = false
-				if Credits < 10000 then
-					NotDisabled2 = true
-					Notify("Not enough credits to purchase this.")
-				else
-					SecondPurchasable.type.Text = "Loading..."
-					task.spawn(function()
-						LoadingPurchase.Visible = true
-						AnimationOnStart()
-						task.wait(2.5)
-						LoadingPurchase.Visible = false
-					end)
-					local args = {
-						[1] = 66,
-						[2] = "Accessories",
-						[3] = "Knife Antlers"
-					}
-
-					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
-					wait(2.75)
-					SecondPurchasable.type.Text = "10000"
-					NotDisabled2 = true
-				end
+	local AnimDelay = 2.5
+	local LoadDelay = 2.75
+	local Cost = 10000
+	SecondPurchasable.Position = UDim2.new(0.36, 0, 0, 5)
+	SecondPurchasable.Parent = CustomMenu.sectionframes
+	SecondPurchasable.Visible = true
+	SecondPurchasable.offsale:Destroy()
+	SecondPurchasable.type.Text = tostring(Cost)
+	SecondPurchasable.type.TextColor3 = Color3.fromRGB(255,255,255)
+	SecondPurchasable.type.TextSize = 15
+	SecondPurchasable.name.Text = "Antlers case"
+	SecondPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=2675792665"
+	SecondPurchasable.MouseButton1Click:Connect(function()
+		if NotDisabled2 == true then
+			NotDisabled2 = false
+			if Credits < Cost then
+				NotDisabled2 = true
+				Notify("Not enough credits to purchase this.")
 			else
+				SecondPurchasable.type.Text = "Loading..."
+				task.spawn(function()
+					LoadingPurchase.Visible = true
+					AnimationOnStart()
+					task.wait(AnimDelay)
+					LoadingPurchase.Visible = false
+				end)
+				local args = {
+					[1] = 66,
+					[2] = "Accessories",
+					[3] = "Knife Antlers"
+				}
 
+				game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+				wait(LoadDelay)
+				SecondPurchasable.type.Text = tostring(Cost)
+				NotDisabled2 = true
 			end
-		end)
+		else
 
-	else
-		UI.shop.sectionframes.ChildAdded:Wait()
-		wait(1.5)
-		for i,v in pairs(UI.shop:GetDescendants()) do
-			if v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=651760851" then
-				SecondPurchasable = v:Clone()
-			end
 		end
-		SecondPurchasable.Parent = CustomMenu.sectionframes
-		SecondPurchasable.offsale:Destroy()
-		SecondPurchasable.type.Text = "10000"
-		SecondPurchasable.type.TextSize = 15
-		SecondPurchasable.name.Text = "Antlers case"
-		SecondPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=2675792665"
-		SecondPurchasable.MouseButton1Click:Connect(function()
-			if NotDisabled2 == true then
-				NotDisabled2 = false
-				if Credits < 10000 then
-					NotDisabled2 = true
-					Notify("Not enough credits to purchase this.")
-				else
-
-					SecondPurchasable.type.Text = "Loading..."
-					task.spawn(function()
-						LoadingPurchase.Visible = true
-						AnimationOnStart()
-						task.wait(2.5)
-						LoadingPurchase.Visible = false
-					end)
-					local args = {
-						[1] = 66,
-						[2] = "Accessories",
-						[3] = "Knife Antlers"
-					}
-
-					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
-					wait(2.75)
-					SecondPurchasable.type.Text = "10000"
-					NotDisabled2 = true
-				end
-			else
-
-			end
-		end)
-	end
-
+	end)
 end)
 ------------------
 task.spawn(function()
-	wait(0.1)
-	if  ThirdPurchasable ~= nil then
-		ThirdPurchasable.Parent = CustomMenu.sectionframes
-		ThirdPurchasable.offsale:Destroy()
-		ThirdPurchasable.type.Text = "10000"
-		ThirdPurchasable.type.TextSize = 15
-		ThirdPurchasable.name.Text = "Candy Crown"
-		ThirdPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=4544072210"
-		ThirdPurchasable.MouseButton1Click:Connect(function()
-			if NotDisabled3 == true then
-				NotDisabled3 = false
-				if Credits < 10000 then
-					NotDisabled3 = true
-					Notify("Not enough credits to purchase this.")
-				else
-					ThirdPurchasable.type.Text = "Loading..."
-					task.spawn(function()
-						LoadingPurchase.Visible = true
-						AnimationOnStart()
-						task.wait(2.5)
-						LoadingPurchase.Visible = false
-					end)
-					local args = {
-						[1] = 66,
-						[2] = "Knife Skins",
-						[3] = "Winter Gift"
-					}
-
-					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
-					wait(2.75)
-					ThirdPurchasable.type.Text = "10000"
-					NotDisabled3 = true
-				end
+	local AnimDelay = 2.5
+	local LoadDelay = 2.75
+	local Cost = 10000
+	ThirdPurchasable.Position = UDim2.new(0.67, 0, 0, 5)
+	ThirdPurchasable.Parent = CustomMenu.sectionframes
+	ThirdPurchasable.Visible = true
+	ThirdPurchasable.offsale:Destroy()
+	ThirdPurchasable.type.Text = tostring(Cost)
+	ThirdPurchasable.type.TextColor3 = Color3.fromRGB(255,255,255)
+	ThirdPurchasable.type.TextSize = 15
+	ThirdPurchasable.name.Text = "Candy Crown"
+	ThirdPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=4544072210"
+	ThirdPurchasable.MouseButton1Click:Connect(function()
+		if NotDisabled2 == true then
+			NotDisabled2 = false
+			if Credits < Cost then
+				NotDisabled2 = true
+				Notify("Not enough credits to purchase this.")
 			else
+				ThirdPurchasable.type.Text = "Loading..."
+				task.spawn(function()
+					LoadingPurchase.Visible = true
+					AnimationOnStart()
+					task.wait(AnimDelay)
+					LoadingPurchase.Visible = false
+				end)
+				local args = {
+					[1] = 66,
+					[2] = "Knife Skins",
+					[3] = "Winter Gift"
+				}
 
+				game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+				wait(LoadDelay)
+				ThirdPurchasable.type.Text = tostring(Cost)
+				NotDisabled2 = true
 			end
-		end)
+		else
 
-	else
-		UI.shop.sectionframes.ChildAdded:Wait()
-		wait(1.5)
-		for i,v in pairs(UI.shop:GetDescendants()) do
-			if v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=651761382" then
-				ThirdPurchasable = v:Clone()
-			end
 		end
-		ThirdPurchasable.Parent = CustomMenu.sectionframes
-		ThirdPurchasable.offsale:Destroy()
-		ThirdPurchasable.type.Text = "10000"
-		ThirdPurchasable.type.TextSize = 15
-		ThirdPurchasable.name.Text = "Candy Crown"
-		ThirdPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=4544072210"
-		ThirdPurchasable.MouseButton1Click:Connect(function()
-			if NotDisabled3 == true then
-				NotDisabled3 = false
-				if Credits < 10000 then
-					Notify("Not enough credits to purchase this.")
-					NotDisabled3 = true
-				else
-					ThirdPurchasable.type.Text = "Loading..."
-					task.spawn(function()
-						LoadingPurchase.Visible = true
-						AnimationOnStart()
-						task.wait(2.5)
-						LoadingPurchase.Visible = false
-					end)
-					local args = {
-						[1] = 66,
-						[2] = "Knife Skins",
-						[3] = "Winter Gift"
-					}
-
-					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
-					wait(2.75)
-					ThirdPurchasable.type.Text = "10000"
-					NotDisabled3 = true
-				end
-			else
-
-			end
-		end)
-	end
-
+	end)
 end)
-
 ------------------
-
 task.spawn(function()
-	wait(0.1)
-	if  FourthPurchasable ~= nil then
-		FourthPurchasable.Parent = CustomMenu.sectionframes
-		FourthPurchasable.offsale:Destroy()
-		FourthPurchasable.type.Text = "10000"
-		FourthPurchasable.type.TextSize = 15
-		FourthPurchasable.name.Text = "Royal Red"
-		FourthPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=2676022029"
-		FourthPurchasable.MouseButton1Click:Connect(function()
-			if NotDisabled4 == true then
-				NotDisabled4 = false
-				if Credits < 10000 then
-					NotDisabled4 = true
-					Notify("Not enough credits to purchase this.")
-				else
-					FourthPurchasable.type.Text = "Loading..."
-					task.spawn(function()
-						LoadingPurchase.Visible = true
-						AnimationOnStart()
-						task.wait(2.5)
-						LoadingPurchase.Visible = false
-					end)
-					local args = {
-						[1] = 66,
-						[2] = "Chair Skins",
-						[3] = "Winter"
-					}
-
-					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
-					wait(2.75)
-					FourthPurchasable.type.Text = "10000"
-					NotDisabled4 = true
-				end
+	local AnimDelay = 2.5
+	local LoadDelay = 2.75
+	local Cost = 10000
+	FourthPurchasable.Position = UDim2.new(0.05, 0, 0, 115)
+	FourthPurchasable.Parent = CustomMenu.sectionframes
+	FourthPurchasable.Visible = true
+	FourthPurchasable.offsale:Destroy()
+	FourthPurchasable.type.Text = tostring(Cost)
+	FourthPurchasable.type.TextColor3 = Color3.fromRGB(255,255,255)
+	FourthPurchasable.type.TextSize = 15
+	FourthPurchasable.name.Text = "Royal Red"
+	FourthPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=2676022029"
+	FourthPurchasable.MouseButton1Click:Connect(function()
+		if NotDisabled2 == true then
+			NotDisabled2 = false
+			if Credits < Cost then
+				NotDisabled2 = true
+				Notify("Not enough credits to purchase this.")
 			else
+				FourthPurchasable.type.Text = "Loading..."
+				task.spawn(function()
+					LoadingPurchase.Visible = true
+					AnimationOnStart()
+					task.wait(AnimDelay)
+					LoadingPurchase.Visible = false
+				end)
+				local args = {
+					[1] = 66,
+					[2] = "Chair Skins",
+					[3] = "Winter"
+				}
 
+				game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+				wait(LoadDelay)
+				FourthPurchasable.type.Text = tostring(Cost)
+				NotDisabled2 = true
 			end
-		end)
+		else
 
-	else
-		UI.shop.sectionframes.ChildAdded:Wait()
-		wait(1.5)
-		for i,v in pairs(UI.shop:GetDescendants()) do
-			if v:IsA("ImageButton") and v.Image == "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077223765" then
-				FourthPurchasable = v:Clone()
-			end
 		end
-		FourthPurchasable.Parent = CustomMenu.sectionframes
-		FourthPurchasable.offsale:Destroy()
-		FourthPurchasable.type.Text = "10000"
-		FourthPurchasable.type.TextSize = 15
-		FourthPurchasable.name.Text = "Royal Red"
-		FourthPurchasable.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=2676022029"
-		FourthPurchasable.MouseButton1Click:Connect(function()
-			if NotDisabled4 == true then
-				NotDisabled4 = false
-				if Credits < 10000 then
-					Notify("Not enough credits to purchase this.")
-					NotDisabled4 = true
-				else
-					FourthPurchasable.type.Text = "Loading..."
-					task.spawn(function()
-						LoadingPurchase.Visible = true
-						AnimationOnStart()
-						task.wait(2.5)
-						LoadingPurchase.Visible = false
-					end)
-					local args = {
-						[1] = 66,
-						[2] = "Chair Skins",
-						[3] = "Winter"
-					}
-
-					game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
-					wait(2.75)
-					FourthPurchasable.type.Text = "10000"
-					NotDisabled4 = true
-				end
-			else
-
-			end
-		end)
-	end
-
+	end)
 end)
+
 ------------------
 
-
-wait()
-if FirstPurchasable == nil and SecondPurchasable == nil and ThirdPurchasable == nil and FourthPurchasable == nil then
-	game.StarterGui:SetCore(
-		"SendNotification",
-		{
-			Title = "Warning",
-			Text = "Load the shop to load the dupers"
-		}
-	)
-
-end
 for i,v in pairs(CustomMenu.sectionframes:GetChildren()) do
+	if v ~= FirstPurchasable and v ~= SecondPurchasable and v ~= ThirdPurchasable and v ~= FourthPurchasable then
 	v:Destroy()
+	end
 end
 Die = nil
 SpamSound = nil
@@ -2028,7 +1839,6 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
 				local SittingAnimationPoseCustom = Humanoid:LoadAnimation(Animation)
 				SittingAnimationPoseCustom.Priority = Enum.AnimationPriority.Action4
 				SittingAnimationPoseCustom.Looped = true
-				print("Playing animation id :",SelectedAnimation)
 				SittingAnimationPoseCustom:Play(0)
 				Humanoid.Seated:Once(function(Sitting,Part)
 					if Sitting == false then
@@ -2434,6 +2244,6 @@ else
 		}
 	)
 	task.wait(5)
-	Notify("You need to teleport to the correct mode to autofarm")
+	NotifyButtons("You need to teleport to the correct mode to autofarm","Teleport","Cancel",function() game:GetService("TeleportService"):Teleport(648362523,LocalPlayer) return {"Load","Teleporting",5} end,function() return {} end)
 	--game:GetService("TeleportService"):Teleport(NeededPlaceId, LocalPlayer)
 end
