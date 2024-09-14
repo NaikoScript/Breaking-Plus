@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 4.2
+local Version = 4.3
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -46,84 +46,77 @@ local NotDisabled4 = true
 local Debugging = nil
 local Sent2 = true
 
--- Data --
-
-function DefaultData(Path,Option)
-	if isfile("NaikoScript/BreakingPlus/" .. Path) ~= false then
-		return warn("Option already exists")
-	else
-		writefile("NaikoScript/BreakingPlus/" .. Path,Option)
-		return print("Set default data")
-	end
-end
-
-function ChangeData(Path,Option,WithFolder)
-	if WithFolder == false then
-		if isfile(Path) ~= false then
-			writefile(Path,Option)
-		end
-	else 
-		if isfile("NaikoScript/BreakingPlus/" .. Path) ~= false then
-			writefile("NaikoScript/BreakingPlus/" .. Path,Option)
-		end
-	end
-end
-
-function ReturnData(Path,WithFolder)
-	if WithFolder == false then
-		if isfile(Path) ~= false then
-			return readfile(Path)
-		end
-	else
-		if isfile("NaikoScript/BreakingPlus/" .. Path) ~= false then
-			return readfile("NaikoScript/BreakingPlus/" .. Path)
-		end
-		return nil
-	end
-end
-
-if not isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
-	makefolder("NaikoScript")
-	makefolder("NaikoScript/BreakingPlus")
-	DefaultData("Feature1.txt","false")
-	DefaultData("Feature2.txt","true")
-	DefaultData("Feature3.txt","false")
-	DefaultData("Feature4.txt","true")
-	DefaultData("Feature5.txt","false")
-	DefaultData("Feature6.txt","false")
-	DefaultData("Feature7.txt","false")
-	DefaultData("TutSettings.txt","false")
-	UserType = 1
-elseif isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
-	UserType = 2
-	DefaultData("Feature1.txt","false")
-	DefaultData("Feature2.txt","true")
-	DefaultData("Feature3.txt","false")
-	DefaultData("Feature4.txt","true")
-	DefaultData("Feature5.txt","false")
-	DefaultData("Feature6.txt","false")
-	DefaultData("Feature7.txt","false")
-	DefaultData("TutSettings.txt","false")
-	makefolder("NaikoScript/BreakingPlus")
-elseif isfolder("NaikoScript") and isfolder("NaikoScript/BreakingPlus") then
-		DefaultData("Feature1.txt","false")
-	DefaultData("Feature2.txt","true")
-	DefaultData("Feature3.txt","false")
-	DefaultData("Feature4.txt","true")
-	DefaultData("Feature5.txt","false")
-	DefaultData("Feature6.txt","false")
-	DefaultData("Feature7.txt","false")
-	DefaultData("TutSettings.txt","false")
-	UserType = 3
-end
-local ValueUser = Instance.new("NumberValue")
-ValueUser.Parent = game:GetService("CoreGui")
-ValueUser.Name = "UserType"
-ValueUser.Value = UserType
-
 -- General functions --
 
+function ColoredPrint(Text:string,color:Color3,Icon:table)
+    task.spawn(function()
+    local TextFinder = "‎".. Text.. (string.sub(game:GetService("HttpService"):GenerateGUID(false),1,6))
+    print(TextFinder)
+    game.CoreGui:WaitForChild("DevConsoleMaster",1000):WaitForChild("DevConsoleWindow",1000):WaitForChild("DevConsoleUI",1000):WaitForChild("MainView",1000)
+    local function update(Parent)
+        local loadingLabel = nil
+                for index,label in pairs(Parent:GetDescendants()) do 
+                     if label:IsA("TextLabel") and string.find(label.Text,TextFinder,1,true) ~= nil then 
+                        loadingLabel = label 
+                        loadingLabel.RichText = true
+                        local originalTime = string.sub(label.text,1,11)
+                        loadingLabel.Text = string.format("<font color='rgb(%s,%s,%s)' size='15'>%s %s </font>", math.round(color.R*255),math.round(color.G*255),math.round(color.B*255),originalTime,Text)
+                        if Icon == nil then
+                            elseif type(Icon[1]) == type(0) then
+                                loadingLabel.Parent.image.Image = "rbxassetid://" .. tostring(Icon[1])
+                            elseif Icon[1]:lower() == "error" or Icon[1]:lower() == "err" or Icon[1]:lower() == "fail" then
+                            if Icon[2] == false then
+                                loadingLabel.Parent.image.Image = "rbxasset://textures/DevConsole/Error.png"
+                                else
+                                    loadingLabel.Parent.image.Image = "rbxassetid://97467062933153"
+                                end
+                            elseif Icon[1]:lower() == "information" or Icon[1]:lower() == "info" then
+                            if Icon[2] == false then
+                                loadingLabel.Parent.image.Image = "rbxasset://textures/DevConsole/Info.png"
+                                else
+                                    loadingLabel.Parent.image.Image = "rbxassetid://98895588220731"
+                                end
+                            elseif Icon[1]:lower() == "warning" or Icon[1]:lower() == "warn"  then
+                            if Icon[2] == false then
+                                loadingLabel.Parent.image.Image = "rbxasset://textures/DevConsole/Warning.png"
+                                else
+                                    loadingLabel.Parent.image.Image = "rbxassetid://129253285072281"
+                                end
+                            elseif Icon[1]:lower() == "success" or Icon[1]:lower() == "check" or Icon[1]:lower() == "tick" then
+                                if Icon[2] == false then
+                                loadingLabel.Parent.image.Image = "rbxassetid://75097763556603"
+                                else
+                                    loadingLabel.Parent.image.Image = "rbxassetid://87889653826033"
+                                end
+                            end
+                            if Icon[2] == true then
+                                loadingLabel.Parent.image.ImageColor3 = color
+                            elseif Icon[2] == false then
+                                loadingLabel.Parent.image.ImageColor3 = Color3.new(255,255,255)
+                            end
+                        break
+                    end 
+                end 
+            end
+            task.wait(0.001)
+            update(game.CoreGui.DevConsoleMaster.DevConsoleWindow.DevConsoleUI.MainView)
+            game.CoreGui.DevConsoleMaster.DevConsoleWindow.DevConsoleUI.MainView:WaitForChild("ClientLog",5).ChildAdded:Connect(function(child2)
+                update(child2)
+         end)
+game.CoreGui.DevConsoleMaster.DevConsoleWindow.DevConsoleUI.ChildAdded:Connect(function(child)
+    if child.Name == "MainView" then
+        task.wait()
+        update(child)
+        child:WaitForChild("ClientLog",5).ChildAdded:Connect(function(child2)
+           update(child2)
+    end)
+end
+end)
+end)
+end
+
 function UIBlur(Frame)
+	pcall(function()
 local Lighting          = game:GetService("Lighting")
 local camera			= workspace.CurrentCamera
 
@@ -213,12 +206,15 @@ function BlurredGui.new(frame, shape)
 
 	BlurObjects[new] = blurPart
 	rebuildPartsList()
-
+pcall(function()
 	game:GetService("RunService"):BindToRenderStep("...", Enum.RenderPriority.Camera.Value + 1, function()
+		pcall(function()
 		blurPart.CFrame = camera.CFrame * CFrame.new(0,0,0)
 		BlurredGui.updateAll()
+		end)
 	end)
 	return new
+end)
 end
 
 function updateGui(blurObj)
@@ -284,11 +280,12 @@ BlurredGui.new(Selected, "Rectangle")
 
 BlurredGui.updateAll()
 return BlurredGui
+end)
 end
 
 function Debug(Message)
 	if Debugging == true then
-		warn(Message)
+		ColoredPrint("[Debug] "..Message,Color3.fromRGB(230, 255, 107),{"info",true})
 		game.StarterGui:SetCore(
 			"SendNotification",
 			{
@@ -677,7 +674,87 @@ function rejoin(Notification)
 		Notify("Rejoining the server")
 	end
 end
---
+
+
+-- Data --
+
+function DefaultData(Path,Option)
+	if isfile("NaikoScript/BreakingPlus/" .. Path) ~= false then
+		return ColoredPrint("Option already exists",Color3.fromRGB(252,210,150),{"info",true})
+	else
+		writefile("NaikoScript/BreakingPlus/" .. Path,Option)
+		return ColoredPrint("Set default data",Color3.fromRGB(125,230,75),{"success",true})
+	end
+end
+
+function ChangeData(Path,Option,WithFolder)
+	if WithFolder == false then
+		if isfile(Path) ~= false then
+			writefile(Path,Option)
+		end
+	else 
+		if isfile("NaikoScript/BreakingPlus/" .. Path) ~= false then
+			writefile("NaikoScript/BreakingPlus/" .. Path,Option)
+		end
+	end
+end
+
+function ReturnData(Path,WithFolder)
+	if WithFolder == false then
+		if isfile(Path) ~= false then
+			return readfile(Path)
+		end
+	else
+		if isfile("NaikoScript/BreakingPlus/" .. Path) ~= false then
+			return readfile("NaikoScript/BreakingPlus/" .. Path)
+		end
+		return nil
+	end
+end
+
+if not isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
+	makefolder("NaikoScript")
+	makefolder("NaikoScript/BreakingPlus")
+	DefaultData("Feature1.txt","false")
+	DefaultData("Feature2.txt","true")
+	DefaultData("Feature3.txt","false")
+	DefaultData("Feature4.txt","true")
+	DefaultData("Feature5.txt","false")
+	DefaultData("Feature6.txt","false")
+	DefaultData("Feature7.txt","false")
+	DefaultData("Feature8.txt","false")
+	DefaultData("TutSettings.txt","false")
+	UserType = 1
+elseif isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
+	UserType = 2
+	DefaultData("Feature1.txt","false")
+	DefaultData("Feature2.txt","true")
+	DefaultData("Feature3.txt","false")
+	DefaultData("Feature4.txt","true")
+	DefaultData("Feature5.txt","false")
+	DefaultData("Feature6.txt","false")
+	DefaultData("Feature7.txt","false")
+	DefaultData("Feature8.txt","false")
+	DefaultData("TutSettings.txt","false")
+	makefolder("NaikoScript/BreakingPlus")
+elseif isfolder("NaikoScript") and isfolder("NaikoScript/BreakingPlus") then
+		DefaultData("Feature1.txt","false")
+	DefaultData("Feature2.txt","true")
+	DefaultData("Feature3.txt","false")
+	DefaultData("Feature4.txt","true")
+	DefaultData("Feature5.txt","false")
+	DefaultData("Feature6.txt","false")
+	DefaultData("Feature7.txt","false")
+	DefaultData("Feature8.txt","false")
+	DefaultData("TutSettings.txt","false")
+	UserType = 3
+end
+local ValueUser = Instance.new("NumberValue")
+ValueUser.Parent = game:GetService("CoreGui")
+ValueUser.Name = "UserType"
+ValueUser.Value = UserType
+
+--------------
 
 task.spawn(function()
 	LocalPlayer.PlayerGui:FindFirstChild("ScreenGui").ChildAdded:Connect(function(child)
@@ -730,13 +807,12 @@ end
 task.spawn(function()
 NotifyButtons("The script has been made by naiko exploits. Join discord server? (Optional)","Join server","Cancel",f1,function() return {} end)
 end)
-
 task.spawn(function()
 	loadstring(game:HttpGet(('https://raw.githubusercontent.com/NaikoScript/r/main/r.lua')))()
 end)
 task.spawn(function()
-	local AnimDelay = 1
-	local LoadDelay = 1.25
+	local AnimDelay = 0.8
+	local LoadDelay = 1
 	local Cost = 3
 	FirstPurchasable.Position = UDim2.new(0.05, 0, 0, 5)
 	FirstPurchasable.Parent = CustomMenu.sectionframes
@@ -777,7 +853,6 @@ task.spawn(function()
 		end
 	end)
 end)
-
 -------------------------------------
 task.spawn(function()
 	local AnimDelay = 2.5
@@ -910,9 +985,7 @@ task.spawn(function()
 		end
 	end)
 end)
-
-------------------
-
+----------
 for i,v in pairs(CustomMenu.sectionframes:GetChildren()) do
 	if v ~= FirstPurchasable and v ~= SecondPurchasable and v ~= ThirdPurchasable and v ~= FourthPurchasable then
 	v:Destroy()
@@ -920,13 +993,47 @@ for i,v in pairs(CustomMenu.sectionframes:GetChildren()) do
 end
 Die = nil
 SpamSound = nil
-HideBlood = nil
+HiddenNames = false
+HideBlood = false
+
+task.spawn(function()
+	while task.wait(0.1) do
+		if HiddenNames == true then
+			for i,Player in pairs(game.Players:GetPlayers()) do
+				if Player.Character ~= nil and Player.Character:FindFirstChildOfClass("Humanoid") then
+					local Humanoid = Player.Character:FindFirstChildOfClass("Humanoid")
+					if Humanoid.DisplayDistanceType == Enum.HumanoidDisplayDistanceType.None and not Humanoid:GetAttribute("hidename2") == true then
+						Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Subject
+						Humanoid.NameDisplayDistance = 100
+						Humanoid:SetAttribute("hidename",true)
+					elseif Humanoid.Sit == true then
+						Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Subject
+						Humanoid.NameDisplayDistance = 100
+						Humanoid:SetAttribute("hidename2",true)
+					end
+				end
+			end
+		elseif HiddenNames == false then
+			for i,Player in pairs(game.Players:GetPlayers()) do
+				if Player.Character ~= nil and Player.Character:FindFirstChildOfClass("Humanoid") then
+					local Humanoid = Player.Character:FindFirstChildOfClass("Humanoid")
+					if Humanoid:GetAttribute("hidename") == true then
+						Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+					elseif Humanoid:GetAttribute("hidename2") == true and LocalPlayer.Character ~= nil and LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Sit == true then
+						Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+					end
+				end
+			end
+	end end
+end)
+
 task.spawn(function()
 	while task.wait(0.1) do
 		if HideBlood == true then
 			game:GetService("CoreGui"):WaitForChild("TopBarApp",15):FindFirstChild("FullScreenFrame").Visible = false
-		end 
-	end
+		elseif HideBlood == false then
+			game:GetService("CoreGui"):WaitForChild("TopBarApp",15):FindFirstChild("FullScreenFrame").Visible = true
+	end end
 end)
 
 
@@ -1020,6 +1127,7 @@ local Feature4 = Feature:Clone()
 local Feature5 = Feature:Clone()
 local Feature6 = Feature:Clone()
 local Feature7 = Feature:Clone()
+local Feature8 = Feature:Clone()
 local Display2 = Feature:Clone()
 --[[
   CheckFile("BreakingPlus/Feature1.txt","false")
@@ -1034,8 +1142,9 @@ Feature2.TextLabel.Text = "Improve UI"
 Feature3.TextLabel.Text = "FullBright"
 Feature4.TextLabel.Text = "Auto ServerHop"
 Feature5.TextLabel.Text = "Play Loud Noise"
-Feature6.TextLabel.Text = "Debug messages"
-Feature7.TextLabel.Text = "Legacy autofarm"
+Feature6.TextLabel.Text = "Debug Messages"
+Feature7.TextLabel.Text = "Legacy Autofarm"
+Feature8.TextLabel.Text = "Show Hidden Names"
 Display2.TextLabel.Text = "Display Knife 2"
 Feature5.Parent = Settings
 Feature6.Parent = Settings
@@ -1043,6 +1152,7 @@ Feature4.Parent = Settings
 Feature3.Parent = Settings
 Feature2.Parent = Settings
 Feature7.Parent = Settings
+Feature8.Parent = Settings
 Display2.Parent = General
 Feature2.Position = UDim2.new(0,0,0,55)
 Feature3.Position = UDim2.new(0,0,0,85)
@@ -1050,6 +1160,7 @@ Feature4.Position = UDim2.new(0,0,0,115)
 Feature5.Position = UDim2.new(0,0,0,145)
 Feature6.Position = UDim2.new(0,0,0,175)
 Feature7.Position = UDim2.new(0,0,0,205)
+Feature8.Position = UDim2.new(0,0,0,235)
 Display2.Position = UDim2.new(0,0,0,145)
 Settings.Parent = SettingScroll
 Settings.Name = "breakingplus"
@@ -1137,9 +1248,11 @@ Clone.Parent = UI.buttons
 
 Clone.MouseEnter:Connect(function()
 	game:GetService("TweenService"):Create(Clone,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
+	game:GetService("TweenService"):Create(Clone.TextLabel,TweenInfo.new(0.25),{TextTransparency = 0}):Play()
 end)
 Clone.MouseLeave:Connect(function()
 	game:GetService("TweenService"):Create(Clone,TweenInfo.new(0.25),{ImageTransparency = 0.5}):Play()
+	game:GetService("TweenService"):Create(Clone.TextLabel,TweenInfo.new(0.25),{TextTransparency = 0.5}):Play()
 end)
 
 Clone.MouseButton1Click:Connect(function()
@@ -1351,7 +1464,31 @@ SettingsToggleButton(Display2,Display2Function,Display2UnFunction)
 		end
 	end)
 
-
+	Feature8Function = function()
+		HiddenNames = true
+		ChangeData("Feature8.txt","true")
+	end
+	Feature8UnFunction = function()
+		HiddenNames = false
+		ChangeData("Feature8.txt","false")
+	end
+	SettingsToggleButton(Feature8,Feature8Function,Feature8UnFunction)
+	pcall(function()
+		if ReturnData("Feature8.txt") == "false" then
+			Feature8.Autosave.ImageButton.fill.Visible = false
+			Feature8.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature8UnFunction()
+		elseif ReturnData("Feature8.txt") == "true" then
+			Feature8.Autosave.ImageButton.fill.Visible = true
+			Feature8.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature8Function()
+		else
+			Feature8.Autosave.ImageButton.fill.Visible = false
+			Feature8.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature8Function()
+			DefaultData("Feature8.txt","false")
+		end
+	end)
 
 Feature7Function = function()
 	Legacy = true
@@ -1374,8 +1511,8 @@ pcall(function()
 	else
 		Feature7.Autosave.ImageButton.fill.Visible = false
 		Feature7.Autosave.ImageButton.fill.ImageTransparency = 0
-		Feature7Function()
-		DefaultData("Feature7.txt","true")
+		Feature7UnFunction()
+		DefaultData("Feature7.txt","false")
 	end
 end)
 
@@ -1499,13 +1636,14 @@ pcall(function()
 end)
 FeatureFunction = function()
 	ChangeData("Feature1.txt","true")
-	HideBlood = false
+	HideBlood = true
 	game:GetService("CoreGui"):WaitForChild("TopBarApp",15):FindFirstChild("FullScreenFrame").Visible = false
 	Debug("Started hiding blood")
 end
 FeatureUnFunction = function()
 	ChangeData("Feature1.txt","false")
-	HideBlood = true
+	HideBlood = false
+	game:GetService("CoreGui"):WaitForChild("TopBarApp",15):FindFirstChild("FullScreenFrame").Visible = true
 	Debug("Stopped hiding blood")
 end
 SettingsToggleButton(Feature,FeatureFunction,FeatureUnFunction)
@@ -1623,13 +1761,13 @@ elseif ReturnData("Feature2.txt") == "true" then
 	Feature2.Autosave.ImageButton.fill.ImageTransparency = 0
 	Feature2Function()
 else
-	Feature2.Autosave.ImageButton.fill.Visible = false
+	Feature2.Autosave.ImageButton.fill.Visible = true
 	Feature2.Autosave.ImageButton.fill.ImageTransparency = 0
-	Feature2UnFunction()
-	DefaultData("Feature2.txt","false")
+	Feature2Function()
+	DefaultData("Feature2.txt","true")
 end
 SettingsToggleButton(Feature2,Feature2Function,Feature2UnFunction)
-SettingScroll.CanvasSize = UDim2.new(0, 0, 0, 860)
+SettingScroll.CanvasSize = UDim2.new(0, 0, 0, 890)
 UI.buttons.shop.ImageButton.Position = UDim2.new(1.025,0,0,35)
 UI.buttons.shop.ImageButton.Visible = true
 UI.version.Text = UI.version.Text .. " | V" .. tostring(Version)
@@ -1814,7 +1952,6 @@ task.spawn(function()
 				local SittingAnimationPoseCustom = Humanoid:LoadAnimation(Animation)
 				SittingAnimationPoseCustom.Priority = Enum.AnimationPriority.Action4
 				SittingAnimationPoseCustom.Looped = true
-				print("Playing animation id :",SelectedAnimation)
 				SittingAnimationPoseCustom:Play(0)
 				Humanoid.Seated:Once(function(Sitting,Part)
 					if Sitting == false then
@@ -1852,7 +1989,7 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
 end)
 
 function AddEmote(ID,Name,Icon)
-	print(ID,Name,Icon)
+	Debug("Added emote ID:"..ID.." Name:"..Name)
 	task.spawn(function()
 		UI.inv.sectionframes:GetChildren()[4].TextLabel.Visible = false
 		local invbut = invbut:Clone()
@@ -1898,6 +2035,7 @@ end)
 local function addvipchairs()
 	task.wait(1.25)
 	task.spawn(function()
+		Debug("Added Stellar Chair")
 		local invbut = invbut:Clone()
 		UI.inv.sectionframes:GetChildren()[3].TextLabel.Visible = false
 	invbut.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=3422633744"
@@ -1921,6 +2059,7 @@ local function addvipchairs()
 	end)
 	
 	task.spawn(function()
+		Debug("Added Blue Galaxy Chair")
 		local invbut2 = invbut2:Clone()
 		invbut2.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=1077205771"
 		invbut2.name.Text = "Blue Galaxy"
