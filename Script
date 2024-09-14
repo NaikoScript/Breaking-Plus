@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 4.3
+local Version = 4.32
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -2015,25 +2015,16 @@ function AddEmote(ID,Name,Icon)
 	end)
 	end)
 end
+--[[
 task.spawn(function()
 	repeat task.wait() until UI.inv.sectionframes:GetChildren()[4]:FindFirstChild("GridOrder")
 	task.wait(0.25)
-local AnimationNamesAvailable = {Sway = {3200586606,3200675416},Rebel = {3200332361,2104492097},Slouch = {2040237465,2036596243},Sleep = {2040220399,2039295925},Tuck = {1236272531,1234316036},L = {955953327,958005778},Lean = {936006882,942467432},Chill = {942556290,942467847}}
 
-for i,v in pairs(UI.inv.sectionframes:GetChildren()[4].GridOrder:GetChildren()) do
-	table.foreachi(AnimationNamesAvailable,function(ii,vv) if ii == v.name.Text then AnimationNamesAvailable[ii] = false end end)
-end
 
-for EmoteName,v in pairs(AnimationNamesAvailable) do
-	if v ~= false then
-		AddEmote(v[1],EmoteName,v[2])
-		task.wait()
-	end
-end
 end)
-
+]]
 local function addvipchairs()
-	task.wait(1.25)
+	task.wait(1.4)
 	task.spawn(function()
 		Debug("Added Stellar Chair")
 		local invbut = invbut:Clone()
@@ -2084,12 +2075,8 @@ local function addvipchairs()
 
 
 task.spawn(function()
-	while task.wait(0.75) do
-		if not UI.inv.sectionframes:GetChildren()[2]:FindFirstChild("GridOrder") then
-	task.wait(0.35)
-	task.spawn(function()
-	addvipchairs()
-	end)
+	while task.wait(0.8) do
+		if not UI.inv.sectionframes:GetChildren()[5]:FindFirstChild("GridOrder") then
 for i,v in pairs(UI.inv.sectionframes:GetChildren()) do
     local MainFrame = Instance.new("Frame")
     local GridLayout = Instance.new("UIGridLayout")
@@ -2135,6 +2122,21 @@ for i,v in pairs(UI.inv.sectionframes:GetChildren()) do
 		v.CanvasSize = UDim2.new(0, 0, 0, GridLayout.AbsoluteContentSize.Y + 10)
     end)
 end
+task.wait(0.5)
+	task.spawn(function()
+	addvipchairs()
+	local AnimationNamesAvailable = {Sway = {3200586606,3200675416},Rebel = {3200332361,2104492097},Slouch = {2040237465,2036596243},Sleep = {2040220399,2039295925},Tuck = {1236272531,1234316036},L = {955953327,958005778},Lean = {936006882,942467432},Chill = {942556290,942467847}}
+
+	for i,v in pairs(UI.inv.sectionframes:GetChildren()[4].GridOrder:GetChildren()) do
+		table.foreachi(AnimationNamesAvailable,function(ii,vv) if ii == v.name.Text then AnimationNamesAvailable[ii] = false end end)
+	end
+	for EmoteName,v in pairs(AnimationNamesAvailable) do
+		if v ~= false then
+			AddEmote(v[1],EmoteName,v[2])
+			task.wait()
+		end
+	end
+	end)
 end
 end
 end)
