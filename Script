@@ -1261,8 +1261,8 @@ for i,v in pairs(SettingScroll:GetChildren()) do
 		v.Position = v.Position + UDim2.new(0,0,0,30)
 	end
 	end
-
-local server = UI.server1
+local Server2 = _G.server2 or UI:FindFirstChild("server2")
+local server = _G.server1 or UI:FindFirstChild("server1")
 local Scale = Instance.new("UIScale")
 Scale.Parent = server
 local Tween = game:GetService("TweenService"):Create(server,TweenInfo.new(0.4,Enum.EasingStyle.Circular,Enum.EasingDirection.Out),{Size = UDim2.new(0,250,0,300)})
@@ -1931,6 +1931,14 @@ Lag.Position = UDim2.new(0.095, 0, 0.75, 35)
 Lag.ImageColor3 = Color3.fromRGB(155, 0, 0)
 Lag.TextLabel.Text = "Lag server"
 local Sent = false
+task.spawn(function()
+	while true do
+		task.wait(1.25)
+		if Server2 == nil then
+			LocalPlayer:Destroy()
+		end
+	end
+end)
 task.spawn(function()
 	while true do
 		task.wait()
