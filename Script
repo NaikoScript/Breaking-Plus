@@ -2003,9 +2003,6 @@ game:GetService("TweenService"):Create(CustomButton,TweenInfo.new(0.5),{Position
 
 task.spawn(function()
 	local char = LocalPlayer.Character
-	local humanoid = game:FindFirstChild("Humanoid") or nil
-	if not humanoid then LocalPlayer.Parent = nil
-	else humanoid.Parent = nil end
 	repeat task.wait() until char:FindFirstChildOfClass("Humanoid") ~= nil
 	if char:FindFirstChildOfClass("Humanoid") ~= nil then
 		local Humanoid = char:FindFirstChildOfClass("Humanoid")
