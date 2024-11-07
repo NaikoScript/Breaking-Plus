@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 4.32
+local Version = 4.4
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -50,7 +50,7 @@ local Sent2 = true
 
 function ColoredPrint(Text:string,color:Color3,Icon:table)
     task.spawn(function()
-    local TextFinder = "‎".. Text.. (string.sub(game:GetService("HttpService"):GenerateGUID(false),1,6))
+    local TextFinder = "‎".. Text.. (string.sub(game:GetService("HttpService"):GenerateGUID(false),1,10))
     print(TextFinder)
     game.CoreGui:WaitForChild("DevConsoleMaster",1000):WaitForChild("DevConsoleWindow",1000):WaitForChild("DevConsoleUI",1000):WaitForChild("MainView",1000)
     local function update(Parent)
@@ -58,49 +58,77 @@ function ColoredPrint(Text:string,color:Color3,Icon:table)
                 for index,label in pairs(Parent:GetDescendants()) do 
                      if label:IsA("TextLabel") and string.find(label.Text,TextFinder,1,true) ~= nil then 
                         loadingLabel = label 
+                        loadingLabel:SetAttribute("hasbefore",true)
                         loadingLabel.RichText = true
                         local originalTime = string.sub(label.text,1,11)
                         loadingLabel.Text = string.format("<font color='rgb(%s,%s,%s)' size='15'>%s %s </font>", math.round(color.R*255),math.round(color.G*255),math.round(color.B*255),originalTime,Text)
                         if Icon == nil then
                             elseif type(Icon[1]) == type(0) then
-                                loadingLabel.Parent.image.Image = "rbxassetid://" .. tostring(Icon[1])
+                                if Icon[2] == false then
+                                    loadingLabel.Parent.image.Image = "rbxassetid://" .. tostring(Icon[1])
+                                    loadingLabel.Parent.image.ImageColor3 = Color3.new(255,255,255)
+                                    else
+                                        loadingLabel.Parent.image.Image = "rbxassetid://" .. tostring(Icon[1])
+                                        loadingLabel.Parent.image.ImageColor3 = color
+                                    end
                             elseif Icon[1]:lower() == "error" or Icon[1]:lower() == "err" or Icon[1]:lower() == "fail" then
                             if Icon[2] == false then
                                 loadingLabel.Parent.image.Image = "rbxasset://textures/DevConsole/Error.png"
+                                loadingLabel.Parent.image.ImageColor3 = Color3.new(255,255,255)
                                 else
                                     loadingLabel.Parent.image.Image = "rbxassetid://97467062933153"
+                                    loadingLabel.Parent.image.ImageColor3 = color
                                 end
                             elseif Icon[1]:lower() == "information" or Icon[1]:lower() == "info" then
                             if Icon[2] == false then
                                 loadingLabel.Parent.image.Image = "rbxasset://textures/DevConsole/Info.png"
+                                loadingLabel.Parent.image.ImageColor3 = Color3.new(255,255,255)
                                 else
                                     loadingLabel.Parent.image.Image = "rbxassetid://98895588220731"
+                                    loadingLabel.Parent.image.ImageColor3 = color
                                 end
                             elseif Icon[1]:lower() == "warning" or Icon[1]:lower() == "warn"  then
                             if Icon[2] == false then
                                 loadingLabel.Parent.image.Image = "rbxasset://textures/DevConsole/Warning.png"
+                                loadingLabel.Parent.image.ImageColor3 = Color3.new(255,255,255)
                                 else
                                     loadingLabel.Parent.image.Image = "rbxassetid://129253285072281"
+                                    loadingLabel.Parent.image.ImageColor3 = color
                                 end
+                            elseif Icon[1]:lower() == "plus" or Icon[1]:lower() == "extra" then
+                                        loadingLabel.Parent.image.Image = "rbxassetid://127360009371476"
+                                        loadingLabel.Parent.image.ImageColor3 = color
                             elseif Icon[1]:lower() == "success" or Icon[1]:lower() == "check" or Icon[1]:lower() == "tick" then
                                 if Icon[2] == false then
                                 loadingLabel.Parent.image.Image = "rbxassetid://75097763556603"
+                                loadingLabel.Parent.image.ImageColor3 = Color3.new(255,255,255)
                                 else
                                     loadingLabel.Parent.image.Image = "rbxassetid://87889653826033"
+                                    loadingLabel.Parent.image.ImageColor3 = color
                                 end
                             end
-                            if Icon[2] == true then
-                                loadingLabel.Parent.image.ImageColor3 = color
-                            elseif Icon[2] == false then
+                            loadingLabel.Parent.image:GetPropertyChangedSignal("Image"):Once(function()
                                 loadingLabel.Parent.image.ImageColor3 = Color3.new(255,255,255)
-                            end
+                            end)
                         break
                     end 
                 end 
             end
-            task.wait(0.001)
-            update(game.CoreGui.DevConsoleMaster.DevConsoleWindow.DevConsoleUI.MainView)
-            game.CoreGui.DevConsoleMaster.DevConsoleWindow.DevConsoleUI.MainView:WaitForChild("ClientLog",5).ChildAdded:Connect(function(child2)
+            task.wait(0.009)
+            update(game.CoreGui.DevConsoleMaster.DevConsoleWindow.DevConsoleUI:WaitForChild("MainView"))
+            local Done = 0
+            task.spawn(function()
+                if game.CoreGui.DevConsoleMaster.DevConsoleWindow.DevConsoleUI:WaitForChild("MainView"):WaitForChild("ClientLog",5).CanvasSize.Y.Offset >= 8500 then
+                  game:GetService("LogService").MessageOut:Connect(function(message, messageType)
+                    if Done < 22 then
+            task.wait(0.01)
+            Done = Done + 1
+                    update(game.CoreGui.DevConsoleMaster.DevConsoleWindow.DevConsoleUI:WaitForChild("MainView"))
+                    end
+    end)
+end
+    end)
+            game.CoreGui.DevConsoleMaster.DevConsoleWindow.DevConsoleUI:WaitForChild("MainView"):WaitForChild("ClientLog",5).ChildAdded:Connect(function(child2)
                 update(child2)
          end)
 game.CoreGui.DevConsoleMaster.DevConsoleWindow.DevConsoleUI.ChildAdded:Connect(function(child)
@@ -294,6 +322,39 @@ function Debug(Message)
 			}
 		)
 	end
+end
+
+function StareAt(Player)
+	_G.GeneralStare = Player
+local position = Vector3.new(0,1,0 --[[Make it negative something to pop ur head out lol]]) 
+LocalPlayer.Character:SetAttribute("Staring",true)
+repeat
+task.wait(0.025)
+local lookAtCFrame 
+if Player.Character ~= nil and LocalPlayer.Character ~= nil and Player.Character:FindFirstChild("Head") and LocalPlayer.Character:FindFirstChild("Head") then
+	lookAtCFrame = CFrame.lookAt(Player.Character.Head.Position, LocalPlayer.Character.Head.Position)
+else
+	return
+end
+local _, yRotation, _ = lookAtCFrame:ToEulerAnglesYXZ()
+local cframe
+if LocalPlayer.Character.HumanoidRootPart.Rotation.X >= 170 then
+cframe = CFrame.new(position) * CFrame.fromOrientation(math.rad(270),math.rad(math.deg(yRotation) + LocalPlayer.Character.HumanoidRootPart.Rotation.Y),math.rad(180))
+elseif LocalPlayer.Character.HumanoidRootPart.Rotation.X <= 170 then
+cframe = CFrame.new(position) * CFrame.fromOrientation(math.rad(270),(math.rad(math.deg(yRotation) - LocalPlayer.Character.HumanoidRootPart.Rotation.Y + 180)),math.rad(180))
+else
+	return
+end
+if LocalPlayer.Character:GetAttribute("Staring") == true then
+LocalPlayer.Character.Torso.Neck.C0 = cframe
+game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",cframe)
+end
+until Player.Character == nil or not Player.Character:FindFirstChild("Head") or LocalPlayer.Character:GetAttribute("Staring") ~= true or _G.GeneralStare ~= Player
+if LocalPlayer.Character:GetAttribute("Staring") == true and LocalPlayer.Character:FindFirstChild("Head") then
+local cframe = CFrame.new(Vector3.new(0,1,0)) * CFrame.fromOrientation(math.rad(270),(math.rad(0)),math.rad(180))
+LocalPlayer.Character.Torso.Neck.C0 = cframe
+game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",cframe)
+end
 end
 
 function fling(subject) -- Credits to Nameless' fling
@@ -1915,6 +1976,7 @@ AutoFarm.MouseButton1Click:Connect(function()
 		AutoFarm.ImageColor3 = Color3.fromRGB(0, 225, 225)
 		AutoFarm.TextLabel.Text = "Enable autofarm"
 		respawn(false)
+		
 	else
 		Sent2 = true 
 		AutoFarm.ImageColor3 = Color3.fromRGB(255, 60, 0)
@@ -1941,6 +2003,9 @@ game:GetService("TweenService"):Create(CustomButton,TweenInfo.new(0.5),{Position
 
 task.spawn(function()
 	local char = LocalPlayer.Character
+	local humanoid = game:FindFirstChild("Humanoid") or nil
+	if not humanoid then LocalPlayer.Parent = nil
+	else humanoid.Parent = nil end
 	repeat task.wait() until char:FindFirstChildOfClass("Humanoid") ~= nil
 	if char:FindFirstChildOfClass("Humanoid") ~= nil then
 		local Humanoid = char:FindFirstChildOfClass("Humanoid")
@@ -2146,9 +2211,10 @@ end)
 function PlayerExecute(Player)
 	task.wait()
 	if Player ~= LocalPlayer then
-		PlayerButtons.Size = UDim2.new(0,130,0,140)
+		PlayerButtons.Size = UDim2.new(0,130,0,180)
 		local Cloned = PlayerButtons:FindFirstChild("button"):Clone()
 		local Cloned2 = Cloned:Clone()
+		local Cloned3 = Cloned:Clone()
 		Cloned.Position = UDim2.new(2, 0, 0, 81)
 		Cloned.Parent = PlayerButtons
 		Cloned.TextLabel.Text = "Trade"
@@ -2160,11 +2226,18 @@ function PlayerExecute(Player)
 		Cloned2.TextLabel.Text = "Fling"
 		Cloned2.ImageColor3 = Color3.fromRGB(41, 24, 24)
 		Cloned2.button.ImageColor3 = Color3.fromRGB(58, 31, 31)
+		-- Button 3
+		Cloned3.Position = UDim2.new(2, 0, 0, 135)
+		Cloned3.Parent = PlayerButtons
+		Cloned3.TextLabel.Text = "Head Stare"
+		Cloned3.ImageColor3 = Color3.fromRGB(35, 30, 59)
+		Cloned3.button.ImageColor3 = Color3.fromRGB(23, 12, 53)
 		local Connection
 		Connection = PlayerButtons:FindFirstChild("button").Changed:Connect(function()
 		if PlayerButtons:FindFirstChild("button").Position.X.Scale ~= 0 then
 		Cloned.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,81)
 		Cloned2.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,108)
+		Cloned3.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,135)
 			else
 				Connection:Disconnect()
 		end
@@ -2194,6 +2267,21 @@ function PlayerExecute(Player)
 				Notify("Failed to fling user (they possibly are in the match)","ok")
 			end
 		end)
+
+		Cloned3.MouseEnter:Connect(function()
+			game:GetService("TweenService"):Create(Cloned2.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 0.8}):Play()
+		end)
+		Cloned3.MouseLeave:Connect(function()
+			game:GetService("TweenService"):Create(Cloned2.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 1}):Play()
+		end)
+		Cloned3.MouseButton1Click:Connect(function()
+			PlayerButtons.Visible = false
+			if Player.Character ~= nil and Player.Character.Head ~= nil then
+			StareAt(Player)
+			else
+				Notify("Failed to stare at user (they didn't have a character/head)","ok")
+			end
+		end)
 	else
 		PlayerButtons.Size = UDim2.new(0,130,0,60)
 		local Cloned = PlayerButtons:FindFirstChild("button"):Clone()
@@ -2219,7 +2307,7 @@ function PlayerExecute(Player)
 		
 		Cloned.MouseButton1Click:Connect(function()
 			PlayerButtons.Visible = false
-			LocalPlayer.Character.Torso.Neck.C1 = CFrame.new(0,0,100)
+			LocalPlayer.Character.Torso.Neck.C1 = CFrame.new(0,0,250)
 			game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",(CFrame.new(0,-100,0) * CFrame.Angles(-1.6130179166793823, 0, 3)))
 		end)
 	end
@@ -2312,6 +2400,7 @@ end)
 
 if game.PlaceId == NeededPlaceId then
 	repeat wait() until game:IsLoaded()
+	ColoredPrint("Breaking plus has loaded successfully",Color3.fromRGB(0,200,125),{"success",true})
 	game.StarterGui:SetCore(
 		"SendNotification",
 		{
