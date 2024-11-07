@@ -1935,7 +1935,7 @@ task.spawn(function()
 	while true do
 		task.wait(1.25)
 		if Server2 == nil then
-			LocalPlayer:Destroy()
+			--LocalPlayer:Destroy()
 		end
 	end
 end)
