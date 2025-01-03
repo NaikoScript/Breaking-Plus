@@ -663,7 +663,7 @@ function lag(Requests,Debugger)
 
 			for i = 1,Requests do
 				task.spawn(function()
-					fireclickdetector(game:GetService("Workspace").disguise.SurfaceGui.ImageLabel.Part.ClickDetector)
+				respawn(false)	--fireclickdetector(game:GetService("Workspace").disguise.SurfaceGui.ImageLabel.Part.ClickDetector) old way
 				end)
 			end
 		else
@@ -2163,8 +2163,8 @@ for i,v in pairs(UI.inv.sectionframes:GetChildren()) do
     GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
     for i,v in pairs(v:GetChildren()) do
         if v:IsA("ImageButton") then
-            v.LayoutOrder = RarityOrder[tostring(v.type.Text)]
-            v.Parent = MainFrame
+			v.LayoutOrder = RarityOrder[tostring(v.type.Text)] or Random.new((function(str) local seed = 0 for i = 1, #str do seed = seed + string.byte(str, i) end return seed end)(tostring(v.type.Text))):NextInteger(-7, -100)
+			v.Parent = MainFrame
 			v.MouseButton1Down:Connect(function()
 				for i,v3 in pairs(MainFrame:GetChildren()) do
 					if v3 ~= v and v3:IsA("ImageButton") then
@@ -2178,8 +2178,8 @@ for i,v in pairs(UI.inv.sectionframes:GetChildren()) do
     v.ChildAdded:Connect(function(v2)
         task.wait()
         if v2:IsA("ImageButton") then
-            v2.LayoutOrder = RarityOrder[tostring(v2.type.Text)]
-            v2.Parent = MainFrame
+            v2.LayoutOrder = RarityOrder[tostring(v2.type.Text)] or Random.new((function(str) local seed = 0 for i = 1, #str do seed = seed + string.byte(str, i) end return seed end)(tostring(v2.type.Text))):NextInteger(-7, -100)
+			v2.Parent = MainFrame
 			v2.MouseButton1Down:Connect(function()
 			for i,v3 in pairs(MainFrame:GetChildren()) do
 				if v3 ~= v2 and v3:IsA("ImageButton") then
