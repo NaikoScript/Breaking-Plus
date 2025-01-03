@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 4.4
+local Version = 4.41
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -1261,8 +1261,7 @@ for i,v in pairs(SettingScroll:GetChildren()) do
 		v.Position = v.Position + UDim2.new(0,0,0,30)
 	end
 	end
-local Server2 = _G.server2 or UI:FindFirstChild("server2")
-local server = _G.server1 or UI:FindFirstChild("server1")
+local server = UI:FindFirstChild("server1")
 local Scale = Instance.new("UIScale")
 Scale.Parent = server
 local Tween = game:GetService("TweenService"):Create(server,TweenInfo.new(0.4,Enum.EasingStyle.Circular,Enum.EasingDirection.Out),{Size = UDim2.new(0,250,0,300)})
@@ -1270,6 +1269,13 @@ local Tween2 = game:GetService("TweenService"):Create(server,TweenInfo.new(0.2,E
 local Tween3 = game:GetService("TweenService"):Create(Scale,TweenInfo.new(0.8,Enum.EasingStyle.Linear,Enum.EasingDirection.Out),{Scale = 0})
 game:GetService("Workspace").disguise.SurfaceGui.noother.Part.ClickDetector.MouseClick:Connect(function()
 	CustomMenu.Visible = false
+	for i,v in pairs(UI:GetChildren()) do
+		task.spawn(function()
+			if v.Name == "setting" or v.Name == "trade" or v.Name == "shop" or v.Name == "inv" or v.Name == "tradelog" then
+				v.Visible = false
+			end
+		end)
+	end
 	if Animations == true then
 server.Size = UDim2.new(0,250,0,0)
 Scale.Scale = 1
@@ -1286,13 +1292,15 @@ Clone3.Parent = server
 Clone3.MouseButton1Click:Connect(function()
 	if Animations == true then
 		SavedPosition2 = server.ScrollingFrame.CanvasPosition
-server.Size = UDim2.new(0,250,0,300)
-Scale.Scale = 1
-Tween:Cancel()
-Tween2:Play()
-Tween3:Play()
-task.wait(0.2)
-server.Visible = false
+		server.Size = UDim2.new(0,250,0,300)
+		Scale.Scale = 1
+		Tween:Cancel()
+		Tween2:Play()
+		Tween3:Play()
+		task.wait(0.2)
+		server.Visible = false
+	else
+		server.Visible = false
 	end
 end)
 
@@ -1357,7 +1365,6 @@ else
 	setting.Visible = not setting.Visible
 end
 end)
-
 local Clone2 = setting.TextButton:Clone()
 setting.TextButton:Destroy()
 Clone2.Parent = setting
@@ -1933,14 +1940,6 @@ Lag.TextLabel.Text = "Lag server"
 local Sent = false
 task.spawn(function()
 	while true do
-		task.wait(1.25)
-		if Server2 == nil then
-			--LocalPlayer:Destroy()
-		end
-	end
-end)
-task.spawn(function()
-	while true do
 		task.wait()
 		if Sent == true then
 			lag(4,false)
@@ -2151,7 +2150,7 @@ for i,v in pairs(UI.inv.sectionframes:GetChildren()) do
     local MainFrame = Instance.new("Frame")
     local GridLayout = Instance.new("UIGridLayout")
     local Padding = Instance.new("UIPadding")
-    local RarityOrder = {Divine = -5,Legendary = -4,Rare = -3,Uncommon = -2,Common = -1}
+    local RarityOrder = {Exotic=-6,Divine = -5,Legendary = -4,Rare = -3,Uncommon = -2,Common = -1}
     MainFrame.Parent = v
     MainFrame.BackgroundTransparency = 1
     MainFrame.Size = UDim2.new(1,0,1,0)
