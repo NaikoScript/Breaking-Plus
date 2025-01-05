@@ -1,0 +1,42 @@
+local LocalPlayer = game.Players.LocalPlayer
+local UI = LocalPlayer.PlayerGui.ScreenGui or LocalPlayer.PlayerGui:WaitForChild("ScreenGui")
+local SkinTypes = {Guns=1,Knifes=2,Chairs=3,Animations=4,Accessories=5,Effects=6}
+local Rarities = {Common=Color3.fromRGB(255, 255, 255),Uncommon=Color3.fromRGB(255, 245, 184),Rare=Color3.fromRGB(25, 255, 190),Legendary=Color3.fromRGB(255, 79, 82),Divine=Color3.fromRGB(255, 204, 0),Exotic=Color3.fromRGB(255, 129, 59)}
+local RarityOrder = {Exotic=-6,Divine = -5,Legendary = -4,Rare = -3,Uncommon = -2,Common = -1}
+
+local SkinType = SkinTypes["Chairs"]
+local SkinName = "Royal red"
+local Rarity = "Legendary"
+
+local Images = {2676022029}
+
+if UI.inv.sectionframes:GetChildren()[SkinType]:FindFirstChild("GridOrder") then
+    local invbut = game.ReplicatedStorage.model.invbut:Clone()
+    local CurrentImage = 1
+    invbut.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. Images[CurrentImage]
+    invbut.name.Text = SkinName
+    invbut.type.Text = Rarity
+    invbut.type.TextColor3 = Rarities[Rarity]
+    invbut.LayoutOrder = RarityOrder[Rarity]
+    invbut.Parent = UI.inv.sectionframes:GetChildren()[SkinType]
+    invbut.MouseButton1Down:Connect(function()
+        if invbut.BorderSizePixel == 0 then
+            invbut.BorderSizePixel = 2
+            local args = {
+                [1] = 55,
+                [2] = "Chair Skins",
+                [3] = "Winter",
+                [4] = "Royal Red"
+            }
+            
+            game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer(unpack(args))            
+        for i,v in pairs(UI.inv.sectionframes:GetChildren()[SkinType].GridOrder:GetChildren()) do
+            if v ~= invbut and v:IsA("ImageButton") then
+                v.BorderSizePixel = 0
+            end
+        end
+            else
+                invbut.BorderSizePixel = 0
+            end
+            end)
+        end
