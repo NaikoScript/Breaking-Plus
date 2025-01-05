@@ -7,7 +7,7 @@ local RarityOrder = {Exotic=-6,Divine = -5,Legendary = -4,Rare = -3,Uncommon = -
 local SkinType = SkinTypes["Animations"]
 local SkinName = "/e rain"
 
-local Images = {18603984891}
+local Images = {3405267362}
 
 if UI.inv.sectionframes:GetChildren()[SkinType]:FindFirstChild("GridOrder") then
     local invbut = game.ReplicatedStorage.model.invbut:Clone()
