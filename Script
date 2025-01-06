@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 4.41
+local Version = 4.5
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -39,6 +39,9 @@ local SelectedAnimation = 0
 local Credits = tonumber(ClassicCredits.Text:sub(-ClassicCredits.Text:len(),-8))
 local invbut = game.ReplicatedStorage.model.invbut:Clone()
 local invbut2 = game.ReplicatedStorage.model.invbut:Clone()
+local ERainSource = game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/ERainSource")
+local CandyCrownSource = game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/CandyCrownSource")
+local RoyalRedSource = game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/RoyalRedSource")
 local NotDisabled = true
 local NotDisabled2 = true
 local NotDisabled3 = true
@@ -905,6 +908,7 @@ task.spawn(function()
 				}
 
 				game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+				loadstring(ERainSource)()
 				wait(LoadDelay)
 				FirstPurchasable.type.Text = tostring(Cost)
 				NotDisabled2 = true
@@ -993,6 +997,7 @@ task.spawn(function()
 				}
 
 				game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+				loadstring(CandyCrownSource)()
 				wait(LoadDelay)
 				ThirdPurchasable.type.Text = tostring(Cost)
 				NotDisabled2 = true
@@ -1037,6 +1042,7 @@ task.spawn(function()
 				}
 
 				game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+				loadstring(RoyalRedSource)()
 				wait(LoadDelay)
 				FourthPurchasable.type.Text = tostring(Cost)
 				NotDisabled2 = true
