@@ -1,6 +1,10 @@
 # Breaking Plus
 > [!IMPORTANT]
 > **Join my [discord server](https://discord.gg/vAWJMYJYcR) if you find any bugs or have issues with the script**
+
+> [!CAUTION]
+> **Breaking point** is currently completely broken *(not breaking plus)* and because of this **breaking plus** will be **shutdown** till **breaking point** is fixed.  Blame **roblox** for it
+
 ## Script thumbnail
 ![BreakingPlus4](https://github.com/NaikoScript/Breaking-Plus/assets/107273752/68352ab9-d209-460d-b394-ec873341403d)
 ## Script version
