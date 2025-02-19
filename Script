@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 4.5
+local Version = 4.6
 local NeededPlaceId = nil
 local RoundMode = nil
 local UserType = 0
@@ -42,11 +42,17 @@ local invbut2 = game.ReplicatedStorage.model.invbut:Clone()
 local ERainSource = game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/ERainSource")
 local CandyCrownSource = game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/CandyCrownSource")
 local RoyalRedSource = game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/RoyalRedSource")
+local FreecamSourceFunction = loadstring(game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/FreecamSource"))()
+local TweenService = game:GetService("TweenService")
 local NotDisabled = true
 local NotDisabled2 = true
 local NotDisabled3 = true
 local NotDisabled4 = true
 local Debugging = nil
+local CurrentLabel = nil
+local TopNotifyConnection = nil
+local IsImmune = false
+local FloatingHead = false
 local Sent2 = true
 
 -- General functions --
@@ -352,8 +358,8 @@ if LocalPlayer.Character:GetAttribute("Staring") == true then
 LocalPlayer.Character.Torso.Neck.C0 = cframe
 game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",cframe)
 end
-until Player.Character == nil or not Player.Character:FindFirstChild("Head") or LocalPlayer.Character:GetAttribute("Staring") ~= true or _G.GeneralStare ~= Player
-if LocalPlayer.Character:GetAttribute("Staring") == true and LocalPlayer.Character:FindFirstChild("Head") then
+until Player.Character == nil or not Player.Character:FindFirstChild("Head") or LocalPlayer.Character:GetAttribute("Staring") ~= true or _G.GeneralStare ~= Player or FloatingHead == true
+if LocalPlayer.Character:GetAttribute("Staring") == true and LocalPlayer.Character:FindFirstChild("Head") and FloatingHead == false then
 local cframe = CFrame.new(Vector3.new(0,1,0)) * CFrame.fromOrientation(math.rad(270),(math.rad(0)),math.rad(180))
 LocalPlayer.Character.Torso.Neck.C0 = cframe
 game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",cframe)
@@ -529,6 +535,85 @@ function fling(subject) -- Credits to Nameless' fling
     end)
 end
 
+function TopNotify(Text, ImmuneDuration, HideAfterImmnityEnd)
+    local function Appear(Label)
+        task.spawn(function()
+            local TweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out, 0, false, 0)
+            if Label:IsA("TextLabel") then
+                Label.Position = UDim2.new(0, 0, 0.1, 25)
+                Label.TextTransparency = 1
+                TweenService:Create(Label, TweenInfo, {Position = UDim2.new(0, 0, 0.1, 0), TextTransparency = 0}):Play()
+            end
+        end)
+    end
+
+    local function Disappear(Label, Destroy)
+        task.spawn(function()
+            local TweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out, 0, false, 0)
+            if Label:IsA("TextLabel") then
+                local Tween = TweenService:Create(Label, TweenInfo, {Position = UDim2.new(0, 0, 0.1, -25), TextTransparency = 1})
+                Tween:Play()
+                Tween.Completed:Wait()
+                if Destroy == true then
+                    Label:Destroy()
+                else
+                    Label.Position = UDim2.new(0, 0, -1000000, 0)
+                end
+            end
+        end)
+    end
+
+    if CurrentLabel then
+        Disappear(CurrentLabel, true)
+        if TopNotifyConnection then
+            TopNotifyConnection:Disconnect()
+            TopNotifyConnection = nil
+        end
+    end
+
+    local Label = game.ReplicatedStorage.model.messagelabel:Clone()
+    Label.Text = Text
+    Label.Parent = UI
+    Label:SetAttribute("ByScript", true)
+    IsImmune = true
+    CurrentLabel = Label
+
+    Appear(Label)
+
+    for i, v in UI:GetChildren() do
+        if v.Name == Label.Name and v:GetAttribute("ByScript") ~= true then
+            Disappear(v)
+        end
+    end
+
+    TopNotifyConnection = UI.ChildAdded:Connect(function(child)
+        if child.Name == CurrentLabel.Name and child ~= CurrentLabel then
+            if IsImmune == true then
+                if child:GetAttribute("ByScript") ~= true then
+                    child.TextTransparency = 1
+                    child.Position = UDim2.new(0, 0, -1000000, 0)
+                    child.Visible = false
+                    Disappear(child)
+                end
+            else
+                Disappear(CurrentLabel, true)
+            end
+        end
+    end)
+
+    task.spawn(function()
+        task.wait(ImmuneDuration)
+        if TopNotifyConnection ~= nil and CurrentLabel == Label and HideAfterImmnityEnd == true then
+            TopNotifyConnection:Disconnect()
+            TopNotifyConnection = nil
+        end
+        IsImmune = false
+        if HideAfterImmnityEnd then
+            Disappear(Label, true)
+        end
+    end)
+end
+
 function Notify(Message,Button)
 	pcall(function()
 		if Message == nil then
@@ -650,6 +735,7 @@ function NotifyButtons(Message,Button,Button2,Function1,Function2)
 end
 
 function respawn(disguised) -- better way
+	FloatingHead = false
 	local args = {
 		[1] = 42,
 		[2] = disguised
@@ -1196,14 +1282,6 @@ local Feature6 = Feature:Clone()
 local Feature7 = Feature:Clone()
 local Feature8 = Feature:Clone()
 local Display2 = Feature:Clone()
---[[
-  CheckFile("BreakingPlus/Feature1.txt","false")
-  CheckFile("BreakingPlus/Feature2.txt","false")
-  CheckFile("BreakingPlus/Feature3.txt","false")
-CheckFile("BreakingPlus/Feature4.txt","false")
-CheckFile("BreakingPlus/Feature5.txt","false")
-CheckFile("BreakingPlus/Feature6.txt","false")
-]]
 Feature.TextLabel.Text = "Hide Blood"
 Feature2.TextLabel.Text = "Improve UI"
 Feature3.TextLabel.Text = "FullBright"
@@ -1348,10 +1426,8 @@ setting.Size = UDim2.new(0,250,0,0)
 Scale.Scale = 1
 Tween3:Cancel()
 Tween2:Cancel()
---local Tween4 = game:GetService("TweenService"):Create(setting.ScrollingFrame,TweenInfo.new(0.6,Enum.EasingStyle.Circular,Enum.EasingDirection.Out),{CanvasPosition = SavedPosition})
 Tween:Play()
 setting.ScrollingFrame.CanvasPosition = SavedPosition
---Tween4:Play()
 task.wait(0.4)
 DoingAnimation = false
 elseif normal == false then
@@ -2090,14 +2166,7 @@ function AddEmote(ID,Name,Icon)
 	end)
 	end)
 end
---[[
-task.spawn(function()
-	repeat task.wait() until UI.inv.sectionframes:GetChildren()[4]:FindFirstChild("GridOrder")
-	task.wait(0.25)
 
-
-end)
-]]
 local function addvipchairs()
 	task.wait(1.4)
 	task.spawn(function()
@@ -2216,38 +2285,55 @@ end
 end
 end)
 
-	
+local Player = nil
 
-function PlayerExecute(Player)
-	task.wait()
+function PlayerExecute()
+	Player = SelectedPlayer
 	if Player ~= LocalPlayer then
-		PlayerButtons.Size = UDim2.new(0,130,0,180)
-		local Cloned = PlayerButtons:FindFirstChild("button"):Clone()
+		repeat
+			task.wait()
+		until (#PlayerButtons:GetChildren() == 3 or #PlayerButtons:GetChildren() == 4) and Player ~= LocalPlayer
+		local ExtraPixels = 0
+		if #PlayerButtons:GetChildren() == 4 then
+			ExtraPixels = 27
+		end
+		local Cloned = PlayerButtons:FindFirstChild("button") or PlayerButtons:WaitForChild("button")
+		Cloned = Cloned:Clone()
 		local Cloned2 = Cloned:Clone()
 		local Cloned3 = Cloned:Clone()
-		Cloned.Position = UDim2.new(2, 0, 0, 81)
+		local Cloned4 = Cloned:Clone()
+		PlayerButtons.Size = UDim2.new(0,130,0,207 + ExtraPixels)
+		Cloned.Position = UDim2.new(2, 0, 0, 81 + ExtraPixels)
 		Cloned.Parent = PlayerButtons
 		Cloned.TextLabel.Text = "Trade"
 		Cloned.ImageColor3 = Color3.fromRGB(14, 35, 14)
 		Cloned.button.ImageColor3 = Color3.fromRGB(85, 170, 0)
 		-- Button 2 
-		Cloned2.Position = UDim2.new(2, 0, 0, 108)
+		Cloned2.Position = UDim2.new(2, 0, 0, 108 + ExtraPixels)
 		Cloned2.Parent = PlayerButtons
 		Cloned2.TextLabel.Text = "Fling"
 		Cloned2.ImageColor3 = Color3.fromRGB(41, 24, 24)
 		Cloned2.button.ImageColor3 = Color3.fromRGB(58, 31, 31)
 		-- Button 3
-		Cloned3.Position = UDim2.new(2, 0, 0, 135)
+		Cloned3.Position = UDim2.new(2, 0, 0, 135 + ExtraPixels)
 		Cloned3.Parent = PlayerButtons
 		Cloned3.TextLabel.Text = "Head Stare"
 		Cloned3.ImageColor3 = Color3.fromRGB(35, 30, 59)
 		Cloned3.button.ImageColor3 = Color3.fromRGB(23, 12, 53)
+		-- Button 4
+		Cloned4.Position = UDim2.new(2, 0, 0, 162 + ExtraPixels)
+		Cloned4.Parent = PlayerButtons
+		Cloned4.TextLabel.Text = "Spam Notifications"
+		Cloned4.ImageColor3 = Color3.fromRGB(75, 53, 24)
+		Cloned4.button.ImageColor3 = Color3.fromRGB(54, 40, 10)
+		Debug("Set buttons | " .. Player.Name .. " |  Current state : ".. tostring(PlayerButtons.Visible) .. " | Amount of buttons : ".. tostring(#PlayerButtons:GetChildren()))
 		local Connection
 		Connection = PlayerButtons:FindFirstChild("button").Changed:Connect(function()
-		if PlayerButtons:FindFirstChild("button").Position.X.Scale ~= 0 then
-		Cloned.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,81)
-		Cloned2.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,108)
-		Cloned3.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,135)
+		if PlayerButtons:FindFirstChild("button") and PlayerButtons:FindFirstChild("button").Position.X.Scale ~= 0 then
+		Cloned.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,81 + ExtraPixels)
+		Cloned2.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,108 + ExtraPixels)
+		Cloned3.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,135 + ExtraPixels)
+		Cloned4.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,162 + ExtraPixels)
 			else
 				Connection:Disconnect()
 		end
@@ -2260,6 +2346,7 @@ function PlayerExecute(Player)
 		end)
 		Cloned.MouseButton1Click:Connect(function()
 			PlayerButtons.Visible = false
+			TopNotify("Sent a trade request to "..Player.Name, 2.75, true)
 			game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(73,Player)
 		end)
 
@@ -2272,7 +2359,11 @@ function PlayerExecute(Player)
 		Cloned2.MouseButton1Click:Connect(function()
 			PlayerButtons.Visible = false
 			if Player.Character ~= nil and Player.Character.Humanoid ~= nil and Player.Character.Humanoid.Sit == false then
-			fling(Player.Name)
+				if FloatingHead == false then
+					fling(Player.Name)
+				else
+					Notify("You must disable float head before flinging someone")
+				end
 			else
 				Notify("Failed to fling user (they possibly are in the match)","ok")
 			end
@@ -2292,18 +2383,52 @@ function PlayerExecute(Player)
 				Notify("Failed to stare at user (they didn't have a character/head)","ok")
 			end
 		end)
+
+		Cloned4.MouseEnter:Connect(function()
+			game:GetService("TweenService"):Create(Cloned4.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 0.8}):Play()
+		end)
+		Cloned4.MouseLeave:Connect(function()
+			game:GetService("TweenService"):Create(Cloned4.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 1}):Play()
+		end)
+		Cloned4.MouseButton1Click:Connect(function()
+			PlayerButtons.Visible = false
+			for i = 1,100 do
+				if Player ~= nil then
+					game:GetService("ReplicatedStorage").RemoteEvent:FireServer(39, Player)
+				else
+					Notify("Failed to spam notifications (player left during spam)","ok")
+					break
+				end
+			end
+		end)
 	else
-		PlayerButtons.Size = UDim2.new(0,130,0,60)
-		local Cloned = PlayerButtons:FindFirstChild("button"):Clone()
+		repeat
+			task.wait()
+		until #PlayerButtons:GetChildren() == 1
+		local Cloned = PlayerButtons:FindFirstChild("button")
+		PlayerButtons.Size = UDim2.new(0,130,0,90)
+		Cloned = Cloned:Clone()
+		local Cloned2 = Cloned:Clone()
 		Cloned.Position = UDim2.new(2, 0, 0, 27)
 		Cloned.Parent = PlayerButtons
 		Cloned.TextLabel.Text = "Headless"
 		Cloned.ImageColor3 = Color3.fromRGB(38, 11, 11)
 		Cloned.button.ImageColor3 = Color3.fromRGB(125, 15, 15)
+		-- Button 2
+		Cloned2.Position = UDim2.new(2, 0, 0, 54)
+		Cloned2.Parent = PlayerButtons
+		if FloatingHead == false then
+		Cloned2.TextLabel.Text = "Head Float"
+		else
+		Cloned2.TextLabel.Text = "Head Unfloat"
+		end
+		Cloned2.ImageColor3 = Color3.fromRGB(17, 43, 33)
+		Cloned2.button.ImageColor3 = Color3.fromRGB(19, 43, 35)
 		local Connection
 		Connection = PlayerButtons:FindFirstChild("button").Changed:Connect(function()
-		if PlayerButtons:FindFirstChild("button").Position.X.Scale ~= 0 then
+		if PlayerButtons:FindFirstChild("button") and PlayerButtons:FindFirstChild("button").Position.X.Scale ~= 0 then
 		Cloned.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,27)
+		Cloned2.Position = UDim2.new(PlayerButtons:FindFirstChild("button").Position.X.Scale,0,0,54)
 			else
 				Connection:Disconnect()
 		end
@@ -2314,20 +2439,69 @@ function PlayerExecute(Player)
 		Cloned.MouseLeave:Connect(function()
 			game:GetService("TweenService"):Create(Cloned.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 1}):Play()
 		end)
-		
 		Cloned.MouseButton1Click:Connect(function()
 			PlayerButtons.Visible = false
-			LocalPlayer.Character.Torso.Neck.C1 = CFrame.new(0,0,250)
+			LocalPlayer.Character.Torso.Neck.C0 = CFrame.new(0, 250, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0)
 			game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",(CFrame.new(0,-100,0) * CFrame.Angles(-1.6130179166793823, 0, 3)))
+		end)
+
+		Cloned2.MouseEnter:Connect(function()
+			game:GetService("TweenService"):Create(Cloned2.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 0.8}):Play()
+		end)
+		Cloned2.MouseLeave:Connect(function()
+			game:GetService("TweenService"):Create(Cloned2.button,TweenInfo.new(0.1, Enum.EasingStyle.Linear),{ImageTransparency = 1}):Play()
+		end)
+		Cloned2.MouseButton1Click:Connect(function()
+			PlayerButtons.Visible = false
+			if FloatingHead == false then
+			Debug("Enabled head float")
+			FloatingHead = true
+			if LocalPlayer.Character:FindFirstChild("Head") then
+			LocalPlayer.Character.Head.CanCollide = false
+			LocalPlayer.Character.Head.Massless = true
+			else
+				Notify("Failed to make head float (you didn't have a head)","ok")
+				return
+			end
+			local Attach = Instance.new("Attachment",LocalPlayer.Character.Torso)
+			FreecamSourceFunction()
+			TopNotify("Enabled freecam for head float (will make ur head go to your camera)", 4,true)
+			repeat
+				if LocalPlayer.Character:FindFirstChild("Torso") and LocalPlayer.Character:FindFirstChild("Torso"):FindFirstChild("Neck") and Attach.Parent ~= nil then
+					Attach.WorldCFrame = workspace.CurrentCamera.CFrame
+					LocalPlayer.Character.Torso.Neck.C0 = (Attach.CFrame * CFrame.fromOrientation(math.rad(270),(math.rad(0)),math.rad(180)))
+					game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",((Attach.CFrame * CFrame.fromOrientation(math.rad(270),(math.rad(0)),math.rad(180)))))
+				else
+					break
+				end
+			task.wait()
+			until Attach.Parent == nil or FloatingHead == false
+			if Attach.Parent ~= nil and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") and LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health ~= 0 then
+				LocalPlayer.Character.Torso.Neck.C0 = CFrame.new(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0)
+				game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",((LocalPlayer.Character.Torso.Neck.C0--[[Attach.CFrame --[[* CFrame.fromOrientation(math.rad(270),(math.rad(0)),math.rad(180))]])))
+			end
+			FreecamSourceFunction()
+			FloatingHead = false
+			Debug("Disabled head float")
+		else
+			FloatingHead = false
+		end
 		end)
 	end
 end
 
 for i,v in pairs(PlayersList:GetChildren()) do
 	if v:IsA("Frame") and v:FindFirstChild("name") and v.name:FindFirstChild("TextButton") then
+		if v.name:FindFirstChild("TextLabel").Text == LocalPlayer.Name then
+			for i,v in v:GetChildren() do	
+				if v:IsA("ImageLabel") then
+					v.ImageColor3 = Color3.fromRGB(70,70,70)
+				end
+			end
+		end
 		v.name:FindFirstChild("TextButton").MouseButton1Click:Connect(function()
 			SelectedPlayer = game.Players:FindFirstChild(v.name:FindFirstChild("TextLabel").Text)
-			PlayerExecute(SelectedPlayer)
+			PlayerExecute()
 		end)
 	end
 end
@@ -2335,7 +2509,7 @@ PlayersList.ChildAdded:Connect(function(v)
 	if v:IsA("Frame") and v:FindFirstChild("name") and v.name:FindFirstChild("TextButton") then
 		v.name:FindFirstChild("TextButton").MouseButton1Click:Connect(function()
 			SelectedPlayer = game.Players:FindFirstChild(v.name:FindFirstChild("TextLabel").Text)
-			PlayerExecute(SelectedPlayer)
+			PlayerExecute()
 		end)
 	end
 end)
@@ -2379,7 +2553,6 @@ NeededPlaceId = 648362523
 
 local queue_on_teleport = syn and syn.queue_on_teleport or queue_on_teleport
 if queue_on_teleport ~= nil then
-	--print(type(queue_on_teleport),queue_on_teleport)
 	queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
 else
 	task.spawn(function()
@@ -2406,6 +2579,10 @@ task.spawn(function()
 			end
 		end
 	end
+end)
+
+LocalPlayer.CharacterRemoving:Connect(function()
+		FloatingHead = false
 end)
 
 if game.PlaceId == NeededPlaceId then
@@ -2466,5 +2643,4 @@ else
 	)
 	task.wait(5)
 	NotifyButtons("You need to teleport to the correct mode to autofarm","Teleport","Cancel",function() game:GetService("TeleportService"):Teleport(648362523,LocalPlayer) return {"Load","Teleporting",5} end,function() return {} end)
-	--game:GetService("TeleportService"):Teleport(NeededPlaceId, LocalPlayer)
 end
