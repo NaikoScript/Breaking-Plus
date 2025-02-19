@@ -2392,14 +2392,7 @@ function PlayerExecute()
 		end)
 		Cloned4.MouseButton1Click:Connect(function()
 			PlayerButtons.Visible = false
-			for i = 1,100 do
-				if Player ~= nil then
-					game:GetService("ReplicatedStorage").RemoteEvent:FireServer(39, Player)
-				else
-					Notify("Failed to spam notifications (player left during spam)","ok")
-					break
-				end
-			end
+			NotifyButtons("Are you sure you want to spam duo request notifications on " .. Player.Name .. "?","Yes","No",function() for i = 1,50 do if Player ~= nil then game:GetService("ReplicatedStorage").RemoteEvent:FireServer(39, Player) else Notify("Failed to spam notifications (player left during spam)","ok") return {} end end return {"Load","Spamming",2.5} end,function() return {} end)
 		end)
 	else
 		repeat
