@@ -983,18 +983,18 @@ local f1 = function()
 			Body = game:GetService("HttpService"):JSONEncode({
 				cmd = 'INVITE_BROWSER',
 				nonce = game:GetService("HttpService"):GenerateGUID(false),
-				args = {code = 'UqGADRrm'}
+				args = {code = 'jpwg5Dcr2D'}
 			})
 		})
 	end)
 	return {"Load","Joining server",3}
 	elseif setclipboard then
-		setclipboard("discord.gg/UqGADRrm")
+		setclipboard("discord.gg/jpwg5Dcr2D")
 		Notify("Failed to join automaticly. Copied the server invite link instead")
 		return {}
 
 	else
-		Notify("Failed to automaticly join or copy the server invite link. join by manually typing it discord.gg/UqGADRrm")
+		Notify("Failed to automaticly join or copy the server invite link. join by manually typing it discord.gg/jpwg5Dcr2D")
 		return {}
 	end
 end
@@ -1616,7 +1616,7 @@ end)
 
 UI.loading:GetPropertyChangedSignal("Text"):Connect(function()
 	if UI.loading.Text == "" then
-		UI.loading.Text = "discord.gg/UqGADRrm"
+		UI.loading.Text = "discord.gg/jpwg5Dcr2D"
 	end
 end)
 
