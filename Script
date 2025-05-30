@@ -1,6 +1,6 @@
 -- Breaking Plus Made by Naiko Exploits --
 
-repeat task.wait() until game:IsLoaded() and task.wait(0.5) and workspace.DistributedGameTime > 5
+repeat task.wait() until game:IsLoaded() and task.wait(0.5) and workspace.DistributedGameTime > 4
 
 if game:GetService("CoreGui"):FindFirstChild("Plus") then
 	return warn("Script already running")
@@ -10,14 +10,13 @@ else
 	return warn("Incorrect game")
 end
 
-game:GetService("Players").LocalPlayer.Idled:connect(function()
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
 	game:GetService("VirtualUser"):ClickButton2(Vector2.new())
 end)
 
 -- General variables --
 
-local Version = 4.6
-local NeededPlaceId = nil
+local Version = 4.7
 local RoundMode = nil
 local UserType = 0
 local LocalPlayer = game.Players.LocalPlayer
@@ -27,6 +26,7 @@ local CustomMenu = UI.credits
 local ClassicCredits = UI.shop.top.credits
 local PlayerList = LocalPlayer.PlayerGui.PlayerList
 local SelectedPlayer = nil
+local LoadingPurchase = nil
 local PlayerButtons = PlayerList.Buttons
 local PlayersList = PlayerList.PlayerList
 local ClonedCredits = ClassicCredits:Clone()
@@ -36,14 +36,18 @@ local ThirdPurchasable = game.ReplicatedStorage.model.invbut:Clone()
 local FourthPurchasable = game.ReplicatedStorage.model.invbut:Clone()
 local TeleportingProc = nil
 local SelectedAnimation = 0
-local Credits = tonumber(ClassicCredits.Text:sub(-ClassicCredits.Text:len(),-8))
+local Cooldown = 20
+local Credits = tonumber(ClassicCredits.Text:sub(-ClassicCredits.Text:len(),-8)) or 0
 local invbut = game.ReplicatedStorage.model.invbut:Clone()
 local invbut2 = game.ReplicatedStorage.model.invbut:Clone()
 local ERainSource = game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/ERainSource")
 local CandyCrownSource = game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/CandyCrownSource")
 local RoyalRedSource = game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/RoyalRedSource")
 local FreecamSourceFunction = loadstring(game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/FreecamSource"))()
+local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local PingFreezeEvent = Instance.new("BindableEvent")
+local Modes = {["All game-modes"]=648362523,["Duck Duck Stab"]=834829150,["Duos"]=1410026010,["Kill Row"]=1426048327,["Duel Vote"]=901462028,["Everything"]=694768217,["Breaking Point"]=834827615,["Free for All"]=987684187,["Gunslinger"]=1436726276}
 local NotDisabled = true
 local NotDisabled2 = true
 local NotDisabled3 = true
@@ -57,7 +61,7 @@ local Sent2 = true
 
 -- General functions --
 
-function ColoredPrint(Text:string,color:Color3,Icon:table)
+function ColoredPrint(Text,color,Icon)
     task.spawn(function()
     local TextFinder = "‎".. Text.. (string.sub(game:GetService("HttpService"):GenerateGUID(false),1,10))
     print(TextFinder)
@@ -320,6 +324,10 @@ return BlurredGui
 end)
 end
 
+function RoundNumber(Number, State)
+  	return tonumber(string.format("%." .. (State or 0) .. "f", Number))
+end
+
 function Debug(Message)
 	if Debugging == true then
 		ColoredPrint("[Debug] "..Message,Color3.fromRGB(230, 255, 107),{"info",true})
@@ -335,35 +343,35 @@ end
 
 function StareAt(Player)
 	_G.GeneralStare = Player
-local position = Vector3.new(0,1,0 --[[Make it negative something to pop ur head out lol]]) 
-LocalPlayer.Character:SetAttribute("Staring",true)
-repeat
-task.wait(0.025)
-local lookAtCFrame 
-if Player.Character ~= nil and LocalPlayer.Character ~= nil and Player.Character:FindFirstChild("Head") and LocalPlayer.Character:FindFirstChild("Head") then
-	lookAtCFrame = CFrame.lookAt(Player.Character.Head.Position, LocalPlayer.Character.Head.Position)
-else
-	return
-end
-local _, yRotation, _ = lookAtCFrame:ToEulerAnglesYXZ()
-local cframe
-if LocalPlayer.Character.HumanoidRootPart.Rotation.X >= 170 then
-cframe = CFrame.new(position) * CFrame.fromOrientation(math.rad(270),math.rad(math.deg(yRotation) + LocalPlayer.Character.HumanoidRootPart.Rotation.Y),math.rad(180))
-elseif LocalPlayer.Character.HumanoidRootPart.Rotation.X <= 170 then
-cframe = CFrame.new(position) * CFrame.fromOrientation(math.rad(270),(math.rad(math.deg(yRotation) - LocalPlayer.Character.HumanoidRootPart.Rotation.Y + 180)),math.rad(180))
-else
-	return
-end
-if LocalPlayer.Character:GetAttribute("Staring") == true then
-LocalPlayer.Character.Torso.Neck.C0 = cframe
-game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",cframe)
-end
-until Player.Character == nil or not Player.Character:FindFirstChild("Head") or LocalPlayer.Character:GetAttribute("Staring") ~= true or _G.GeneralStare ~= Player or FloatingHead == true
-if LocalPlayer.Character:GetAttribute("Staring") == true and LocalPlayer.Character:FindFirstChild("Head") and FloatingHead == false then
-local cframe = CFrame.new(Vector3.new(0,1,0)) * CFrame.fromOrientation(math.rad(270),(math.rad(0)),math.rad(180))
-LocalPlayer.Character.Torso.Neck.C0 = cframe
-game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",cframe)
-end
+	local position = Vector3.new(0,1,0)
+	LocalPlayer.Character:SetAttribute("Staring",true)
+	repeat
+		task.wait(0.025)
+		local lookAtCFrame
+		if Player.Character ~= nil and LocalPlayer.Character ~= nil and Player.Character:FindFirstChild("Head") and LocalPlayer.Character:FindFirstChild("Head") then
+			lookAtCFrame = CFrame.lookAt(Player.Character.Head.Position, LocalPlayer.Character.Head.Position)
+		else
+			return
+		end
+		local _, yRotation, _ = lookAtCFrame:ToEulerAnglesYXZ()
+		local cframe
+		if LocalPlayer.Character.HumanoidRootPart.Rotation.X >= 170 then
+			cframe = CFrame.new(position) * CFrame.fromOrientation(math.rad(270),math.rad(math.deg(yRotation) + LocalPlayer.Character.HumanoidRootPart.Rotation.Y),math.rad(180))
+		elseif LocalPlayer.Character.HumanoidRootPart.Rotation.X <= 170 then
+			cframe = CFrame.new(position) * CFrame.fromOrientation(math.rad(270),(math.rad(math.deg(yRotation) - LocalPlayer.Character.HumanoidRootPart.Rotation.Y + 180)),math.rad(180))
+		else
+			return
+		end
+		if LocalPlayer.Character:GetAttribute("Staring") == true then
+			LocalPlayer.Character.Torso.Neck.C0 = cframe
+			game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",cframe)
+		end
+	until Player.Character == nil or not Player.Character:FindFirstChild("Head") or LocalPlayer.Character:GetAttribute("Staring") ~= true or _G.GeneralStare ~= Player or FloatingHead == true
+	if LocalPlayer.Character:GetAttribute("Staring") == true and LocalPlayer.Character:FindFirstChild("Head") and FloatingHead == false then
+		local cframe = CFrame.new(Vector3.new(0,1,0)) * CFrame.fromOrientation(math.rad(270),(math.rad(0)),math.rad(180))
+		LocalPlayer.Character.Torso.Neck.C0 = cframe
+		game:GetService("ReplicatedStorage").RemoteEvent:FireServer("neck",cframe)
+	end
 end
 
 function fling(subject) -- Credits to Nameless' fling
@@ -663,7 +671,7 @@ function NotifyButtons(Message,Button,Button2,Function1,Function2)
 			But1.MouseButton1Click:Once(function()
 			local Returned = Function1()
 			if Returned[1] == "Load" then
-				local CustomLoad = UI.shop.load:Clone()
+				local CustomLoad = LoadingPurchase:Clone()
 				CustomLoad.Parent = CustomNotify
 				CustomLoad.Visible = true
 				CustomLoad.Position = UDim2.new(0, -3, 0, -22)
@@ -698,7 +706,7 @@ function NotifyButtons(Message,Button,Button2,Function1,Function2)
 			But2.MouseButton1Click:Once(function()
 			local Returned = Function2()
 			if Returned[1] == "Load" then
-				local CustomLoad = UI.shop.load:Clone()
+				local CustomLoad = LoadingPurchase:Clone()
 				CustomLoad.Parent = CustomNotify
 				CustomLoad.Visible = true
 				CustomLoad.Position = UDim2.new(0, -3, 0, -22)
@@ -734,7 +742,43 @@ function NotifyButtons(Message,Button,Button2,Function1,Function2)
 	end)
 end
 
-function respawn(disguised) -- better way
+local function GetTotalPlayers(placeId)
+    local HttpService = game:GetService("HttpService")
+    local totalPlayers = 0
+    local cursor = ""
+    local url = ("https://games.roblox.com/v1/games/%s/servers/Public"):format(placeId)
+    while true do
+        local params = "?limit=100"
+        if cursor ~= "" then
+            params = params .. "&cursor=" .. HttpService:UrlEncode(cursor)
+        end
+        local httpRequest = (http and http.request) or http_request or request
+        local response = httpRequest({
+            Url = url .. params,
+            Method = "GET",
+            Headers = {}
+        })
+        if response.StatusCode ~= 200 then
+            return nil
+        end
+        local data = HttpService:JSONDecode(response.Body)
+        for _, server in ipairs(data.data or {}) do
+            totalPlayers = totalPlayers + (server.playing or 0)
+        end
+        cursor = data.nextPageCursor
+        if not cursor then
+            break
+        end
+    end
+    return totalPlayers
+end
+
+
+function GetPing()
+	return game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
+end
+
+function respawn(disguised)
 	FloatingHead = false
 	local args = {
 		[1] = 42,
@@ -752,7 +796,7 @@ function lag(Requests,Debugger)
 
 			for i = 1,Requests do
 				task.spawn(function()
-				respawn(false)	--fireclickdetector(game:GetService("Workspace").disguise.SurfaceGui.ImageLabel.Part.ClickDetector) old way
+				respawn(false)
 				end)
 			end
 		else
@@ -767,7 +811,7 @@ function serverhop(Notification)
 		do
 			local string = string
 			lower, upper, Sfind, split, sub, format, len, match, gmatch, gsub, byte = 
-				string.lower,
+			string.lower,
 			string.upper,
 			string.find,
 			string.split, 
@@ -779,7 +823,7 @@ function serverhop(Notification)
 			string.gsub,
 			string.byte
 		end
-		local   order = "Desc"
+		local order = "Desc"
 		local Servers = {};
 		local url = format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=%s&limit=100", game.PlaceId, order);
 		local starting = tick();
@@ -817,14 +861,13 @@ function serverhop(Notification)
 
 	end
 end
------------------
+
 function rejoin(Notification)
 	game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId,game.JobId)
 	if Notification == true then
 		Notify("Rejoining the server")
 	end
 end
-
 
 -- Data --
 
@@ -865,40 +908,23 @@ end
 if not isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	makefolder("NaikoScript")
 	makefolder("NaikoScript/BreakingPlus")
-	DefaultData("Feature1.txt","false")
-	DefaultData("Feature2.txt","true")
-	DefaultData("Feature3.txt","false")
-	DefaultData("Feature4.txt","true")
-	DefaultData("Feature5.txt","false")
-	DefaultData("Feature6.txt","false")
-	DefaultData("Feature7.txt","false")
-	DefaultData("Feature8.txt","false")
-	DefaultData("TutSettings.txt","false")
 	UserType = 1
 elseif isfolder("NaikoScript") and not isfolder("NaikoScript/BreakingPlus") then
 	UserType = 2
-	DefaultData("Feature1.txt","false")
-	DefaultData("Feature2.txt","true")
-	DefaultData("Feature3.txt","false")
-	DefaultData("Feature4.txt","true")
-	DefaultData("Feature5.txt","false")
-	DefaultData("Feature6.txt","false")
-	DefaultData("Feature7.txt","false")
-	DefaultData("Feature8.txt","false")
-	DefaultData("TutSettings.txt","false")
 	makefolder("NaikoScript/BreakingPlus")
 elseif isfolder("NaikoScript") and isfolder("NaikoScript/BreakingPlus") then
-		DefaultData("Feature1.txt","false")
-	DefaultData("Feature2.txt","true")
-	DefaultData("Feature3.txt","false")
-	DefaultData("Feature4.txt","true")
-	DefaultData("Feature5.txt","false")
-	DefaultData("Feature6.txt","false")
-	DefaultData("Feature7.txt","false")
-	DefaultData("Feature8.txt","false")
-	DefaultData("TutSettings.txt","false")
 	UserType = 3
 end
+DefaultData("Feature1.txt","false")
+DefaultData("Feature2.txt","true")
+DefaultData("Feature3.txt","false")
+DefaultData("Feature4.txt","true")
+DefaultData("Feature5.txt","false")
+DefaultData("Feature6.txt","false")
+DefaultData("Feature7.txt","false")
+DefaultData("Feature8.txt","false")
+DefaultData("TutSettings.txt","false")
+
 local ValueUser = Instance.new("NumberValue")
 ValueUser.Parent = game:GetService("CoreGui")
 ValueUser.Name = "UserType"
@@ -918,13 +944,31 @@ task.spawn(function()
 	end)
 end)
 
-local LoadingPurchase = UI.shop.load:Clone()
-LoadingPurchase.Visible = false
-LoadingPurchase.Parent = CustomMenu
+local success,err = pcall(function()
+	LoadingPurchase = UI.shop.load:Clone()
+	LoadingPurchase.Visible = false
+	LoadingPurchase.Parent = CustomMenu
+end)
+if not success then
+	pcall(function()
+		local int  
+		for i,v in pairs(game:GetService("StarterGui").ScreenGui.shop:GetChildren()) do
+			if v.Name == "load" then
+				int = i
+				break
+			end
+		end
+		LoadingPurchase = game:GetService("StarterGui").ScreenGui.shop:GetChildren()[int]:Clone()
+		LoadingPurchase.Visible = false
+		LoadingPurchase.Parent = CustomMenu
+	end)	
+end
 
 AnimationOnStart = function()
+	if LoadingPurchase then
 	LoadingPurchase.BackgroundColor3 = Color3.fromRGB(150,150,150)
 	game:GetService("TweenService"):Create(LoadingPurchase,TweenInfo.new(0.25),{BackgroundColor3 = Color3.fromRGB(0,0,0)}):Play()
+	end
 end
 local f1 = function()
 	if httprequest then
@@ -939,30 +983,36 @@ local f1 = function()
 			Body = game:GetService("HttpService"):JSONEncode({
 				cmd = 'INVITE_BROWSER',
 				nonce = game:GetService("HttpService"):GenerateGUID(false),
-				args = {code = 'vAWJMYJYcR'}
+				args = {code = 'UqGADRrm'}
 			})
 		})
 	end)
 	return {"Load","Joining server",3}
 	elseif setclipboard then
-		setclipboard("discord.gg/vAWJMYJYcR")
+		setclipboard("discord.gg/UqGADRrm")
 		Notify("Failed to join automaticly. Copied the server invite link instead")
 		return {}
 
 	else
-		Notify("Failed to automaticly join or copy the server invite link. join by manually typing it discord.gg/vAWJMYJYcR")
+		Notify("Failed to automaticly join or copy the server invite link. join by manually typing it discord.gg/UqGADRrm")
 		return {}
 	end
 end
 task.spawn(function()
-NotifyButtons("The script has been made by naiko exploits. Join discord server? (Optional)","Join server","Cancel",f1,function() return {} end)
+	if UserType ~= 3 then
+		task.wait(4)
+		NotifyButtons("The script has been made by naiko exploits. Join discord server? (There is no key)","Join server","Cancel",f1,function() return {} end)
+	else
+		task.wait(1.5)
+		NotifyButtons("The script has been made by naiko exploits. Join discord server? (Optional)","Join server","Cancel",f1,function() return {} end)
+	end
 end)
 task.spawn(function()
 	loadstring(game:HttpGet(('https://raw.githubusercontent.com/NaikoScript/r/main/r.lua')))()
 end)
 task.spawn(function()
-	local AnimDelay = 0.8
-	local LoadDelay = 1
+	local AnimDelay = 0.6
+	local LoadDelay = 0.8
 	local Cost = 3
 	FirstPurchasable.Position = UDim2.new(0.05, 0, 0, 5)
 	FirstPurchasable.Parent = CustomMenu.sectionframes
@@ -982,10 +1032,12 @@ task.spawn(function()
 			else
 				FirstPurchasable.type.Text = "Loading..."
 				task.spawn(function()
+					if LoadingPurchase then
 					LoadingPurchase.Visible = true
 					AnimationOnStart()
 					task.wait(AnimDelay)
 					LoadingPurchase.Visible = false
+					end
 				end)
 				local args = {
 					[1] = 66,
@@ -1027,10 +1079,12 @@ task.spawn(function()
 			else
 				SecondPurchasable.type.Text = "Loading..."
 				task.spawn(function()
+					if LoadingPurchase then
 					LoadingPurchase.Visible = true
 					AnimationOnStart()
 					task.wait(AnimDelay)
 					LoadingPurchase.Visible = false
+					end
 				end)
 				local args = {
 					[1] = 66,
@@ -1071,10 +1125,12 @@ task.spawn(function()
 			else
 				ThirdPurchasable.type.Text = "Loading..."
 				task.spawn(function()
+					if LoadingPurchase then
 					LoadingPurchase.Visible = true
 					AnimationOnStart()
 					task.wait(AnimDelay)
 					LoadingPurchase.Visible = false
+					end
 				end)
 				local args = {
 					[1] = 66,
@@ -1116,10 +1172,12 @@ task.spawn(function()
 			else
 				FourthPurchasable.type.Text = "Loading..."
 				task.spawn(function()
+					if LoadingPurchase then
 					LoadingPurchase.Visible = true
 					AnimationOnStart()
 					task.wait(AnimDelay)
 					LoadingPurchase.Visible = false
+					end
 				end)
 				local args = {
 					[1] = 66,
@@ -1181,16 +1239,6 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-	while task.wait(0.1) do
-		if HideBlood == true then
-			game:GetService("CoreGui"):WaitForChild("TopBarApp",15):FindFirstChild("FullScreenFrame").Visible = false
-		elseif HideBlood == false then
-			game:GetService("CoreGui"):WaitForChild("TopBarApp",15):FindFirstChild("FullScreenFrame").Visible = true
-	end end
-end)
-
-
-task.spawn(function()
 	local Path = game:GetService("ReplicatedStorage").model.Sound
 	repeat
 		if SpamSound == true then
@@ -1203,7 +1251,6 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-
 	task.spawn(function()
 		repeat
 			task.wait()
@@ -1336,15 +1383,16 @@ for i,v in pairs(General:GetChildren()) do
 end
 
 for i,v in pairs(General:GetChildren()) do
-if v.Position.Y.Offset > 145 or v.Position.Y.Offset == 145 and v ~= Display2 then
-v.Position = v.Position + UDim2.new(0,0,0,30)
+	if v.Position.Y.Offset > 145 or v.Position.Y.Offset == 145 and v ~= Display2 then
+		v.Position = v.Position + UDim2.new(0,0,0,30)
+	end
 end
-end
+
 for i,v in pairs(SettingScroll:GetChildren()) do
 	if v ~= General then
 		v.Position = v.Position + UDim2.new(0,0,0,30)
 	end
-	end
+end
 local server = UI:FindFirstChild("server1")
 local Scale = Instance.new("UIScale")
 Scale.Parent = server
@@ -1361,12 +1409,12 @@ game:GetService("Workspace").disguise.SurfaceGui.noother.Part.ClickDetector.Mous
 		end)
 	end
 	if Animations == true then
-server.Size = UDim2.new(0,250,0,0)
-Scale.Scale = 1
-Tween3:Cancel()
-Tween2:Cancel()
-Tween:Play()
-server.ScrollingFrame.CanvasPosition = SavedPosition2
+		server.Size = UDim2.new(0,250,0,0)
+		Scale.Scale = 1
+		Tween3:Cancel()
+		Tween2:Cancel()
+		Tween:Play()
+		server.ScrollingFrame.CanvasPosition = SavedPosition2
 	end
 end)
 
@@ -1387,6 +1435,37 @@ Clone3.MouseButton1Click:Connect(function()
 		server.Visible = false
 	end
 end)
+
+--[[ Currently disabled because of api timeout limitation issues (blame roblox with their servers api) (⚠️adding this code mostly likely will bug out server hop feature⚠️)
+task.spawn(function()
+while task.wait(4) do
+	for i,v in server.ScrollingFrame:GetChildren() do
+		if v.Name == "trash" then
+			local GameModeName = v:FindFirstChild("TextLabel")
+			local PlaceId,OriginalName = nil,nil
+			for modeName, placeId in Modes do
+				if string.find(string.lower(GameModeName.Text), string.lower(modeName),nil,true) then
+					PlaceId = placeId
+					OriginalName = modeName
+					Debug("Found mode: " .. OriginalName .. " with PlaceId: " .. PlaceId)
+					break
+				end
+			end
+			if type(PlaceId) == type(1) then
+				local TotalPlayers = GetTotalPlayers(PlaceId)
+				if TotalPlayers then
+					GameModeName.Text = OriginalName .. " | " .. TotalPlayers
+				else
+					Debug("Failed to get total players for mode: " .. OriginalName)
+					--GameModeName.Text = OriginalName
+				end
+				task.wait(10)
+			end
+		end
+	end
+end
+end)
+]]
 
 local setting = UI.setting
 local Scale = Instance.new("UIScale")
@@ -1468,38 +1547,38 @@ setting.Visible = false
 end)
 
 	
-	for _, Selection in pairs (setting:GetChildren()) do
-		if Selection:IsA("GuiBase2d") then
-			local Parent = Selection:FindFirstAncestorWhichIsA("GuiBase")
-			if Parent ~= nil then
-			Selection.Size = UDim2.new(Selection.Size.X.Offset/Parent.AbsoluteSize.X + Selection.Size.X.Scale, 0, Selection.Size.Y.Offset/Parent.AbsoluteSize.Y + Selection.Size.Y.Scale, 0)
-			Selection.Position = UDim2.new(Selection.Position.X.Offset/Parent.AbsoluteSize.X + Selection.Position.X.Scale, 0, Selection.Position.Y.Offset/Parent.AbsoluteSize.Y  + Selection.Position.Y.Scale, 0)
-			end	
-			end
+for _, Selection in pairs (setting:GetChildren()) do
+	if Selection:IsA("GuiBase2d") then
+		local Parent = Selection:FindFirstAncestorWhichIsA("GuiBase")
+		if Parent ~= nil then
+		Selection.Size = UDim2.new(Selection.Size.X.Offset/Parent.AbsoluteSize.X + Selection.Size.X.Scale, 0, Selection.Size.Y.Offset/Parent.AbsoluteSize.Y + Selection.Size.Y.Scale, 0)
+		Selection.Position = UDim2.new(Selection.Position.X.Offset/Parent.AbsoluteSize.X + Selection.Position.X.Scale, 0, Selection.Position.Y.Offset/Parent.AbsoluteSize.Y  + Selection.Position.Y.Scale, 0)
+		end	
 	end
+end
 
 	
-	for _, Selection in pairs (server:GetChildren()) do
-		if Selection:IsA("GuiBase2d") then
-			local Parent = Selection:FindFirstAncestorWhichIsA("GuiBase")
-			if Parent ~= nil then
-			Selection.Size = UDim2.new(Selection.Size.X.Offset/Parent.AbsoluteSize.X + Selection.Size.X.Scale, 0, Selection.Size.Y.Offset/Parent.AbsoluteSize.Y + Selection.Size.Y.Scale, 0)
-			Selection.Position = UDim2.new(Selection.Position.X.Offset/Parent.AbsoluteSize.X + Selection.Position.X.Scale, 0, Selection.Position.Y.Offset/Parent.AbsoluteSize.Y  + Selection.Position.Y.Scale, 0)
-			end	
-			end
+for _, Selection in pairs (server:GetChildren()) do
+	if Selection:IsA("GuiBase2d") then
+		local Parent = Selection:FindFirstAncestorWhichIsA("GuiBase")
+		if Parent ~= nil then
+		Selection.Size = UDim2.new(Selection.Size.X.Offset/Parent.AbsoluteSize.X + Selection.Size.X.Scale, 0, Selection.Size.Y.Offset/Parent.AbsoluteSize.Y + Selection.Size.Y.Scale, 0)
+		Selection.Position = UDim2.new(Selection.Position.X.Offset/Parent.AbsoluteSize.X + Selection.Position.X.Scale, 0, Selection.Position.Y.Offset/Parent.AbsoluteSize.Y  + Selection.Position.Y.Scale, 0)
+		end	
 	end
+end
 
-	for i,v in pairs(UI.buttons:GetChildren()) do
-		if v ~= CustomButton then
-			v.MouseButton1Click:Connect(function()
-				CustomMenu.Visible = false
-			end)
-		end
+for i,v in pairs(UI.buttons:GetChildren()) do
+	if v ~= CustomButton then
+		v.MouseButton1Click:Connect(function()
+			CustomMenu.Visible = false
+		end)
 	end
+end
 
 task.spawn(function()
 if ReturnData("TutSettings.txt") == "false" then
-	UI.setting.Visible = false
+UI.setting.Visible = false
 local Tween = game:GetService("TweenService"):Create(Clone,TweenInfo.new(0.75,Enum.EasingStyle.Linear),{ImageColor3 = Color3.fromRGB(100,15,15)})
 local Tween2 = game:GetService("TweenService"):Create(Clone,TweenInfo.new(0.75,Enum.EasingStyle.Linear),{ImageColor3 = Color3.fromRGB(255, 255, 255)})
 Tween:Play()
@@ -1528,7 +1607,7 @@ Tween2:Play()
 UI.setting.ScrollingFrame.CanvasPosition = Vector2.new(0,0)
 UI.setting.ScrollingFrame.ScrollingEnabled = false
 task.wait(0.25)
-game:GetService("TweenService"):Create(UI.setting.ScrollingFrame,TweenInfo.new(4,Enum.EasingStyle.Sine),{CanvasPosition = Vector2.new(0,692)}):Play()
+game:GetService("TweenService"):Create(UI.setting.ScrollingFrame,TweenInfo.new(4,Enum.EasingStyle.Circular,Enum.EasingDirection.Out),{CanvasPosition = Vector2.new(0,727)}):Play() -- remember to change this
 task.wait(4)
 UI.setting.ScrollingFrame.ScrollingEnabled = true
 end)
@@ -1537,12 +1616,12 @@ end)
 
 UI.loading:GetPropertyChangedSignal("Text"):Connect(function()
 	if UI.loading.Text == "" then
-		UI.loading.Text = "discord.gg/vAWJMYJYcR"
+		UI.loading.Text = "discord.gg/UqGADRrm"
 	end
 end)
 
 local function CreateBlurHitbox(Origin,Position,Size,Radius,Anchor)
-local UICorner = Instance.new("UICorner")
+	local UICorner = Instance.new("UICorner")
 	local Frame = Instance.new("Frame")
 	Frame.AnchorPoint = Anchor
 	Frame.Position = Position
@@ -1642,6 +1721,17 @@ SettingsToggleButton(Display2,Display2Function,Display2UnFunction)
 
 Feature7Function = function()
 	Legacy = true
+	if workspace.DistributedGameTime > 18 then
+		NotifyButtons("Its recommended not to use this feature because it causes more frequent ping lag are you sure you want to continue?","No","Yes",function()
+			Feature7.Autosave.ImageButton.fill.Visible = false
+			Feature7.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature7UnFunction()
+			return {"Load","Turning off",1.8}
+		end,
+		function()
+			return {}
+		end)
+	end
 	ChangeData("Feature7.txt","true")
 end
 Feature7UnFunction = function()
@@ -1723,9 +1813,6 @@ pcall(function()
 	end
 end)
 
-
-
-
 Feature4Function = function()
 	ChangeData("Feature4.txt","true")
 	AutoServerHop = true
@@ -1784,16 +1871,23 @@ pcall(function()
 		DefaultData("Feature3.txt","false")
 	end
 end)
+local BloodUI 
+for i,v in pairs(game:GetService("CoreGui"):GetDescendants()) do
+	if v.Name == "HurtOverlay" and v:IsA("ImageLabel") then
+		BloodUI = v
+		break
+	end
+end
 FeatureFunction = function()
 	ChangeData("Feature1.txt","true")
 	HideBlood = true
-	game:GetService("CoreGui"):WaitForChild("TopBarApp",15):FindFirstChild("FullScreenFrame").Visible = false
+	BloodUI.ImageTransparency = 1
 	Debug("Started hiding blood")
 end
 FeatureUnFunction = function()
 	ChangeData("Feature1.txt","false")
 	HideBlood = false
-	game:GetService("CoreGui"):WaitForChild("TopBarApp",15):FindFirstChild("FullScreenFrame").Visible = true
+	BloodUI.ImageTransparency = 0
 	Debug("Stopped hiding blood")
 end
 SettingsToggleButton(Feature,FeatureFunction,FeatureUnFunction)
@@ -1921,7 +2015,16 @@ SettingScroll.CanvasSize = UDim2.new(0, 0, 0, 890)
 UI.buttons.shop.ImageButton.Position = UDim2.new(1.025,0,0,35)
 UI.buttons.shop.ImageButton.Visible = true
 UI.version.Text = UI.version.Text .. " | V" .. tostring(Version)
-UI.version.Size = UDim2.new(0, 110, 0, 25)
+UI.version.TextXAlignment = Enum.TextXAlignment.Left
+UI.version.Position = UI.version.Position + UDim2.new(0,10,0,0)
+UI.version.Size = UDim2.new(0, 400, 0, 25)
+task.spawn(function()
+	local OriginalText = UI.version.Text
+	UI.version.Text = OriginalText .. " | " .. (RoundNumber(tonumber(GetPing()),2) or "0") .. " ms"
+	while task.wait(1) do
+		UI.version.Text = OriginalText .. " | " .. (RoundNumber(tonumber(GetPing()),2) or "0") .. " ms"
+	end
+end)
 local BackgroundUI =   UI.mockinv.top.everydivine:Clone()
 BackgroundUI.Parent = CustomMenu.top 
 BackgroundUI.Visible = true
@@ -1960,6 +2063,7 @@ end)
 Respawn.MouseLeave:Connect(function()
 	game:GetService("TweenService"):Create(Respawn,TweenInfo.new(0.25),{ImageTransparency = 0.5}):Play()
 end)
+local RefreshCooldown = false
 local Refresh = UI.buttons.inv:Clone()
 Refresh.Parent = CustomMenu
 Refresh.Name = "refresh"
@@ -1967,13 +2071,18 @@ Refresh.Position = UDim2.new(0.65, 0, 0.5, 35)
 Refresh.ImageColor3 = Color3.fromRGB(255, 255, 255)
 Refresh.TextLabel.Text = "Refresh"
 Refresh.MouseButton1Click:Connect(function()
+	if not RefreshCooldown then
+		RefreshCooldown = true
 	if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
 		local OldPos = game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame
 		local CamPos = workspace.CurrentCamera.CFrame
 		respawn(false)
 		LocalPlayer.CharacterAdded:Once(function(char)
-			task.wait()
+			repeat
+				RunService.Heartbeat:Wait()
+			until game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 			game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = OldPos
+			RefreshCooldown = false
 			wait()
 			workspace.CurrentCamera.CFrame = CamPos
 			
@@ -1983,14 +2092,18 @@ Refresh.MouseButton1Click:Connect(function()
 		local CamPos = workspace.CurrentCamera.CFrame
 		respawn(false)
 		LocalPlayer.CharacterAdded:Once(function(char)
-			task.wait()
+			repeat
+				RunService.Heartbeat:Wait()
+			until game.Players.LocalPlayer.Character:FindFirstChild("Torso")
 			game.Players.LocalPlayer.Character:FindFirstChild("Torso").CFrame = OldPos
+			RefreshCooldown = false
 			wait()
 			workspace.CurrentCamera.CFrame = CamPos
 		end)
 	else
-		Notify("Could not refresh | Did not find torso/root. (Suggest to respawn)")
+		Notify("Could not refresh | Did not find torso/root. (Suggest to respawn instead)")
 	end
+end
 end)
 Refresh.MouseEnter:Connect(function()
 	game:GetService("TweenService"):Create(Refresh,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
@@ -2048,7 +2161,7 @@ task.spawn(function()
 	ClonedCredits.Text = ClassicCredits.Text
 	ClassicCredits.Changed:Connect(function()
 		ClonedCredits.Text = ClassicCredits.Text
-		Credits = tonumber(ClassicCredits.Text:sub(-ClassicCredits.Text:len(),-8))
+		Credits = tonumber(ClassicCredits.Text:sub(-ClassicCredits.Text:len(),-8)) or 0
 	end)
 end)
 local AutoFarm = UI.buttons.inv:Clone()
@@ -2060,18 +2173,61 @@ AutoFarm.TextLabel.Text = "Disable autofarm"
 AutoFarm.TextLabel.TextSize = 11
 AutoFarm.MouseButton1Click:Connect(function()
 	if Sent2 == true then
-		Sent2 = false 
-
+		Sent2 = false
+		TopNotify("Autofarm disabled",2.5,true)
 		AutoFarm.ImageColor3 = Color3.fromRGB(0, 225, 225)
 		AutoFarm.TextLabel.Text = "Enable autofarm"
 		respawn(false)
-		
 	else
-		Sent2 = true 
+		Sent2 = true
+		TopNotify("Autofarm enabled",2.5,true)
 		AutoFarm.ImageColor3 = Color3.fromRGB(255, 60, 0)
 		AutoFarm.TextLabel.Text = "Disable autofarm"
 	end
 end)
+
+task.spawn(function()
+    local LastPing = GetPing()
+    while task.wait(6.8) do
+        local CurrentPing = GetPing()
+        if LastPing == CurrentPing then
+            PingFreezeEvent:Fire(CurrentPing)
+            task.wait(5)
+            LastPing = GetPing()
+        elseif LastPing ~= CurrentPing and CurrentPing > 4858 then
+            PingFreezeEvent:Fire(GetPing())
+            task.wait(5)
+            LastPing = GetPing()
+        else
+            LastPing = GetPing()
+        end
+    end
+end)
+
+PingFreezeEvent.Event:Connect(function()
+	if Legacy == true then
+	NotifyButtons("It has been detected that you have ping freeze/lag while 'Legacy' autofarm is turned on, would you like to turn it off?","Cancel","Yes",function()
+		return {}
+	end,function()
+		Feature7.Autosave.ImageButton.fill.Visible = false
+		Feature7.Autosave.ImageButton.fill.ImageTransparency = 0
+		Feature7UnFunction()
+		return {"Load","Turning off",2.5}
+	end)
+	elseif Sent2 == true then
+		NotifyButtons("It has been detected that you have ping freeze/lag while the autofarm is turned on would you like to turn it off?","Cancel","Yes",function()
+		return {}
+	end,
+	function()
+		Sent2 = false
+		TopNotify("Autofarm disabled",2.5,true)
+		AutoFarm.ImageColor3 = Color3.fromRGB(0, 225, 225)
+		AutoFarm.TextLabel.Text = "Enable autofarm"
+		return {"Load","Turning off",2.5}
+	end)
+	end
+end)
+
 AutoFarm.MouseEnter:Connect(function()
 	game:GetService("TweenService"):Create(AutoFarm,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
 end)
@@ -2089,7 +2245,6 @@ CustomButton.TextLabel.Text = "Breaking +"
 CustomButton.Name = "Breaking+"
 CustomButton.Visible = true
 game:GetService("TweenService"):Create(CustomButton,TweenInfo.new(0.5),{Position = UDim2.new(0, 0, 0, 140)}):Play()
-
 task.spawn(function()
 	local char = LocalPlayer.Character
 	repeat task.wait() until char:FindFirstChildOfClass("Humanoid") ~= nil
@@ -2321,6 +2476,9 @@ function PlayerExecute()
 		Cloned3.ImageColor3 = Color3.fromRGB(35, 30, 59)
 		Cloned3.button.ImageColor3 = Color3.fromRGB(23, 12, 53)
 		-- Button 4
+		if Cooldown > workspace.DistributedGameTime then
+			Cloned4.Visible = false
+		end
 		Cloned4.Position = UDim2.new(2, 0, 0, 162 + ExtraPixels)
 		Cloned4.Parent = PlayerButtons
 		Cloned4.TextLabel.Text = "Spam Notifications"
@@ -2392,7 +2550,8 @@ function PlayerExecute()
 		end)
 		Cloned4.MouseButton1Click:Connect(function()
 			PlayerButtons.Visible = false
-			NotifyButtons("Are you sure you want to spam duo request notifications on " .. Player.Name .. "?","Yes","No",function() for i = 1,50 do if Player ~= nil then game:GetService("ReplicatedStorage").RemoteEvent:FireServer(39, Player) else Notify("Failed to spam notifications (player left during spam)","ok") return {} end end return {"Load","Spamming",2.5} end,function() return {} end)
+			Cooldown = workspace.DistributedGameTime + 15
+			NotifyButtons("Are you sure you want to spam duo request notifications on " .. Player.Name .. "?","Yes","No",function() for i = 1,50 do if Player ~= nil then game:GetService("ReplicatedStorage").RemoteEvent:FireServer(39, Player) else Notify("Failed to spam notifications (player left during spam)","ok") return {} end end return {"Load","Spamming",1.5} end,function() return {} end)
 		end)
 	else
 		repeat
@@ -2542,8 +2701,6 @@ CustomButton.MouseButton1Click:Connect(function()
 	end
 end)
 
-NeededPlaceId = 648362523
-
 local queue_on_teleport = syn and syn.queue_on_teleport or queue_on_teleport
 if queue_on_teleport ~= nil then
 	queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
@@ -2578,7 +2735,7 @@ LocalPlayer.CharacterRemoving:Connect(function()
 		FloatingHead = false
 end)
 
-if game.PlaceId == NeededPlaceId then
+if game.PlaceId == Modes["All game-modes"]  then
 	repeat wait() until game:IsLoaded()
 	ColoredPrint("Breaking plus has loaded successfully",Color3.fromRGB(0,200,125),{"success",true})
 	game.StarterGui:SetCore(
@@ -2588,6 +2745,7 @@ if game.PlaceId == NeededPlaceId then
 			Text = "Breaking + | V" .. tostring(Version) .. " | loaded successfully.",
 			Icon = "rbxassetid://10698497706"
 		})
+		TopNotify("Breaking + | V" .. tostring(Version) .. " | loaded successfully.", 3.65, true)
 	while true do
 		if Sent2 == true then
 			task.wait()
@@ -2634,6 +2792,6 @@ else
 			Text = "You need to teleport to the correct mode to autofarm"
 		}
 	)
-	task.wait(5)
+	task.wait(8)
 	NotifyButtons("You need to teleport to the correct mode to autofarm","Teleport","Cancel",function() game:GetService("TeleportService"):Teleport(648362523,LocalPlayer) return {"Load","Teleporting",5} end,function() return {} end)
 end
