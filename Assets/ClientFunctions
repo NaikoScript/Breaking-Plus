@@ -514,7 +514,7 @@ function FunctionsTable:OpenCase(ItemType, Case, Item)
 		local v113 = table2.get("invbut")
 		v113.name.Text = val40.name 
 		v113.type.Text = val40.type or ""
-		v113.type.TextColor3 = table27[val40.type]
+		v113.type.TextColor3 = table27[val40.type] or Color3.fromRGB(255, 255, 255)
 		imagebutton(v113, val40)
 		v113.Position = UDim2.new(0, v40 * 110, 0, 0)
 		v40 = v40 + 1
