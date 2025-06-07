@@ -522,8 +522,8 @@ function FunctionsTable:OpenCase(ItemType, Case, Item)
 	end
 	local u111 = table8.get(ItemType, Case, Item)
 	local u112 = table2.get("invbut")
-	u112.name.Text = u111.name
-	u112.type.Text = u111.type
+	u112.name.Text = u111.name or ""
+	u112.type.Text = u111.type or ""
 	u112.type.TextColor3 = table27[u111.type]
 	spawn(function()
 		if type(u111.image) == "table" then
