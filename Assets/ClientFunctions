@@ -1,0 +1,655 @@
+-- I Tried to make it more readable, but it is still very messy.
+-- This is some peices of code from the breaking point client script.
+local FunctionsTable = {}
+local table1 = {}
+local table2 = {}
+local table3 = {}
+local table4 = {}
+local table5 = {}
+local table6 = {}
+local table7 = {}
+local table8 = {}
+local table9 = {}
+local table10 = {}
+local table11 = {}
+local table12 = {}
+local table13 = {}
+local table14 = {}
+local table15 = {}
+local table16 = {}
+local table17 = {}
+local table18 = {}
+local table19 = {}
+local table20 = {}
+local table21 = {}
+local LocalPlayer = game.Players.LocalPlayer
+local workspace_CurrentCamera = workspace.CurrentCamera
+local FindFirstChild = game.FindFirstChild
+local WaitForChild = game.WaitForChild
+local GetService = game.GetService
+local v2 = GetService(game, "ReplicatedStorage")
+local u2 = GetService(game, "RunService")
+local u3 = GetService(game, "ReplicatedStorage")
+local u4 = GetService(game, "MarketplaceService")
+local u5 = GetService(game, "TeleportService")
+local u6 = GetService(game, "UserInputService")
+local u7 = GetService(game, "StarterGui")
+local u8 = GetService(game, "ContentProvider")
+local u9 = GetService(game, "ContextActionService")
+local v3 = GetService(game, "Chat")
+local _ = GetService(game, "GroupService")
+local Heartbeat = u2.Heartbeat
+local u11 = WaitForChild(LocalPlayer, "PlayerGui")
+local u12 = WaitForChild(u11, "ScreenGui")
+local u13 = WaitForChild(u12, "buttons")
+local TweenService = game:GetService("TweenService")
+local function tween2(instance, value, changedvalue, Time, EasingStyle, p7) 
+
+	local table22 = {}
+	table22[value] = changedvalue
+	TweenService:Create(instance, TweenInfo.new(Time, EasingStyle or Enum.EasingStyle.Quint, p7 or Enum.EasingDirection.Out), table22):Play()
+end
+
+function table2.get(name)
+    return game:GetService("ReplicatedStorage").model:FindFirstChild(name):Clone()
+end
+
+
+local table32 = {}
+local function tween(p75, p76, p77, p78) 
+
+	p78 = p78 or 1
+	for key20, val20 in pairs(table32) do
+		if val20.obj ~= p75 or val20.property ~= p76 then continue end
+		table32[key20] = {
+			obj = p75,
+			property = p76,
+			e = p77,
+			inc = p78
+		}
+		return
+	end
+	local u100 = tick() .. math.random()
+	table32[u100] = {
+		obj = p75,
+		property = p76,
+		e = p77,
+		inc = p78
+	}
+	spawn(function() 
+		
+		while true do
+			if Heartbeat:wait() then
+				local v219 = table32[u100]
+				local v220 = p75
+				local v221 = p76
+				local v222 = p75[p76]
+				v220[v221] = v222 + (v219.e - v222) * v219.inc
+				if math.abs(p75[p76] - v219.e) >= 0.01 then continue end
+				table32[u100] = nil
+				p75[p76] = v219.e
+				return
+			end
+			return
+		end
+	end)
+end
+
+local require_ret3 = nil
+local v5 = WaitForChild(u3, "shopdata", 5)
+if v5 then
+	require_ret3 = require(v5)
+end
+
+local function shuffle(value4)
+	local v25 = #value4
+	for index5 = 1, v25 do
+		local math_random_ret = math.random(1, v25)
+		local v97 = value4[index5]
+		local v98 = value4[math_random_ret]
+		value4[math_random_ret] = v97
+		value4[index5] = v98
+	end
+	return value4
+end
+
+function table8.get(p145, p146, p147) 
+
+	if not p146 and not p147 then
+		return require_ret3.sections[p145]
+	end
+	if p146 and not p147 then
+		return require_ret3.sections[p145].gifts[p146]
+	end
+	if not p146 and p147 then
+		for _, val98 in pairs(require_ret3.sections[p145].gifts) do
+			for _, val149 in pairs(val98.items) do
+				if val149.name ~= p147 then continue end
+				return val149
+			end
+		end
+	end
+	if require_ret3.sections[p145] and require_ret3.sections[p145].gifts[p146] then
+		for _, val99 in pairs(require_ret3.sections[p145].gifts[p146].items) do
+			if val99.name ~= p147 then continue end
+			return val99
+		end
+	end
+	return nil
+end
+
+local table26 = {}
+local u18 = 1
+local function imagebutton(value1, value2, value3)
+	if type(value2.image) == "string" and value2.image:sub(1, 1) == "d" then
+		value1.Image = "rbxassetid://" .. value2.image:sub(2)
+		return
+	end
+	if type(value2.image) ~= "table" then
+		value1.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. value2.image
+		return
+	end
+	if not value3 then
+		spawn(function()
+			while value1.Parent do
+				for _, val187 in pairs(value2.image) do
+					value1.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. val187
+					wait()
+				end
+			end
+		end)
+		return
+	end
+	if u18 == 1 then
+		spawn(function()
+			while value1.Parent do
+				if value3.Visible then
+					for _, val206 in pairs(value2.image) do
+						value1.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. val206
+						wait()
+					end
+				else
+					wait(0.15)
+				end
+			end
+		end)
+		return
+	end
+	local v23 = table26[value3.Name]
+	if not v23 then
+		table26[value3.Name] = {
+			0,
+			{}
+		}
+		v23 = table26[value3.Name]
+	end
+	local v24 = v23[1]
+	local u93 = v23[2]
+	if #u93 % u18 == 0 then
+		local u123 = #u93 / u18
+		local u124 = u123 + 1
+		if v24 < u124 then
+			v23[1] = v23[1] + 1
+			spawn(function()
+				local v217 = 0
+				while wait() do
+					if value3.Visible then
+						for index76 = math.min(u18 * u124, #u93), u18 * u123 + 1, -1 do
+							local v258 = u93[index76]
+							if not v258[1].Parent then
+								table.remove(u93, index76)
+							else
+								v258[1].Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. v258[2][v217 % #v258[2] + 1]
+							end
+						end
+						v217 = v217 + 1
+					else
+						if v217 ~= 0 then
+							v217 = 0
+							for index82 = math.min(u18 * u124, #u93), u18 * u123 + 1, -1 do
+								local v271 = u93[index82]
+								if not v271[1].Parent then
+									table.remove(u93, index82)
+								else
+									v271[1].Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. v271[2][v217 % #v271[2] + 1]
+								end
+							end
+						end
+						wait(0.1)
+					end
+				end
+			end)
+		end
+	end
+	v23[2][#v23[2] + 1] = {
+		value1,
+		value2.image
+	}
+end
+
+
+function table12.get(name)
+    return game:GetService("ReplicatedStorage").model:FindFirstChild(name):Clone()
+end
+
+function table11.add(EasingStyle9, p70)
+	table11.listens[EasingStyle9] = p70
+end
+
+table3.topnotifs = {}
+function table3.topnotif(p112, p113, p114, p115) 
+	spawn(function() 
+
+		local Sound = Instance.new("Sound", u11)
+		Sound.SoundId = "rbxassetid://1402995762"
+		Sound.Volume = 1
+		delay(0.3, function()
+			Sound:Play()
+			wait(1)
+			Sound:Destroy()
+		end)
+		local u149 = table2.get("not")
+		u149.Parent = u12
+		table.insert(table3.topnotifs, 1, u149)
+		for key140, val140 in pairs(table3.topnotifs) do
+			if key140 == 1 then continue end
+			local v192 = 0
+			for index57 = 1, key140 - 1 do
+				v192 = v192 + math.max(0, table3.topnotifs[index57].pic.TextLabel.TextBounds.X - 50)
+			end
+			val140:TweenPosition(UDim2.new(1, key140 * -150 - v192 - (u11.PlayerList.PlayerList.Visible and 280 or 0), 0, 50), "Out", "Quint", 1, true)
+		end
+		u149.pic.Rotation = -90
+		u149.ViewportFrame.Rotation = -90
+		u149.ImageLabel.Rotation = -180
+		tween2(u149.pic, "Rotation", 0, 1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+		tween2(u149.ViewportFrame, "Rotation", 0, 1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+		tween2(u149.ImageLabel, "Rotation", 0, 2, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut)
+		u149.ImageLabel.ImageTransparency = 1
+		u149.pic.ImageTransparency = 1
+		u149.ViewportFrame.ImageTransparency = 1
+		delay(0.3, function() 
+			tween(u149.ImageLabel, "ImageTransparency", 0, 0.1)
+			tween(u149.pic, "ImageTransparency", 0, 0.1)
+			tween(u149.ViewportFrame, "ImageTransparency", 0, 0.1)
+			for index64 = 1, #p113 do
+				u149.pic.TextLabel.Text = p113:sub(1, index64)
+				for key202, val202 in pairs(table3.topnotifs) do
+					local v252 = 0
+					if key202 ~= 1 then
+						for index78 = 1, key202 - 1 do
+							v252 = v252 + math.max(0, table3.topnotifs[index78].pic.TextLabel.TextBounds.X - 50)
+						end
+					end
+					val202:TweenPosition(UDim2.new(1, key202 * -150 - v252 - (u11.PlayerList.PlayerList.Visible and 280 or 0), 0, 50), "Out", "Quint", 1, true)
+				end
+				wait()
+			end
+			wait(5)
+			for key181, val181 in pairs(table3.topnotifs) do
+				if val181 ~= u149 then continue end
+				table.remove(table3.topnotifs, key181)
+			end
+			u149:Destroy()
+		end)
+		if type(p112) == "table" then
+			spawn(function() 
+				while wait() do
+					for _, val210 in pairs(p112) do
+						if u149.Parent == nil then break end
+						u149.pic.Image = val210
+						wait()
+					end
+				end
+			end)
+		elseif p115 then
+			u149.pic.Image = ""
+			u149.ViewportFrame.Ambient = Color3.fromRGB(255, 255, 255)
+			u149.ViewportFrame.Position = UDim2.new(0, -50, 0, 0)
+			u149.ViewportFrame.Size = UDim2.new(0, 200, 0, 100)
+			for index68 = 1, 4 do
+				local u186 = table2.get(p115[5])
+				u186.Material = "Neon"
+				local u187 = table2.get(p115[5])
+				if index68 ~= 4 then
+					u187.Material = "ForceField"
+				end
+				local u188 = p115[index68]
+				if type(u188) == "table" then
+					spawn(function()
+						while wait() do
+							for _, val222 in pairs(u188) do
+								if u149.Parent == nil then break end
+								u186.TextureID = "rbxassetid://" .. val222
+								wait()
+							end
+						end
+					end)
+				else
+					u186.TextureID = "rbxassetid://" .. u188
+				end
+				spawn(function()
+					u186.CFrame = CFrame.new((index68 - 2) * 2, 0, -4.5) * CFrame.Angles(0, -math.pi / 2, 0) * CFrame.Angles(-0.5235987755982988, 0, 0)
+					delay(1, function()
+						
+						tween2(u187, "Transparency", 0, 3)
+						local _ = index68 == 4
+						tween2(u149.ViewportFrame, "LightDirection", Vector3.new(-1, 0, -1), 1)
+						wait(0.3)
+						if index68 == 4 then
+							u186.Transparency = 0
+						else
+							tween2(u186, "Transparency", 1, 0.01)
+						end
+						tween2(u187, "Transparency", 1, 1)
+					end)
+					for index79 = 1, 20, 0.5 do
+						local v263 = (20 - index79) / 10
+						local v264 = index79 ^ 0.5 * 10
+						local v265 = (0.5 - math.abs((index79 - 5) / 20 - 0.5)) * 2
+						tween2(u186, "CFrame", CFrame.new(math.sin(index79 + index68 * 2) * math.max(0, v263 - 0.15), -math.sin(index79 + index68 * 2) * v265 * math.max(0, v263 - 0.15), math.cos(index79 + index68 * 2) * 1 * (20 - index79) / 20 + -4.5) * CFrame.Angles(0, -math.pi / 2, 0) * CFrame.Angles(-math.rad(30 - v265 * 0), v264, 0), (20 - index79) / 20 * 0.2)
+						tween2(u187, "CFrame", CFrame.new(math.sin(index79 + index68 * 2) * math.max(0, v263 - 0.15), -math.sin(index79 + index68 * 2) * v265 * math.max(0, v263 - 0.15), math.cos(index79 + index68 * 2) * 1 * (20 - index79) / 20 + -4.5) * CFrame.Angles(0, -math.pi / 2, 0) * CFrame.Angles(-math.rad(30 - v265 * 0), v264, 0), (20 - index79) / 20 * 0.2)
+						wait((20 - index79) / 20 * 0.05)
+					end
+					for index80 = 20, 25, 0.5 do
+						local v266 = index80 ^ 0.5 * 10
+						local v267 = 0.5 - (25 - index80) / 10
+						tween2(u186, "CFrame", CFrame.new(math.sin(index68 * 2 + 20) * 0, 0, math.cos(index68 * 2 + 20) * 1 * 0 + -4.5) * CFrame.Angles(0, -math.pi / 2, 0) * CFrame.Angles(-0.5235987755982988, v266, 0), v267 + 0.01)
+						tween2(u187, "CFrame", CFrame.new(math.sin(index68 * 2 + 20) * 0, 0, math.cos(index68 * 2 + 20) * 1 * 0 + -4.5) * CFrame.Angles(0, -math.pi / 2, 0) * CFrame.Angles(-0.5235987755982988, v266, 0), v267 + 0.01)
+						wait(v267 / 3)
+					end
+					tween2(u186, "CFrame", CFrame.new(math.sin(index68 * 2 + 20) * 0, 0, math.cos(index68 * 2 + 20) * 1 * 0 + -4.5) * CFrame.Angles(0, -math.pi / 2, 0) * CFrame.Angles(-0.5235987755982988, 0, 0), 1)
+					tween2(u187, "CFrame", CFrame.new(math.sin(index68 * 2 + 20) * 0, 0, math.cos(index68 * 2 + 20) * 1 * 0 + -4.5) * CFrame.Angles(0, -math.pi / 2, 0) * CFrame.Angles(-0.5235987755982988, 0, 0), 1)
+				end)
+				if index68 ~= 4 then
+					u186.Transparency = 0
+				end
+				u186.Parent = u149.ViewportFrame
+				u187.Parent = u149.ViewportFrame
+			end
+		elseif p114 then
+			u149.pic.Image = ""
+			spawn(function()
+				local u190 = createAvatar(p114[1])
+				tween2(u149.ViewportFrame, "LightDirection", Vector3.new(-1, -4, -5), 4)
+				for _, child216 in pairs(u190:GetChildren()) do
+					pcall(function()
+						child216.Anchored = false
+					end)
+				end
+				u190.Parent = workspace
+				u190:SetPrimaryPartCFrame(CFrame.new(0, 1.5, -7.5) * CFrame.Angles(0, math.pi + -0.3490658503988659, 0))
+				if p114[3] then
+					local v268 = table2.get("Blade")
+					v268.Parent = u190
+					local huh__2 = Instance.new("Weld")
+					huh__2.Name = "huh__"
+					huh__2.Part0 = u190["Right Arm"]
+					huh__2.Part1 = u190.Blade.Handle
+					if p114[2] then
+						if type(p114[2]) == "table" then
+							table1.listens.skin(v268.Handle.Mesh, p114[2])
+						else
+							v268.Handle.Mesh.TextureId = "rbxassetid://" .. p114[2]
+						end
+					end
+					huh__2.C0 = CFrame.new(0, -1, 0, 1, 0, -0, 0, 0, 1, 0, -1, -0)
+					huh__2.C1 = CFrame.new(0, -1.29999995, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+					huh__2.Parent = u190["Right Arm"]
+				else
+					local v269 = table2.get("gun")
+					v269.Parent = u190
+					local huh__ = Instance.new("Weld")
+					huh__.Name = "huh__"
+					huh__.Part0 = u190["Right Arm"]
+					huh__.Part1 = v269
+					if p114[2] then
+						if type(p114[2]) == "table" then
+							table1.listens.skin(v269, p114[2])
+						else
+							v269.TextureID = "rbxassetid://" .. p114[2]
+						end
+					end
+					huh__.C0 = CFrame.new(0, -1, 0, 1, 0, -0, 0, 0, 1, 0, -1, -0)
+					huh__.C1 = CFrame.new(0, -1.29999995, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1) * CFrame.Angles(math.pi, 0, math.pi) * CFrame.new(0, 0.9, 0.6)
+					huh__.Parent = u190["Right Arm"]
+				end
+				Heartbeat:wait()
+				u190.Parent = u149.ViewportFrame
+				local CFrameValue = Instance.new("CFrameValue", workspace)
+				CFrameValue.Value = CFrame.new(0, 0.5, -3) * CFrame.Angles(0, math.pi + -0.4537856055185257, 0)
+				delay(0, function()
+					
+					tween2(CFrameValue, "Value", CFrame.new(0, 1, -3.5) * CFrame.Angles(0, -0.3839724354387525, 0), 0.5, nil, Enum.EasingDirection.In)
+					wait(0.5)
+					tween2(CFrameValue, "Value", CFrame.new(0, 1, -5) * CFrame.Angles(0, math.pi + -0.3490658503988659, -0.2617993877991494), 1)
+					wait(0.5)
+					tween2(CFrameValue, "Value", CFrame.new(0, 0.5, -6) * CFrame.Angles(0, math.pi + -0.3490658503988659, -0.2617993877991494), 1, nil, Enum.EasingDirection.InOut)
+					wait(2.35)
+					tween2(CFrameValue, "Value", CFrame.new(0, 0.5, -3) * CFrame.Angles(-0.3490658503988659, math.pi + 1.3962634015954636, 0.2617993877991494), 1.3, nil, Enum.EasingDirection.InOut)
+				end)
+				local Animation3 = Instance.new("Animation")
+				Animation3.AnimationId = "rbxassetid://03491551282"
+				local Clone_ret2 = u190:Clone()
+				Clone_ret2.Parent = workspace
+				local LoadAnimation_ret = nil
+				delay(0.4, function() 
+					LoadAnimation_ret = Clone_ret2.Humanoid:LoadAnimation(Animation3)
+					LoadAnimation_ret:Play()
+				end)
+				local tick_ret = nil
+				for index81 = 1, 300 do
+					if u190.Parent == nil then break end
+					if LoadAnimation_ret and LoadAnimation_ret.TimePosition > 2 and not tick_ret then
+						tick_ret = tick()
+					end
+					if tick_ret then
+						local v272 = math.sin((math.min((tick() - tick_ret) * 5, 3.2))) * 3
+						tween2(Clone_ret2["Right Arm"].huh__, "C0", CFrame.new(0, -1, 0, 1, 0, -0, 0, 0, 1, 0, -1, -0) * CFrame.new(0, v272 * 2, v272 / 2) * CFrame.Angles(math.rad((math.min(360, (tick() - tick_ret) * 360 * 2))), 0, 0), 0.3)
+					end
+					pcall(function() 
+						for _, child223 in pairs(u190:GetChildren()) do
+							if child223:IsA("BasePart") then
+								child223.CFrame = Clone_ret2[child223.Name].CFrame
+								continue
+							end
+							if not child223:IsA("Accessory") and not child223:IsA("Tool") then continue end
+							child223.Handle.CFrame = Clone_ret2[child223.Name].Handle.CFrame
+						end
+						u190:SetPrimaryPartCFrame(CFrameValue.Value)
+					end)
+					Heartbeat:wait()
+				end
+				Clone_ret2:Destroy()
+				Animation3:Destroy()
+				CFrameValue:Destroy()
+			end)
+		else
+			u149.pic.Image = p112
+		end
+		u149:TweenPosition(UDim2.new(1, -150 - (u11.PlayerList.PlayerList.Visible and 280 or 0), 0, 50), "Out", "Quint", 1, true)
+		u149.pic.TextLabel.Text = ""
+		u149.pic.TextLabel:TweenPosition(UDim2.new(-1, 0, 0.5, 0), "Out", "Back", 2, true)
+		wait(4)
+		tween(u149.pic.TextLabel, "TextTransparency", 1, 0.1)
+		tween(u149.pic.TextLabel, "TextStrokeTransparency", 1, 0.1)
+		tween(u149.ImageLabel, "Rotation", -180, 0.05)
+		tween(u149.pic, "ImageTransparency", 1, 0.1)
+		tween(u149.ViewportFrame, "ImageTransparency", 1, 0.1)
+		tween(u149.ImageLabel, "ImageTransparency", 1, 0.1)
+		u149:TweenPosition(UDim2.new(1, 70, 0, 50), "InOut", "Quint", 1, true)
+	end)
+end
+
+local table27 = {
+	Common = Color3.fromRGB(255, 255, 255),
+	Rare = Color3.fromRGB(25, 255, 190),
+	Uncommon = Color3.fromRGB(255, 245, 184),
+	Legendary = Color3.fromRGB(255, 79, 82),
+	Divine = Color3.fromRGB(255, 204, 0)
+}
+
+local u33 = WaitForChild(u12, "inv")
+local u35 = WaitForChild(u12, "shop")
+local u38 = WaitForChild(u12, "scroll")
+local u39 = WaitForChild(u12, "popup")
+
+
+
+function FunctionsTable:OpenCase(ItemType, Case, Item)
+	local p176 =  false
+	table8.disabled = true
+	u38.Visible = true
+	u35.Visible = false
+	u38.Frame:ClearAllChildren()
+	local t_items3 = table8.get(ItemType, Case).items
+	local table46 = {}
+	for key39, val39 in pairs(t_items3) do
+		table46[key39] = val39
+	end
+	local v39 = shuffle(table46)
+	local v40 = 0
+	for _, val40 in pairs(v39) do
+		if val40.name == Item then continue end
+		local v113 = table2.get("invbut")
+		v113.name.Text = val40.name
+		v113.type.Text = val40.type
+		v113.type.TextColor3 = table27[val40.type]
+		imagebutton(v113, val40)
+		v113.Position = UDim2.new(0, v40 * 110, 0, 0)
+		v40 = v40 + 1
+		v113.Parent = u38.Frame
+	end
+	local u111 = table8.get(ItemType, Case, Item)
+	local u112 = table2.get("invbut")
+	u112.name.Text = u111.name
+	u112.type.Text = u111.type
+	u112.type.TextColor3 = table27[u111.type]
+	spawn(function()
+		if type(u111.image) == "table" then
+			while true do
+				for _, val192 in pairs(u111.image) do
+					u112.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. val192
+					wait()
+				end
+			end
+		else
+			u112.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. u111.image
+		end
+	end)
+	u112.Position = UDim2.new(0, (#v39 - 1) * 110, 0, 0)
+	u112.Parent = u38.Frame
+	u38.Frame.Size = UDim2.new(0, #v39 * 110, 0, 100)
+	u38.Frame.Position = UDim2.new(0, 100, 0, 13)
+	wait(0.1)
+	u38.Frame:TweenPosition(UDim2.new(0, -(u38.Frame.AbsoluteSize.X - 200), 0, 13), "Out", "Quad", #v39 * 0.2, true)
+	delay(#v39 * 0.2, function() 
+		pcall(function() 
+			local table47 = {}
+			if type(u111.image) == "table" then
+				for key203, val203 in pairs(u111.image) do
+					table47[key203] = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. val203
+				end
+				table3.topnotif(table47, "NEW SKIN:\n" .. (u111.fixedname or u111.name):upper())
+				return
+			end
+			table3.topnotif("https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. u111.image, "NEW SKIN:\n" .. (u111.fixedname or u111.name):upper())
+		end)
+		u38.Visible = false
+		wait(3)
+		table8.disabled = false
+	end)
+	return u111
+end
+
+function table12.convertforteleport()
+	local table64 = {}
+	for key75, val75 in pairs(table12.data) do
+		if val75.save then continue end
+		table64[key75] = val75
+	end
+	return table64
+end
+
+local function loadscreen()
+		local u145 = table2.get("teleport")
+		local TELEPORTGUI = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
+		TELEPORTGUI.Name = "TELEPORTGUI"
+		u145.Parent = TELEPORTGUI
+		local table81 = {
+			u145.shake.ViewportFrame.b,
+			u145.shake.ViewportFrame.p
+		}
+		u145.ImageLabel.Visible = true
+		tween2(u145.ImageLabel, "BackgroundTransparency", 0, 0.5)
+		u7:SetCore("TopbarEnabled", false)
+		tween2(u145.shake.ViewportFrame, "Rotation", -5, 0.5)
+		delay(0.1, function()
+			tween2(u145.shake.ViewportFrame, "Size", UDim2.new(1, 0, 1, 0), 0.5, nil, Enum.EasingDirection.InOut)
+			tween2(u145.shake.ViewportFrame, "Position", UDim2.new(0.5, 0, 0.45, 0), 0.5, nil, Enum.EasingDirection.InOut)
+			tween2(u145.shake, "Size", UDim2.new(1.2, 0, 1.2, 0), 0.01)
+			tween2(u145.shake, "Size", UDim2.new(1, 0, 1, 0), 5)
+			for index60 = 0, 3.5, 0.05 do
+				if not u145.Parent then break end
+				u145.shake.Rotation = math.sin(index60) * 3
+				Heartbeat:wait()
+			end
+		end)
+		for key126, val126 in pairs(table81) do
+			val126.CFrame = val126.CFrame * CFrame.Angles(math.rad((0.5 - math.floor(key126 / 2)) * 100), math.rad((0.5 - math.floor(key126 / 2)) * 100), (math.rad((0.5 - math.floor(key126 / 2)) * 100)))
+			tween2(val126.Decal, "Transparency", 0, 0.5)
+			tween2(val126, "CFrame", CFrame.new(key126 == 2 and 1.25 or val126.Position.X * 1.25, 1, val126.Position.Z), 1)
+			tween2(val126, "Size", Vector3.new(5, 5, 1), 0.5, Enum.EasingStyle.Back)
+			wait(0.1)
+			val126.Decal.Texture = key126 == 1 and "rbxassetid://3336365375" or "rbxassetid://3336365527"
+		end
+		delay(0, function()
+			for key179, val179 in pairs(table81) do
+				spawn(function()
+					val179.Decal.Texture = key179 == 1 and "rbxassetid://3336921066" or "rbxassetid://3336921427"
+					wait()
+					val179.Decal.Texture = key179 == 1 and "rbxassetid://3336365375" or "rbxassetid://3336365527"
+				end)
+			end
+		end)
+		wait(0.1)
+		spawn(function()
+			for index61 = 1, 20, 0.5 do
+				for key199, val199 in pairs(table81) do
+					tween2(val199, "CFrame", CFrame.new(key199 == 2 and 1.25 or -1.25, 1, -20) * CFrame.Angles(math.rad(math.sin(index61) * 5 / index61 / 15), math.rad((key199 == 2 and math.sin or math.sin)(index61) * 5 / index61 / 15), 0), 0.5)
+				end
+				wait()
+			end
+		end)
+		delay(10, function()
+			TELEPORTGUI:Destroy()
+			u7:SetCore("TopbarEnabled", true)
+		end)
+		return TELEPORTGUI
+	end
+	u5.TeleportInitFailed:Connect(function(p319, p320, p321)
+		if LocalPlayer == p319 and FindFirstChild(LocalPlayer.PlayerGui, "TELEPORTGUI") then
+			table3.msgbox("Teleport failed (" .. tostring(p321) .. ")")
+			LocalPlayer.PlayerGui.TELEPORTGUI:Destroy()
+			u7:SetCore("TopbarEnabled", true)
+		end
+	end)
+
+
+
+		function FunctionsTable:Teleport(PlaceId,JobId)
+		local u146 = nil
+		if PlaceId and PlaceId ~= 0 then
+			spawn(function()
+				u146 = loadscreen()
+			end)
+		end
+		if JobId and PlaceId == game.PlaceId then
+			u5:TeleportToPlaceInstance(PlaceId, JobId, nil, v2.model.TELEPORTGUI, table2.get("TELEPORTGUI"))
+		else
+		u5:Teleport(PlaceId, nil, v2.model.TELEPORTGUI, table2.get("TELEPORTGUI"))
+		end
+	end
+
+
+return FunctionsTable
