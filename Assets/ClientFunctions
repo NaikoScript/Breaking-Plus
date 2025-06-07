@@ -512,7 +512,7 @@ function FunctionsTable:OpenCase(ItemType, Case, Item)
 	for _, val40 in pairs(v39) do
 		if val40.name == Item then continue end
 		local v113 = table2.get("invbut")
-		v113.name.Text = val40.name 
+		v113.name.Text = val40.name or ""
 		v113.type.Text = val40.type or ""
 		v113.type.TextColor3 = table27[val40.type] or Color3.fromRGB(255, 255, 255)
 		imagebutton(v113, val40)
@@ -522,9 +522,9 @@ function FunctionsTable:OpenCase(ItemType, Case, Item)
 	end
 	local u111 = table8.get(ItemType, Case, Item)
 	local u112 = table2.get("invbut")
-	u112.name.Text = u111.name 
-	u112.type.Text = u111.type 
-	u112.type.TextColor3 = table27[u111.type]
+	u112.name.Text = u111.name or ""
+	u112.type.Text = u111.type or ""
+	u112.type.TextColor3 = table27[u111.type] or Color3.fromRGB(255, 255, 255)
 	spawn(function()
 		if type(u111.image) == "table" then
 			while true do
