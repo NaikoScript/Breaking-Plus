@@ -4,8 +4,8 @@ function Porting:Port(Name,Image,Type,Location)
     local LocalPlayer = game.Players.LocalPlayer
     local UI = LocalPlayer.PlayerGui.ScreenGui or LocalPlayer.PlayerGui:WaitForChild("ScreenGui")
     local SkinTypes = {["Gun Skins"]=1,["Knife Skins"]=2,["Chair Skins"]=3,Animations=4,Accessories=5,Effects=6}
-    local Rarities = {Common=Color3.fromRGB(255, 255, 255),Uncommon=Color3.fromRGB(255, 245, 184),Rare=Color3.fromRGB(25, 255, 190),Legendary=Color3.fromRGB(255, 79, 82),Divine=Color3.fromRGB(255, 204, 0),Exotic=Color3.fromRGB(255, 129, 59)}
-    local RarityOrder = {Exotic=-6,Divine = -5,Legendary = -4,Rare = -3,Uncommon = -2,Common = -1}
+    local Rarities = {[""]=Color3.fromRGB(255, 255, 255),Common=Color3.fromRGB(255, 255, 255),Uncommon=Color3.fromRGB(255, 245, 184),Rare=Color3.fromRGB(25, 255, 190),Legendary=Color3.fromRGB(255, 79, 82),Divine=Color3.fromRGB(255, 204, 0),Exotic=Color3.fromRGB(255, 129, 59)}
+    local RarityOrder = {Exotic=-6,Divine = -5,Legendary = -4,Rare = -3,Uncommon = -2,Common = -1,[""]=0}
 
     -- Configuration --
     local SkinType = SkinTypes[Location[1]] -- Where it would be located in your inventory [Gun Skins, Knife Skins, Chair Skins, Animations, Accessories, Effects]
