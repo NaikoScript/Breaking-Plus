@@ -497,7 +497,7 @@ local u39 = WaitForChild(u12, "popup")
 
 
 
-function FunctionsTable:OpenCase(ItemType, Case, Item)
+function FunctionsTable:OpenCase(ItemType, Case, Item,Notify)
 	local p176 =  false
 	table8.disabled = true
 	u38.Visible = true
@@ -526,18 +526,7 @@ function FunctionsTable:OpenCase(ItemType, Case, Item)
 	u112.name.Text = u111.name or ""
 	u112.type.Text = u111.type or ""
 	u112.type.TextColor3 = table27[u111.type] or Color3.fromRGB(255, 255, 255)
-	spawn(function()
-		if type(u111.image) == "table" then
-			while true do
-				for _, val192 in pairs(u111.image) do
-					u112.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. val192
-					wait()
-				end
-			end
-		else
-			u112.Image = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. u111.image
-		end
-	end)
+	imagebutton(u112, u111)
 	u112.Position = UDim2.new(0, (#v39 - 1) * 110, 0, 0)
 	u112.Parent = u38.Frame
 	u38.Frame.Size = UDim2.new(0, #v39 * 110, 0, 100)
@@ -546,15 +535,19 @@ function FunctionsTable:OpenCase(ItemType, Case, Item)
 	u38.Frame:TweenPosition(UDim2.new(0, -(u38.Frame.AbsoluteSize.X - 200), 0, 13), "Out", "Quad", #v39 * 0.2, true)
 	delay(#v39 * 0.2, function() 
 		pcall(function() 
+			if Notify == true then
 			local table47 = {}
 			if type(u111.image) == "table" then
 				for key203, val203 in pairs(u111.image) do
-					table47[key203] = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. val203
+					table47[key203] = "https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. (tostring(val203):gsub("%D+", ""))
 				end
 				table3.topnotif(table47, "NEW SKIN:\n" .. (u111.fixedname or u111.name):upper())
 				return
 			end
-			table3.topnotif("https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. u111.image, "NEW SKIN:\n" .. (u111.fixedname or u111.name):upper())
+			table3.topnotif("https://www.roblox.com/Thumbs/Asset.ashx?width=100&height=100&assetId=" .. (tostring(u111.image):gsub("%D+", "")), "NEW SKIN:\n" .. (u111.fixedname or u111.name):upper())
+		elseif Notify == "NoImage" or Notify == "Name" then
+			table3.topnotif("" , "NEW SKIN:\n" .. (u111.fixedname or u111.name):upper())
+		end
 		end)
 		u38.Visible = false
 		wait(3)
