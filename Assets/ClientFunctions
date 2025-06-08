@@ -43,6 +43,7 @@ local u11 = WaitForChild(LocalPlayer, "PlayerGui")
 local u12 = WaitForChild(u11, "ScreenGui")
 local u13 = WaitForChild(u12, "buttons")
 local TweenService = game:GetService("TweenService")
+table12.data = require(WaitForChild(u3, "settings"))
 local function tween2(instance, value, changedvalue, Time, EasingStyle, p7) 
 
 	local table22 = {}
