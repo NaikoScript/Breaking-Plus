@@ -21,7 +21,7 @@ function Porting:Port(Name,Image,Type,Location)
             Images = {Images}
         end
         for i,v in pairs(Images) do
-           v = string.gsub(v, "%D+", "")
+           Images[i] = string.gsub(v, "%D+", "")
         end
         if #Images == 1 then
             table.insert(Images,Images[1])
