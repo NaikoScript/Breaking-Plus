@@ -16,7 +16,7 @@ end)
 
 -- General variables --
 
-local Version = 4.7
+local Version = 4.71
 local RoundMode = nil
 local UserType = 0
 local LocalPlayer = game.Players.LocalPlayer
@@ -2187,19 +2187,10 @@ AutoFarm.MouseButton1Click:Connect(function()
 end)
 
 task.spawn(function()
-    local LastPing = GetPing()
-    while task.wait(6.8) do
-        local CurrentPing = GetPing()
-        if LastPing == CurrentPing then
-            PingFreezeEvent:Fire(CurrentPing)
-            task.wait(5)
-            LastPing = GetPing()
-        elseif LastPing ~= CurrentPing and CurrentPing > 4858 then
+    while task.wait(260) do
+        if GetPing() > 4858 then
             PingFreezeEvent:Fire(GetPing())
-            task.wait(5)
-            LastPing = GetPing()
-        else
-            LastPing = GetPing()
+            task.wait(0.5)
         end
     end
 end)
