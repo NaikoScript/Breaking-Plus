@@ -43,7 +43,108 @@ local u11 = WaitForChild(LocalPlayer, "PlayerGui")
 local u12 = WaitForChild(u11, "ScreenGui")
 local u13 = WaitForChild(u12, "buttons")
 local TweenService = game:GetService("TweenService")
-table12.data = require(WaitForChild(u3, "settings"))
+table12.data = {
+	["Mute Radios"] = {
+		index = 2;
+		enabled = false;
+		save = false;
+	};
+	["Auto Equip"] = {
+		index = 1;
+		enabled = true;
+		save = false;
+	};
+	["Ignore Trades"] = {
+		index = 10;
+		cate = "trading";
+		enabled = false;
+		save = true;
+	};
+	Afk = {
+		index = 3;
+		enabled = false;
+		save = false;
+	};
+	["Display Knife"] = {
+		index = 5;
+		enabled = false;
+		save = true;
+	};
+	Optimize = {
+		index = 4;
+		cate = "performance";
+		enabled = false;
+		save = true;
+	};
+	["Display Gun"] = {
+		index = 7;
+		enabled = false;
+		save = true;
+	};
+	["Hide Chat"] = {
+		index = 8;
+		enabled = false;
+	};
+	["Display Knife 2"] = {
+		index = 6;
+		enabled = false;
+		save = true;
+		pass = 651921357;
+	};
+	["Custom Joystick"] = {
+		index = 2;
+		cate = "controls";
+		enabled = false;
+		save = true;
+	};
+	["Center Aim (Mobile)"] = {
+		fixedname = "Mobile Crosshair";
+		index = 1;
+		cate = "controls";
+		enabled = true;
+		save = true;
+	};
+	RadioId = {
+		index = 1;
+		otype = "IntValue";
+		hide = true;
+		save = true;
+	};
+	["Invert Chat"] = {
+		index = 9;
+		enabled = false;
+		save = true;
+	};
+	["Hide Monthly Stats"] = {
+		index = 1;
+		cate = "other";
+		enabled = false;
+		save = true;
+	};
+	["Throw Keybind"] = {
+		index = 3;
+		cate = "controls";
+		otype = "StringValue";
+		enabled = "";
+		text = true;
+		save = true;
+	};
+	["Log up to"] = {
+		index = 11;
+		cate = "trading";
+		otype = "IntValue";
+		enabled = 100;
+		options = {25, 50, 100, 150, 200};
+		save = true;
+	};
+	["Show Round Stats"] = {
+		index = 1;
+		cate = "other";
+		enabled = false;
+		save = true;
+	};
+}
+
 local function tween2(instance, value, changedvalue, Time, EasingStyle, p7) 
 
 	local table22 = {}
@@ -99,7 +200,7 @@ end
 local require_ret3 = nil
 local v5 = WaitForChild(u3, "shopdata", 5)
 if v5 then
-	require_ret3 = require(v5)
+	require_ret3 = game:GetService("HttpService"):JSONDecode(game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/Jsonshopdata"))
 end
 
 function shuffle(value4)
