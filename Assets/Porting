@@ -93,6 +93,13 @@ function Porting:Port(Name,Image,Type,Location)
                 end
             else
                 invbut.BorderSizePixel = 0
+                local suc,err = pcall(function()
+                local args = {
+                    [1] = 55,
+                    [2] = Location[1]
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer(unpack(args)) 
+                end)
             end
         end)
     else
