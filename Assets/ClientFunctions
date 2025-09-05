@@ -739,7 +739,7 @@ local function loadscreen()
 				u146 = loadscreen()
 			end)
 		end
-		if JobId and PlaceId == game.PlaceId then
+		if JobId then
 			u5:TeleportToPlaceInstance(PlaceId, JobId,LocalPlayer, nil, table12.convertforteleport(), table2.get("TELEPORTGUI"))
 		else
 		u5:Teleport(PlaceId, LocalPlayer, table12.convertforteleport(), table2.get("TELEPORTGUI"))
