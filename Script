@@ -1,6 +1,6 @@
 -- Breaking Plus Made by Naiko Exploits --
 
-repeat task.wait() until game:IsLoaded() and task.wait(0.5) and workspace.DistributedGameTime > 4
+repeat task.wait() until game:IsLoaded() and task.wait(1) and workspace.DistributedGameTime > 4
 
 if game:GetService("CoreGui"):FindFirstChild("Plus") then
 	return warn("Script already running")
@@ -16,12 +16,13 @@ end)
 
 -- General variables --
 
-local Version = 4.71
+local Version = "5.0"
 local RoundMode = nil
 local UserType = 0
 local LocalPlayer = game.Players.LocalPlayer
 local UI = LocalPlayer.PlayerGui.ScreenGui
 local CustomButton = UI.buttons.log
+local Scroll = UI.scroll
 local CustomMenu = UI.credits
 local ClassicCredits = UI.shop.top.credits
 local PlayerList = LocalPlayer.PlayerGui.PlayerList
@@ -40,10 +41,9 @@ local Cooldown = 20
 local Credits = tonumber(ClassicCredits.Text:sub(-ClassicCredits.Text:len(),-8)) or 0
 local invbut = game.ReplicatedStorage.model.invbut:Clone()
 local invbut2 = game.ReplicatedStorage.model.invbut:Clone()
-local ERainSource = game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/ERainSource")
-local CandyCrownSource = game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/CandyCrownSource")
-local RoyalRedSource = game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/RoyalRedSource")
 local FreecamSourceFunction = loadstring(game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/FreecamSource"))()
+local Porting = loadstring(game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/Porting"))()
+local ClientFunctions = loadstring(game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/ClientFunctions"))()
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local PingFreezeEvent = Instance.new("BindableEvent")
@@ -56,6 +56,8 @@ local Debugging = nil
 local CurrentLabel = nil
 local TopNotifyConnection = nil
 local IsImmune = false
+local AutoExec = true
+local TeleportNotify = false
 local FloatingHead = false
 local Sent2 = true
 
@@ -326,6 +328,15 @@ end
 
 function RoundNumber(Number, State)
   	return tonumber(string.format("%." .. (State or 0) .. "f", Number))
+end
+
+local function GetModeByPlaceId(PlaceId)
+	for Mode,Id in pairs(Modes) do
+		if Id == PlaceId then
+			return Mode
+		end
+	end
+	return "Unknown"
 end
 
 function Debug(Message)
@@ -773,6 +784,39 @@ local function GetTotalPlayers(placeId)
     return totalPlayers
 end
 
+function UITeleport(PlaceId,JobId)
+	if AutoExec == true then
+		local queue_on_teleport = syn and syn.queue_on_teleport or queue_on_teleport
+		if queue_on_teleport ~= nil then
+			queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
+		end
+		task.wait(0.8)
+	end
+	ClientFunctions:Teleport(PlaceId,JobId)
+end
+
+function PortItem(Name,Image,Type,Location)
+	return Porting:Port(Name,Image,Type,Location)
+end
+
+function OpenCase(SkinType,Case,Item,Port,Notify)
+	UI.inv.Visible = false
+	UI.shop.Visible = false 
+	CustomMenu.Visible = false
+	if Item == nil then
+	local args = {
+			[1] = 66,
+			[2] = SkinType,
+			[3] = Case,
+		}
+	Item = game:GetService("ReplicatedStorage").RemoteEvent:FireServer(unpack(args))
+	end
+	local Data = ClientFunctions:OpenCase(SkinType,Case,Item,Notify)
+	if Port then
+		PortItem(Item,Data.image,Data.type,{SkinType,Case})
+	end
+end
+
 
 function GetPing()
 	return game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
@@ -835,7 +879,29 @@ function serverhop(Notification)
 				wait(2);
 				continue;
 			end
-			local decoded = game:GetService("HttpService"):JSONDecode(result);
+			if result == nil or result == "" then
+				NotifyButtons("Failed to server hop. Do you want to join generally?","Cancel","Yes",function()
+				return {}
+			end,function()
+				UITeleport(game.PlaceId)
+				return {"Load","Joining",1}
+			end)
+				return
+			end
+			local decoded
+			local suc,err = pcall(function()
+				decoded = game:GetService("HttpService"):JSONDecode(result);
+			end);
+			if not suc then
+				Debug(err)
+				NotifyButtons("Failed to server hop. Do you want to join generally?","Cancel","Yes",function()
+				return {}
+			end,function()
+				UITeleport(game.PlaceId)
+				return {"Load","Joining",1}
+			end)
+				return
+			end
 			if (#decoded.data ~= 0) then
 				Servers = decoded.data
 				for i, v in pairs(Servers) do
@@ -851,22 +917,24 @@ function serverhop(Notification)
 			url = format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=%s&limit=100&cursor=%s", game.PlaceId, order, decoded.nextPageCursor);
 		until tick() - starting >= 600;
 		if (not Server or #Servers == 0) then
-			return 
+			NotifyButtons("Failed to server hop. Do you want to join generally?","Cancel","Yes",function()
+				return {}
+			end,function()
+				UITeleport(game.PlaceId)
+				return {"Load","Joining",1}
+			end)
+			return
 		end
 
 		if Notification == true then
 			Notify("Going to server " .. Server.playing .. "/" .. Server.maxPlayers)
 		end
-		game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, Server.id);    
-
+		UITeleport(game.PlaceId,Server.id)
 	end
 end
 
-function rejoin(Notification)
-	game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId,game.JobId)
-	if Notification == true then
-		Notify("Rejoining the server")
-	end
+function rejoin()
+	UITeleport(game.PlaceId,game.JobId)
 end
 
 -- Data --
@@ -923,6 +991,9 @@ DefaultData("Feature5.txt","false")
 DefaultData("Feature6.txt","false")
 DefaultData("Feature7.txt","false")
 DefaultData("Feature8.txt","false")
+DefaultData("Feature9.txt","true")
+DefaultData("Feature10.txt","false")
+DefaultData("Feature11.txt","true")
 DefaultData("TutSettings.txt","false")
 
 local ValueUser = Instance.new("NumberValue")
@@ -1044,9 +1115,10 @@ task.spawn(function()
 					[2] = "Animations",
 					[3] = "Exclusive"
 				}
-
-				game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
-				loadstring(ERainSource)()
+				task.spawn(function()
+				local Item = game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+				OpenCase("Animations","Exclusive",Item,true,"Name")
+				end)
 				wait(LoadDelay)
 				FirstPurchasable.type.Text = tostring(Cost)
 				NotDisabled2 = true
@@ -1091,8 +1163,10 @@ task.spawn(function()
 					[2] = "Accessories",
 					[3] = "Knife Antlers"
 				}
-
-				game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+				task.spawn(function()
+				local Item = game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+				OpenCase("Accessories","Knife Antlers",Item,true,true)
+				end)
 				wait(LoadDelay)
 				SecondPurchasable.type.Text = tostring(Cost)
 				NotDisabled2 = true
@@ -1137,9 +1211,10 @@ task.spawn(function()
 					[2] = "Knife Skins",
 					[3] = "Winter Gift"
 				}
-
-				game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
-				loadstring(CandyCrownSource)()
+				task.spawn(function()
+				local Item = game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+				OpenCase("Knife Skins","Winter Gift",Item,true,true)
+				end)
 				wait(LoadDelay)
 				ThirdPurchasable.type.Text = tostring(Cost)
 				NotDisabled2 = true
@@ -1184,9 +1259,10 @@ task.spawn(function()
 					[2] = "Chair Skins",
 					[3] = "Winter"
 				}
-
-				game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
-				loadstring(RoyalRedSource)()
+				task.spawn(function()
+				local Item = game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(unpack(args))
+				OpenCase("Chair Skins","Winter",Item,true,true)
+				end)
 				wait(LoadDelay)
 				FourthPurchasable.type.Text = tostring(Cost)
 				NotDisabled2 = true
@@ -1328,6 +1404,9 @@ local Feature5 = Feature:Clone()
 local Feature6 = Feature:Clone()
 local Feature7 = Feature:Clone()
 local Feature8 = Feature:Clone()
+local Feature9 = Feature:Clone()
+local Feature10 = Feature:Clone()
+local Feature11 = Feature:Clone()
 local Display2 = Feature:Clone()
 Feature.TextLabel.Text = "Hide Blood"
 Feature2.TextLabel.Text = "Improve UI"
@@ -1337,6 +1416,9 @@ Feature5.TextLabel.Text = "Play Loud Noise"
 Feature6.TextLabel.Text = "Debug Messages"
 Feature7.TextLabel.Text = "Legacy Autofarm"
 Feature8.TextLabel.Text = "Show Hidden Names"
+Feature9.TextLabel.Text = "Auto execute"
+Feature10.TextLabel.Text = "Teleport Notify"
+Feature11.TextLabel.Text = "Fix chat"
 Display2.TextLabel.Text = "Display Knife 2"
 Feature5.Parent = Settings
 Feature6.Parent = Settings
@@ -1345,6 +1427,9 @@ Feature3.Parent = Settings
 Feature2.Parent = Settings
 Feature7.Parent = Settings
 Feature8.Parent = Settings
+Feature9.Parent = Settings
+Feature10.Parent = Settings
+Feature11.Parent = Settings
 Display2.Parent = General
 Feature2.Position = UDim2.new(0,0,0,55)
 Feature3.Position = UDim2.new(0,0,0,85)
@@ -1353,6 +1438,9 @@ Feature5.Position = UDim2.new(0,0,0,145)
 Feature6.Position = UDim2.new(0,0,0,175)
 Feature7.Position = UDim2.new(0,0,0,205)
 Feature8.Position = UDim2.new(0,0,0,235)
+Feature9.Position = UDim2.new(0,0,0,265)
+Feature10.Position = UDim2.new(0,0,0,295)
+Feature11.Position = UDim2.new(0,0,0,325)
 Display2.Position = UDim2.new(0,0,0,145)
 Settings.Parent = SettingScroll
 Settings.Name = "breakingplus"
@@ -1547,7 +1635,7 @@ setting.Visible = false
 end)
 
 	
-for _, Selection in pairs (setting:GetChildren()) do
+for i, Selection in pairs (setting:GetChildren()) do
 	if Selection:IsA("GuiBase2d") then
 		local Parent = Selection:FindFirstAncestorWhichIsA("GuiBase")
 		if Parent ~= nil then
@@ -1558,7 +1646,7 @@ for _, Selection in pairs (setting:GetChildren()) do
 end
 
 	
-for _, Selection in pairs (server:GetChildren()) do
+for i, Selection in pairs (server:GetChildren()) do
 	if Selection:IsA("GuiBase2d") then
 		local Parent = Selection:FindFirstAncestorWhichIsA("GuiBase")
 		if Parent ~= nil then
@@ -1607,7 +1695,7 @@ Tween2:Play()
 UI.setting.ScrollingFrame.CanvasPosition = Vector2.new(0,0)
 UI.setting.ScrollingFrame.ScrollingEnabled = false
 task.wait(0.25)
-game:GetService("TweenService"):Create(UI.setting.ScrollingFrame,TweenInfo.new(4,Enum.EasingStyle.Circular,Enum.EasingDirection.Out),{CanvasPosition = Vector2.new(0,727)}):Play() -- remember to change this
+game:GetService("TweenService"):Create(UI.setting.ScrollingFrame,TweenInfo.new(4,Enum.EasingStyle.Circular,Enum.EasingDirection.Out),{CanvasPosition = Vector2.new(0,980)}):Play() -- remember to change this
 task.wait(4)
 UI.setting.ScrollingFrame.ScrollingEnabled = true
 end)
@@ -1693,6 +1781,97 @@ SettingsToggleButton(Display2,Display2Function,Display2UnFunction)
 		end
 	end)
 
+
+
+	
+	Feature11Function = function()
+		local MainChatWindow = game:GetService("TextChatService"):FindFirstChild("ChatWindowConfiguration") or game:GetService("TextChatService"):WaitForChild("ChatWindowConfiguration")
+		if MainChatWindow then
+			MainChatWindow.Enabled = false
+		end
+		ChangeData("Feature11.txt","true")
+	end
+	Feature11UnFunction = function()
+		local MainChatWindow = game:GetService("TextChatService"):FindFirstChild("ChatWindowConfiguration") or game:GetService("TextChatService"):WaitForChild("ChatWindowConfiguration")
+		if MainChatWindow then
+			MainChatWindow.Enabled = true
+		end
+		ChangeData("Feature11.txt","false")
+	end
+	SettingsToggleButton(Feature11,Feature11Function,Feature11UnFunction)
+	pcall(function()
+		if ReturnData("Feature11.txt") == "false" then
+			Feature11.Autosave.ImageButton.fill.Visible = false
+			Feature11.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature11UnFunction()
+		elseif ReturnData("Feature11.txt") == "true" then
+			Feature11.Autosave.ImageButton.fill.Visible = true
+			Feature11.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature11Function()
+		else
+			Feature11.Autosave.ImageButton.fill.Visible = false
+			Feature11.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature11Function()
+			DefaultData("Feature11.txt","true")
+		end
+	end)
+
+
+
+	Feature10Function = function()
+		TeleportNotify = true
+		ChangeData("Feature10.txt","true")
+	end
+	Feature10UnFunction = function()
+		TeleportNotify = false
+		ChangeData("Feature10.txt","false")
+	end
+	SettingsToggleButton(Feature10,Feature10Function,Feature10UnFunction)
+	pcall(function()
+		if ReturnData("Feature10.txt") == "false" then
+			Feature10.Autosave.ImageButton.fill.Visible = false
+			Feature10.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature10UnFunction()
+		elseif ReturnData("Feature10.txt") == "true" then
+			Feature10.Autosave.ImageButton.fill.Visible = true
+			Feature10.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature10Function()
+		else
+			Feature10.Autosave.ImageButton.fill.Visible = false
+			Feature10.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature10UnFunction()
+			DefaultData("Feature10.txt","false")
+		end
+	end)
+
+
+	Feature9Function = function()
+		AutoExec = true
+		ChangeData("Feature9.txt","true")
+	end
+	Feature9UnFunction = function()
+		AutoExec = false
+		ChangeData("Feature9.txt","false")
+	end
+	SettingsToggleButton(Feature9,Feature9Function,Feature9UnFunction)
+	pcall(function()
+		if ReturnData("Feature9.txt") == "false" then
+			Feature9.Autosave.ImageButton.fill.Visible = false
+			Feature9.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature9UnFunction()
+		elseif ReturnData("Feature9.txt") == "true" then
+			Feature9.Autosave.ImageButton.fill.Visible = true
+			Feature9.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature9Function()
+		else
+			Feature9.Autosave.ImageButton.fill.Visible = true
+			Feature9.Autosave.ImageButton.fill.ImageTransparency = 0
+			Feature9Function()
+			DefaultData("Feature9.txt","true")
+		end
+	end)
+
+
 	Feature8Function = function()
 		HiddenNames = true
 		ChangeData("Feature8.txt","true")
@@ -1714,21 +1893,21 @@ SettingsToggleButton(Display2,Display2Function,Display2UnFunction)
 		else
 			Feature8.Autosave.ImageButton.fill.Visible = false
 			Feature8.Autosave.ImageButton.fill.ImageTransparency = 0
-			Feature8Function()
+			Feature8UnFunction()
 			DefaultData("Feature8.txt","false")
 		end
 	end)
 
 Feature7Function = function()
 	Legacy = true
-	if workspace.DistributedGameTime > 18 then
-		NotifyButtons("Its recommended not to use this feature because it causes more frequent ping lag are you sure you want to continue?","No","Yes",function()
+	if workspace.DistributedGameTime > 40 then
+		NotifyButtons("This feature causes more frequent ping lag but may give more credits, do you want to turn it on?","No","Yes",
+		function()
 			Feature7.Autosave.ImageButton.fill.Visible = false
 			Feature7.Autosave.ImageButton.fill.ImageTransparency = 0
 			Feature7UnFunction()
 			return {"Load","Turning off",1.8}
-		end,
-		function()
+		end,function()
 			return {}
 		end)
 	end
@@ -2011,10 +2190,10 @@ else
 	DefaultData("Feature2.txt","true")
 end
 SettingsToggleButton(Feature2,Feature2Function,Feature2UnFunction)
-SettingScroll.CanvasSize = UDim2.new(0, 0, 0, 890)
+SettingScroll.CanvasSize = UDim2.new(0, 0, 0, 980)
 UI.buttons.shop.ImageButton.Position = UDim2.new(1.025,0,0,35)
 UI.buttons.shop.ImageButton.Visible = true
-UI.version.Text = UI.version.Text .. " | V" .. tostring(Version)
+UI.version.Text = GetModeByPlaceId(game.PlaceId) .. " | V" .. tostring(Version)
 UI.version.TextXAlignment = Enum.TextXAlignment.Left
 UI.version.Position = UI.version.Position + UDim2.new(0,10,0,0)
 UI.version.Size = UDim2.new(0, 400, 0, 25)
@@ -2112,13 +2291,22 @@ Refresh.MouseLeave:Connect(function()
 	game:GetService("TweenService"):Create(Refresh,TweenInfo.new(0.25),{ImageTransparency = 0.5}):Play()
 end)
 local ServerHop = UI.buttons.inv:Clone()
+local ServerHopCoolDown = false
 ServerHop.Parent = CustomMenu
 ServerHop.Name = "serverhop"
 ServerHop.Position = UDim2.new(0.65, 0, 0.75, 35)
 ServerHop.ImageColor3 = Color3.fromRGB(166, 255, 137)
 ServerHop.TextLabel.Text = "Server hop"
+
 ServerHop.MouseButton1Click:Connect(function()
+if not ServerHopCoolDown then
+	ServerHopCoolDown = true
+	task.spawn(function()
 	serverhop(true)
+	end)
+	task.wait(2)
+	ServerHopCoolDown = false
+end
 end)
 ServerHop.MouseEnter:Connect(function()
 	game:GetService("TweenService"):Create(ServerHop,TweenInfo.new(0.25),{ImageTransparency = 0}):Play()
@@ -2159,6 +2347,7 @@ end)
 task.spawn(function()
 	task.wait(0.25)
 	ClonedCredits.Text = ClassicCredits.Text
+	Credits = tonumber(ClassicCredits.Text:sub(-ClassicCredits.Text:len(),-8)) or 0
 	ClassicCredits.Changed:Connect(function()
 		ClonedCredits.Text = ClassicCredits.Text
 		Credits = tonumber(ClassicCredits.Text:sub(-ClassicCredits.Text:len(),-8)) or 0
@@ -2171,20 +2360,26 @@ AutoFarm.Position = UDim2.new(0.375, 0, 0.625, 35)
 AutoFarm.ImageColor3 = Color3.fromRGB(255, 60, 0)
 AutoFarm.TextLabel.Text = "Disable autofarm"
 AutoFarm.TextLabel.TextSize = 11
-AutoFarm.MouseButton1Click:Connect(function()
+local function ToggleAutoFarm()
 	if Sent2 == true then
 		Sent2 = false
 		TopNotify("Autofarm disabled",2.5,true)
 		AutoFarm.ImageColor3 = Color3.fromRGB(0, 225, 225)
 		AutoFarm.TextLabel.Text = "Enable autofarm"
+		if game.PlaceId == Modes["All game-modes"] then
 		respawn(false)
+		end
 	else
 		Sent2 = true
 		TopNotify("Autofarm enabled",2.5,true)
 		AutoFarm.ImageColor3 = Color3.fromRGB(255, 60, 0)
 		AutoFarm.TextLabel.Text = "Disable autofarm"
 	end
-end)
+end
+if game.PlaceId ~= Modes["All game-modes"] then
+	ToggleAutoFarm()
+end
+AutoFarm.MouseButton1Click:Connect(ToggleAutoFarm)
 
 task.spawn(function()
     while task.wait(260) do
@@ -2633,6 +2828,33 @@ function PlayerExecute()
 	end
 end
 
+game.Players.PlayerRemoving:Connect(function(Player)
+	local UserId = Player.UserId
+	task.wait(2.5)
+	local worked = false
+	for i = 1,4 do
+		if TeleportNotify and worked ~= true then
+			local Status,Nil,PlaceId,JobId = game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(51, UserId)
+			local function callback(Text)
+				if Text == "Join" then
+					UITeleport(PlaceId, JobId)
+				end
+			end
+			if game.JobId ~= JobId and JobId ~= nil and PlaceId ~= nil then
+				worked = true
+				local NotificationBindable = Instance.new("BindableFunction")
+				NotificationBindable.OnInvoke = callback
+				game:GetService("StarterGui"):SetCore("SendNotification",{Title="@" .. Player.Name,Icon = game.Players:GetUserThumbnailAsync(UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420),Text="Has gone to " .. GetModeByPlaceId(PlaceId), Duration=7,Button1 = "Join", Button2 = "Cancel", Callback = NotificationBindable})
+			end
+			task.wait(1.5)
+		end
+		if worked == true then
+			break
+		end
+	end
+end)
+
+
 for i,v in pairs(PlayersList:GetChildren()) do
 	if v:IsA("Frame") and v:FindFirstChild("name") and v.name:FindFirstChild("TextButton") then
 		if v.name:FindFirstChild("TextLabel").Text == LocalPlayer.Name then
@@ -2691,16 +2913,6 @@ CustomButton.MouseButton1Click:Connect(function()
 		end)
 	end
 end)
-
-local queue_on_teleport = syn and syn.queue_on_teleport or queue_on_teleport
-if queue_on_teleport ~= nil then
-	queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
-else
-	task.spawn(function()
-		task.wait(2.5)
-	Notify("Your exploit does not support teleport execution")
-	end)
-end
 
 task.spawn(function()
 	while task.wait(1) do
@@ -2784,5 +2996,8 @@ else
 		}
 	)
 	task.wait(8)
-	NotifyButtons("You need to teleport to the correct mode to autofarm","Teleport","Cancel",function() game:GetService("TeleportService"):Teleport(648362523,LocalPlayer) return {"Load","Teleporting",5} end,function() return {} end)
+	NotifyButtons("You need to teleport to the correct mode to autofarm","Teleport","Cancel",function() UITeleport(648362523) return {"Load","Teleporting",1} end,function() return {} end)
 end
+
+
+
