@@ -1,6 +1,8 @@
 -- Breaking Plus Made by Naiko Exploits --
 
-repeat task.wait() until game:IsLoaded() and task.wait(1) and workspace.DistributedGameTime > 4
+if workspace.DistributedGameTime < 3 then
+	task.wait(3-workspace.DistributedGameTime)
+end
 
 if game:GetService("CoreGui"):FindFirstChild("Plus") then
 	return warn("Script already running")
@@ -16,7 +18,7 @@ end)
 
 -- General variables --
 
-local Version = "5.0"
+local Version = 5.01
 local RoundMode = nil
 local UserType = 0
 local LocalPlayer = game.Players.LocalPlayer
@@ -47,6 +49,7 @@ local ClientFunctions = loadstring(game:HttpGet("https://raw.githubusercontent.c
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local PingFreezeEvent = Instance.new("BindableEvent")
+local queueteleport =  queue_on_teleport or (syn and syn.queue_on_teleport) or queueonteleport
 local Modes = {["All game-modes"]=648362523,["Duck Duck Stab"]=834829150,["Duos"]=1410026010,["Kill Row"]=1426048327,["Duel Vote"]=901462028,["Everything"]=694768217,["Breaking Point"]=834827615,["Free for All"]=987684187,["Gunslinger"]=1436726276}
 local NotDisabled = true
 local NotDisabled2 = true
@@ -785,13 +788,6 @@ local function GetTotalPlayers(placeId)
 end
 
 function UITeleport(PlaceId,JobId)
-	if AutoExec == true then
-		local queue_on_teleport = syn and syn.queue_on_teleport or queue_on_teleport
-		if queue_on_teleport ~= nil then
-			queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
-		end
-		task.wait(0.8)
-	end
 	ClientFunctions:Teleport(PlaceId,JobId)
 end
 
@@ -2855,6 +2851,13 @@ game.Players.PlayerRemoving:Connect(function(Player)
 end)
 
 
+LocalPlayer.OnTeleport:Once(function(State)
+	if AutoExec and  queueteleport then
+		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
+	end
+end)
+
+
 for i,v in pairs(PlayersList:GetChildren()) do
 	if v:IsA("Frame") and v:FindFirstChild("name") and v.name:FindFirstChild("TextButton") then
 		if v.name:FindFirstChild("TextLabel").Text == LocalPlayer.Name then
@@ -2913,7 +2916,6 @@ CustomButton.MouseButton1Click:Connect(function()
 		end)
 	end
 end)
-
 task.spawn(function()
 	while task.wait(1) do
 		if #game.Players:GetPlayers() < 8 and Sent2 == true and AutoServerHop == true then
@@ -2998,6 +3000,3 @@ else
 	task.wait(8)
 	NotifyButtons("You need to teleport to the correct mode to autofarm","Teleport","Cancel",function() UITeleport(648362523) return {"Load","Teleporting",1} end,function() return {} end)
 end
-
-
-

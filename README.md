@@ -5,7 +5,7 @@
 ## Script thumbnail
 ![BreakingPlus4](https://github.com/NaikoScript/Breaking-Plus/assets/107273752/68352ab9-d209-460d-b394-ec873341403d)
 ## Script version
-`Version 5.0`
+`Version 5.01`
 ## Shortened Script
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script"))()
