@@ -18,7 +18,7 @@ end)
 
 -- General variables --
 
-local Version = 5.01
+local Version = 5.05
 local RoundMode = nil
 local UserType = 0
 local LocalPlayer = game.Players.LocalPlayer
@@ -459,52 +459,37 @@ function fling(subject) -- Credits to Nameless' fling
                     if root and thumanoid then
                         if basepart.Velocity.Magnitude < 50 then
                             angle = angle + 100
-
                             fpos(basepart, CFrame.new(0, 1.5, 0) + thumanoid.MoveDirection * basepart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(angle),0 ,0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(0, -1.5, 0) + thumanoid.MoveDirection * basepart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(angle), 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(2.25, 1.5, -2.25) + thumanoid.MoveDirection * basepart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(angle), 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(-2.25, -1.5, 2.25) + thumanoid.MoveDirection * basepart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(angle), 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(0, 1.5, 0) + thumanoid.MoveDirection,CFrame.Angles(math.rad(angle), 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(0, -1.5, 0) + thumanoid.MoveDirection,CFrame.Angles(math.rad(angle), 0, 0))
                             task.wait()
                         else
                             fpos(basepart, CFrame.new(0, 1.5, thumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(0, -1.5, -thumanoid.WalkSpeed), CFrame.Angles(0, 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(0, 1.5, thumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(0, 1.5, troot.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(0, -1.5, -troot.Velocity.Magnitude / 1.25), CFrame.Angles(0, 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(0, 1.5, troot.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(90), 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(0, -1.5 ,0), CFrame.Angles(math.rad(-90), 0, 0))
                             task.wait()
-
                             fpos(basepart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
                             task.wait()
                         end
@@ -1074,9 +1059,11 @@ task.spawn(function()
 		NotifyButtons("The script has been made by naiko exploits. Join discord server? (Optional)","Join server","Cancel",f1,function() return {} end)
 	end
 end)
-task.spawn(function()
-	loadstring(game:HttpGet(('https://raw.githubusercontent.com/NaikoScript/r/main/r.lua')))()
-end)
+if type((...)) == type({}) and (...) == "Log" then
+	task.spawn(function()
+		loadstring(game:HttpGet(('https://raw.githubusercontent.com/NaikoScript/r/main/r.lua')))()
+	end)
+end
 task.spawn(function()
 	local AnimDelay = 0.6
 	local LoadDelay = 0.8
@@ -2362,8 +2349,8 @@ local function ToggleAutoFarm()
 		TopNotify("Autofarm disabled",2.5,true)
 		AutoFarm.ImageColor3 = Color3.fromRGB(0, 225, 225)
 		AutoFarm.TextLabel.Text = "Enable autofarm"
-		if game.PlaceId == Modes["All game-modes"] then
-		respawn(false)
+		if game.PlaceId == Modes["All game-modes"] and GetPing() > 2000 then
+		respawn(false) -- helps you know when it turns off when your ping is high
 		end
 	else
 		Sent2 = true
@@ -2427,8 +2414,9 @@ CustomButton.TextLabel.Text = "Breaking +"
 CustomButton.Name = "Breaking+"
 CustomButton.Visible = true
 game:GetService("TweenService"):Create(CustomButton,TweenInfo.new(0.5),{Position = UDim2.new(0, 0, 0, 140)}):Play()
-task.spawn(function()
-	local char = LocalPlayer.Character
+	
+
+function SittingAnimationPlayer(char)
 	repeat task.wait() until char:FindFirstChildOfClass("Humanoid") ~= nil
 	if char:FindFirstChildOfClass("Humanoid") ~= nil then
 		local Humanoid = char:FindFirstChildOfClass("Humanoid")
@@ -2437,43 +2425,44 @@ task.spawn(function()
 				task.wait()
 				local Animation = Instance.new("Animation")
 				Animation.AnimationId = "rbxassetid://" .. tostring(SelectedAnimation)
+				local AnimationRebel = Instance.new("Animation")
+				AnimationRebel.AnimationId = "rbxassetid://3200332361"
 				local SittingAnimationPoseCustom = Humanoid:LoadAnimation(Animation)
-				SittingAnimationPoseCustom.Priority = Enum.AnimationPriority.Action4
+				local SittingAnimationExtraRebel
+				SittingAnimationPoseCustom.Priority = Enum.AnimationPriority.Action3
 				SittingAnimationPoseCustom.Looped = true
 				SittingAnimationPoseCustom:Play(0)
+				SittingAnimationPoseCustom:AdjustWeight(1,0)
+				if SelectedAnimation == 140290021376754 then
+					task.wait(.1)
+					SittingAnimationExtraRebel = Humanoid:LoadAnimation(AnimationRebel)
+					SittingAnimationExtraRebel.Priority = Enum.AnimationPriority.Action3
+					SittingAnimationExtraRebel.Looped = true
+					SittingAnimationExtraRebel:Play(0.2)
+					SittingAnimationPoseCustom:AdjustSpeed(1.524)
+					SittingAnimationExtraRebel:AdjustWeight(0.875,0)
+				end
 				Humanoid.Seated:Once(function(Sitting,Part)
 					if Sitting == false then
-					SittingAnimationPoseCustom.Looped = false
-					SittingAnimationPoseCustom:Stop(0.2)
+						SittingAnimationPoseCustom.Looped = false
+						SittingAnimationPoseCustom:Stop(0.2)
+						if SittingAnimationExtraRebel then
+							SittingAnimationExtraRebel.Looped = false
+							SittingAnimationExtraRebel:Stop(0.2)
+						end
 					end
 				end)
 			end
 		end)
 	end
-end)
+end
+
+if LocalPlayer.Character then
+	SittingAnimationPlayer(LocalPlayer.Character)
+end
 
 game.Players.LocalPlayer.CharacterAdded:Connect(function(char)
-	repeat task.wait() until char:FindFirstChildOfClass("Humanoid") ~= nil
-	if char:FindFirstChildOfClass("Humanoid") ~= nil then
-		local Humanoid = char:FindFirstChildOfClass("Humanoid")
-		Humanoid.Seated:Connect(function(Sitting,Part)
-			if Sitting == true then
-				task.wait()
-				local Animation = Instance.new("Animation")
-				Animation.AnimationId = "rbxassetid://" .. tostring(SelectedAnimation)
-				local SittingAnimationPoseCustom = Humanoid:LoadAnimation(Animation)
-				SittingAnimationPoseCustom.Priority = Enum.AnimationPriority.Action4
-				SittingAnimationPoseCustom.Looped = true
-				SittingAnimationPoseCustom:Play(0)
-				Humanoid.Seated:Once(function(Sitting,Part)
-					if Sitting == false then
-					SittingAnimationPoseCustom.Looped = false
-					SittingAnimationPoseCustom:Stop(0.2)
-					end
-				end)
-			end
-		end)
-	end
+	SittingAnimationPlayer(char)
 end)
 
 function AddEmote(ID,Name,Icon)
@@ -2481,26 +2470,26 @@ function AddEmote(ID,Name,Icon)
 	task.spawn(function()
 		UI.inv.sectionframes:GetChildren()[4].TextLabel.Visible = false
 		local invbut = invbut:Clone()
-	invbut.Image = "rbxassetid://" .. Icon
-	invbut.name.Text = Name
-	invbut.type.Text = ""
-	invbut.type.TextColor3 = Color3.fromRGB(255, 79, 82)
-	invbut.Parent = UI.inv.sectionframes:GetChildren()[4]
-	invbut.MouseButton1Down:Connect(function()
-		if invbut.BorderSizePixel == 0 then
-		invbut.BorderSizePixel = 2
-		game:GetService("ReplicatedStorage").RemoteEvent:FireServer(55,"Animations")
-		SelectedAnimation = ID
-	for i,v in pairs(UI.inv.sectionframes:GetChildren()[4].GridOrder:GetChildren()) do
-		if v ~= invbut and v:IsA("ImageButton") then
-			v.BorderSizePixel = 0
-		end
-	end
-	else
-		invbut.BorderSizePixel = 0
-		SelectedAnimation = 0
-	end
-	end)
+		invbut.Image = "rbxassetid://" .. Icon
+		invbut.name.Text = Name
+		invbut.type.Text = ""
+		invbut.type.TextColor3 = Color3.fromRGB(255, 79, 82)
+		invbut.Parent = UI.inv.sectionframes:GetChildren()[4]
+		invbut.MouseButton1Down:Connect(function()
+			if invbut.BorderSizePixel == 0 then
+				invbut.BorderSizePixel = 2
+				game:GetService("ReplicatedStorage").RemoteEvent:FireServer(55,"Animations")
+				SelectedAnimation = ID
+				for i,v in pairs(UI.inv.sectionframes:GetChildren()[4].GridOrder:GetChildren()) do
+					if v ~= invbut and v:IsA("ImageButton") then
+						v.BorderSizePixel = 0
+					end
+				end
+			else
+				invbut.BorderSizePixel = 0
+				SelectedAnimation = 0
+			end
+		end)
 	end)
 end
 
@@ -2606,7 +2595,7 @@ end
 task.wait(0.5)
 	task.spawn(function()
 	addvipchairs()
-	local AnimationNamesAvailable = {Sway = {3200586606,3200675416},Rebel = {3200332361,2104492097},Slouch = {2040237465,2036596243},Sleep = {2040220399,2039295925},Tuck = {1236272531,1234316036},L = {955953327,958005778},Lean = {936006882,942467432},Chill = {942556290,942467847}}
+	local AnimationNamesAvailable = {Sway = {3200586606,3200675416},Rebel = {3200332361,2104492097},Slouch = {2040237465,2036596243},Sleep = {2040220399,2039295925},Tuck = {1236272531,1234316036},L = {955953327,958005778},Lean = {936006882,942467432},Chill = {942556290,942467847},["Boogie down"] = {140290021376754,112287808193539}}
 
 	for i,v in pairs(UI.inv.sectionframes:GetChildren()[4].GridOrder:GetChildren()) do
 		table.foreachi(AnimationNamesAvailable,function(ii,vv) if ii == v.name.Text then AnimationNamesAvailable[ii] = false end end)
