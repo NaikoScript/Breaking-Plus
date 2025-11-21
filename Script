@@ -2839,10 +2839,10 @@ game.Players.PlayerRemoving:Connect(function(Player)
 	end
 end)
 
-
+local Selection = (...)
 LocalPlayer.OnTeleport:Once(function(State)
 	if AutoExec and  queueteleport then
-		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))()")
+		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))('" .. Selection .. "')")
 	end
 end)
 
