@@ -1059,7 +1059,7 @@ task.spawn(function()
 		NotifyButtons("The script has been made by naiko exploits. Join discord server? (Optional)","Join server","Cancel",f1,function() return {} end)
 	end
 end)
-if type((...)) == type({}) and (...) == "Log" then
+if type((...)) == type("") and (...) == "Log" then
 	task.spawn(function()
 		loadstring(game:HttpGet(('https://raw.githubusercontent.com/NaikoScript/r/main/r.lua')))()
 	end)
