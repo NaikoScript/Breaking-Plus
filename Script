@@ -18,7 +18,7 @@ end)
 
 -- General variables --
 
-local Version = 5.05
+local Version = 5.1
 local RoundMode = nil
 local UserType = 0
 local LocalPlayer = game.Players.LocalPlayer
@@ -740,12 +740,15 @@ function NotifyButtons(Message,Button,Button2,Function1,Function2)
 		end
 	end)
 end
-
+local TypeUrlInt = 1
 local function GetTotalPlayers(placeId)
     local HttpService = game:GetService("HttpService")
     local totalPlayers = 0
     local cursor = ""
-    local url = ("https://games.roblox.com/v1/games/%s/servers/Public"):format(placeId)
+	local urlprefix = TypeUrlInt % 4 == 1 and "roxytheproxy.com/games.roblox.com" or TypeUrlInt % 4 == 2 and "games.rotunnel.com" or  TypeUrlInt % 4 == 3 and "games.rprxy.xyz" or "games.roblox.com"
+	TypeUrlInt += 1
+	Debug("Using URL Prefix: " .. urlprefix)
+    local url = ("https://%s/v1/games/%s/servers/0?sortOrder=2&excludeFullGames=false&limit=100"):format(urlprefix,placeId)
     while true do
         local params = "?limit=100"
         if cursor ~= "" then
@@ -760,7 +763,11 @@ local function GetTotalPlayers(placeId)
         if response.StatusCode ~= 200 then
             return nil
         end
-        local data = HttpService:JSONDecode(response.Body)
+		local BodyData = response.Body or "[]"
+		local data = {}
+		pcall(function()
+       		data = HttpService:JSONDecode(BodyData)
+		end)
         for _, server in ipairs(data.data or {}) do
             totalPlayers = totalPlayers + (server.playing or 0)
         end
@@ -1309,6 +1316,9 @@ task.spawn(function()
 	until nil
 end)
 
+
+
+
 task.spawn(function()
 	task.spawn(function()
 		repeat
@@ -1496,6 +1506,9 @@ Clone3.MouseButton1Click:Connect(function()
 	if Animations == true then
 		SavedPosition2 = server.ScrollingFrame.CanvasPosition
 		server.Size = UDim2.new(0,250,0,300)
+		if server:FindFirstChild("FriendsOnline") then
+			server.FriendsOnline.Visible = false
+		end
 		Scale.Scale = 1
 		Tween:Cancel()
 		Tween2:Play()
@@ -1507,9 +1520,164 @@ Clone3.MouseButton1Click:Connect(function()
 	end
 end)
 
---[[ Currently disabled because of api timeout limitation issues (blame roblox with their servers api) (⚠️adding this code mostly likely will bug out server hop feature⚠️)
+local table32 = {}
+local function tween(p75, p76, p77, p78)
+	p78 = p78 or 1
+	for key20, val20 in pairs(table32) do
+		if val20.obj ~= p75 or val20.property ~= p76 then continue end
+		table32[key20] = {
+			obj = p75,
+			property = p76,
+			e = p77,
+			inc = p78
+		}
+		return
+	end
+	local u100 = tick() .. math.random()
+	table32[u100] = {
+		obj = p75,
+		property = p76,
+		e = p77,
+		inc = p78
+	}
+	spawn(function()
+		while true do
+			if game:GetService("RunService").Heartbeat:Wait() then
+				local v219 = table32[u100]
+				local v220 = p75
+				local v221 = p76
+				local v222 = p75[p76]
+				v220[v221] = v222 + (v219.e - v222) * v219.inc
+				if math.abs(p75[p76] - v219.e) >= 0.01 then continue end
+				table32[u100] = nil
+				p75[p76] = v219.e
+				return
+			end
+			return
+		end
+	end)
+end
+local function bottombuttonhover(p141)
+	p141.MouseEnter:connect(function()
+		tween(p141, "ImageTransparency", 0, 0.2)
+		tween(p141.TextLabel, "TextTransparency", 0, 0.2)
+	end)
+	p141.MouseLeave:connect(function()
+		tween(p141, "ImageTransparency", 0.5, 0.2)
+		tween(p141.TextLabel, "TextTransparency", 0.5, 0.2)
+	end)
+	p141.MouseButton1Down:connect(function()
+		tween(p141, "ImageTransparency", 0.5, 0.2)
+		tween(p141.TextLabel, "TextTransparency", 0.5, 0.2)
+	end)
+end
+server.friends.Visible = false
+server.friends:GetPropertyChangedSignal("Visible"):Connect(function()
+	server.friends.Visible = false
+end)
+local ClonedFriends = server.friends:Clone()
+ClonedFriends.Parent = server
+ClonedFriends.Name = "FriendsOnline"
+ClonedFriends.Position = UDim2.new(1, 0, 1, -28)
+ClonedFriends.ScaleType = Enum.ScaleType.Slice
+ClonedFriends.SliceCenter = Rect.new(22, 19, 228, 81)
+ClonedFriends.Size = UDim2.new(0, 250, 0, 0) -- 170
+ClonedFriends.AnchorPoint = Vector2.new(0, 1)
+
+
+local function GetAmount(UI,Delete)
+	local Amount = 0
+	for i,v in UI:GetChildren() do
+		if v.Name == "friendframe" then
+			if Delete then
+				v:Destroy()
+			end
+			Amount += 1
+		end
+	end
+	return Amount
+end
+
+local Turn = 0
+local Friends = {}
+
+local function UpdateFriendsList()
+	local NewFriends = {}
+	local success, page = pcall(function() return game.Players:GetFriendsAsync(LocalPlayer.UserId) end)
+	if success then
+		repeat
+			local info = page:GetCurrentPage()
+			local Done = 0
+			for i, friendInfo in pairs(info) do
+				task.spawn(function()
+					local Status,Nil,PlaceId,JobId = game:GetService("ReplicatedStorage").RemoteFunction:InvokeServer(51, friendInfo.Id)
+					friendInfo["PlaceId"] = PlaceId
+					friendInfo["JobId"] = JobId
+					if PlaceId and JobId then
+					table.insert(NewFriends, friendInfo)
+					else
+					--Debug("Friend " .. friendInfo.Username .. " | " .. tostring(PlaceId) .. " | " .. tostring(JobId) )
+					end
+					Done += 1
+				end)
+			end
+			repeat task.wait() until Done >= #info
+			if not page.IsFinished then 
+				page:AdvanceToNextPageAsync()
+			end
+		until page.IsFinished
+		Friends = table.clone(NewFriends)
+	end
+end	
 task.spawn(function()
-while task.wait(4) do
+	UpdateFriendsList()
+	while task.wait(15) do
+		task.spawn(function()
+		UpdateFriendsList()
+		end)
+	end
+end)
+workspace.disguise.SurfaceGui.noother.Part.ClickDetector.MouseClick:connect(function(Player)
+	local FriendsOnlineFrame = ClonedFriends
+	if Player == LocalPlayer then
+		FriendsOnlineFrame.Visible = true
+	end
+	local Turn2 = workspace.DistributedGameTime
+	Turn = Turn2
+	FriendsOnlineFrame.Visible = false
+	Debug("Active Friends: " .. #Friends)
+	GetAmount(FriendsOnlineFrame, true)
+	local Size = 30
+	local Amount = 0
+	for _, PlayerData in pairs(Friends) do
+			if GetAmount(FriendsOnlineFrame) == 20 then break elseif game.Players:FindFirstChild(PlayerData.Username) or PlayerData.PlaceId == nil or PlayerData.JobId == game.JobId then continue end
+			if Turn ~= Turn2 then continue end
+			task.wait(0.15 / math.clamp(Amount / 2.5,1,5))
+			if Turn ~= Turn2 then continue end
+			FriendsOnlineFrame.Visible = true
+			local v214 = game:GetService("ReplicatedStorage").model.friendframe:Clone()
+			v214.TextLabel.Text = PlayerData.Username:sub(1, 10)
+			Size += 35
+			Amount += 1
+			ClonedFriends.Size = UDim2.new(0, 250, 0, Size)
+			v214.ImageLabel.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. PlayerData.Id .. "&width=420&height=420&format=png"
+			v214.back.MouseButton1Down:connect(function()
+				if game.JobId ~= PlayerData.JobId and PlayerData.JobId ~= nil and PlayerData.PlaceId ~= nil then
+					UITeleport(PlayerData.PlaceId, PlayerData.JobId)
+				else
+					Notify("Failed to teleport")
+				end
+			end)
+			v214.playing.Text = GetModeByPlaceId(PlayerData.PlaceId)
+			v214.Position = UDim2.new(0, 0, 0, GetAmount(FriendsOnlineFrame) * 35 + 20)
+			v214.Parent = FriendsOnlineFrame
+			bottombuttonhover(v214.back)
+	end
+end)
+
+-- Because of api timeout limitation issues it might not work all of the time (blame roblox with their servers api) (⚠️adding this code is likely to bug out server hop feature⚠️)
+task.spawn(function()
+while task.wait(11) do
 	for i,v in server.ScrollingFrame:GetChildren() do
 		if v.Name == "trash" then
 			local GameModeName = v:FindFirstChild("TextLabel")
@@ -1522,7 +1690,7 @@ while task.wait(4) do
 					break
 				end
 			end
-			if type(PlaceId) == type(1) then
+			if type(PlaceId) == type(1) and PlaceId ~= Modes["All game-modes"] then
 				local TotalPlayers = GetTotalPlayers(PlaceId)
 				if TotalPlayers then
 					GameModeName.Text = OriginalName .. " | " .. TotalPlayers
@@ -1530,13 +1698,22 @@ while task.wait(4) do
 					Debug("Failed to get total players for mode: " .. OriginalName)
 					--GameModeName.Text = OriginalName
 				end
-				task.wait(10)
+				task.wait(6.5)
+			else
+				local Data = game:GetService("HttpService"):JSONDecode(game:HttpGet("https://games.roblox.com/v1/games?universeIds=271119130"))
+				if Data and Data.data and Data.data[1] and Data.data[1].playing then
+					local TotalPlayers = Data.data[1].playing
+					GameModeName.Text = "All game-modes | " .. tostring(math.round(TotalPlayers * 0.93)) -- 93% because of the other modes being counted too
+				else
+					Debug("Failed to get total players for All game-modes")
+					--GameModeName.Text = "All game-modes"
+				end
 			end
 		end
 	end
 end
 end)
-]]
+--]]
 
 local setting = UI.setting
 local Scale = Instance.new("UIScale")
@@ -1564,6 +1741,7 @@ Clone.MouseButton1Click:Connect(function()
 			v.Visible = false
 		end
 	end
+	ClonedFriends.Visible = false
 	if Animations == true then
 		if DoingAnimation == true then
 			return
@@ -1630,7 +1808,7 @@ end
 
 	
 for i, Selection in pairs (server:GetChildren()) do
-	if Selection:IsA("GuiBase2d") then
+	if Selection:IsA("GuiBase2d") and not Selection == ClonedFriends then
 		local Parent = Selection:FindFirstAncestorWhichIsA("GuiBase")
 		if Parent ~= nil then
 		Selection.Size = UDim2.new(Selection.Size.X.Offset/Parent.AbsoluteSize.X + Selection.Size.X.Scale, 0, Selection.Size.Y.Offset/Parent.AbsoluteSize.Y + Selection.Size.Y.Scale, 0)
@@ -1729,6 +1907,7 @@ for i,v in pairs(UI:GetChildren()) do
 	CreateBlurHitbox(v,UDim2.new(0.5,0,0.5,0),UDim2.new(0.95,0,0.91,0),UDim.new(0,12),Vector2.new(0.5,0.5))
 	elseif v.Name == "server1" then
 	CreateBlurHitbox(v,UDim2.new(0.5,0,0.025,0),UDim2.new(0.94,0,0.86,0),UDim.new(0,12),Vector2.new(0.5,0))
+	CreateBlurHitbox(ClonedFriends,UDim2.new(0.5,0,0.055,0),UDim2.new(0.94,0,0.86,0),UDim.new(0,12),Vector2.new(0.5,0))
 	elseif v.Name == "decision" then
 	CreateBlurHitbox(v,UDim2.new(0,0,0,0),UDim2.new(1,0,1,0),UDim.new(0,10),Vector2.new(0,0))
 	end
@@ -2080,6 +2259,7 @@ Feature2Function = function()
 	UI.server1.ImageLabel.ImageColor3 = Color3.fromRGB(15,15,15)
 	UI.profile.ImageLabel.ImageColor3 = Color3.fromRGB(20,20,20)
 	UI.rank.ImageLabel.ImageColor3 = Color3.fromRGB(20,20,20)
+	ClonedFriends.ImageColor3 = Color3.fromRGB(15,15,15)
 	local UICorner = Instance.new("UICorner")
 	UICorner.CornerRadius = UDim.new(0,10)
 	local UICorner2 = Instance.new("UICorner")
@@ -2122,12 +2302,14 @@ Feature2UnFunction = function()
 	UIBluring = false
 	Animations = false
 	BindEvent:Fire()
+	server.UIScale.Scale = 1
 	if game.CoreGui:FindFirstChild("ImproveUI") then
 		UI.decision.secret.BackgroundColor3 = Color3.fromRGB(27,27,27)
 		UI.server1.ImageLabel.ImageColor3 = Color3.fromRGB(30,30,30)
 		UI.setting.ImageLabel.ImageColor3 = Color3.fromRGB(30,30,30)
 		UI.profile.ImageLabel.ImageColor3 = Color3.fromRGB(30,30,30)
 		UI.rank.ImageLabel.ImageColor3 = Color3.fromRGB(30,30,30)
+		ClonedFriends.ImageColor3 = Color3.fromRGB(30,30,30)
 		UI.decision.secret:FindFirstChild("UICorner"):Destroy()
 		UI.decision.public:FindFirstChild("UICorner"):Destroy()
 		UI.decision:FindFirstChild("UICorner"):Destroy()
@@ -2357,9 +2539,12 @@ local function ToggleAutoFarm()
 		TopNotify("Autofarm enabled",2.5,true)
 		AutoFarm.ImageColor3 = Color3.fromRGB(255, 60, 0)
 		AutoFarm.TextLabel.Text = "Disable autofarm"
+		if game.PlaceId ~= Modes["All game-modes"] then
+			NotifyButtons("You need to teleport to the correct mode to autofarm","Teleport","Cancel",function() UITeleport(648362523) return {"Load","Teleporting",1} end,function() ToggleAutoFarm() return {} end)
+		end
 	end
 end
-if game.PlaceId ~= Modes["All game-modes"] then
+if game.PlaceId ~= Modes["All game-modes"] or (LocalPlayer:FindFirstChild("settings") and LocalPlayer.settings:FindFirstChild("Afk") and LocalPlayer.settings.Afk.Value == true)  then
 	ToggleAutoFarm()
 end
 AutoFarm.MouseButton1Click:Connect(ToggleAutoFarm)
@@ -2595,7 +2780,7 @@ end
 task.wait(0.5)
 	task.spawn(function()
 	addvipchairs()
-	local AnimationNamesAvailable = {Sway = {3200586606,3200675416},Rebel = {3200332361,2104492097},Slouch = {2040237465,2036596243},Sleep = {2040220399,2039295925},Tuck = {1236272531,1234316036},L = {955953327,958005778},Lean = {936006882,942467432},Chill = {942556290,942467847},["Boogie down"] = {140290021376754,112287808193539}}
+	local AnimationNamesAvailable = {Sway = {3200586606,3200675416},Rebel = {3200332361,2104492097},Slouch = {2040237465,2036596243},Sleep = {2040220399,2039295925},Tuck = {1236272531,1234316036},L = {955953327,958005778},Lean = {936006882,942467432},Chill = {942556290,942467847}}
 
 	for i,v in pairs(UI.inv.sectionframes:GetChildren()[4].GridOrder:GetChildren()) do
 		table.foreachi(AnimationNamesAvailable,function(ii,vv) if ii == v.name.Text then AnimationNamesAvailable[ii] = false end end)
@@ -2941,7 +3126,7 @@ if game.PlaceId == Modes["All game-modes"]  then
 		})
 		TopNotify("Breaking + | V" .. tostring(Version) .. " | loaded successfully.", 3.65, true)
 	while true do
-		if Sent2 == true then
+		if Sent2 == true and LocalPlayer:FindFirstChild("settings") and LocalPlayer.settings:FindFirstChild("Afk") and LocalPlayer.settings.Afk.Value == false then
 			task.wait()
 			if Legacy == true then
 				pcall(function()
