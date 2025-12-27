@@ -18,7 +18,7 @@ end)
 
 -- General variables --
 
-local Version = 5.1
+local Version = 5.11
 local RoundMode = nil
 local UserType = 0
 local LocalPlayer = game.Players.LocalPlayer
@@ -49,7 +49,7 @@ local ClientFunctions = loadstring(game:HttpGet("https://raw.githubusercontent.c
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local PingFreezeEvent = Instance.new("BindableEvent")
-local queueteleport =  queue_on_teleport or (syn and syn.queue_on_teleport) or queueonteleport
+local queueteleport =  queue_on_teleport or queueonteleport or (syn and syn.queue_on_teleport)
 local Modes = {["All game-modes"]=648362523,["Duck Duck Stab"]=834829150,["Duos"]=1410026010,["Kill Row"]=1426048327,["Duel Vote"]=901462028,["Everything"]=694768217,["Breaking Point"]=834827615,["Free for All"]=987684187,["Gunslinger"]=1436726276}
 local NotDisabled = true
 local NotDisabled2 = true
@@ -1862,10 +1862,20 @@ UI.setting.ScrollingFrame.ScrollingEnabled = true
 end)
 end
 end)
-
+local Invite = "discord.gg/jpwg5Dcr2D"
 UI.loading:GetPropertyChangedSignal("Text"):Connect(function()
 	if UI.loading.Text == "" then
-		UI.loading.Text = "discord.gg/jpwg5Dcr2D"
+		UI.loading.Text = Invite
+	end
+end)
+if UI.loading.Text == "" then
+	UI.loading.Text = Invite
+end
+UI.loading:GetPropertyChangedSignal("GuiState"):Connect(function()
+	if UI.loading.GuiState == Enum.GuiState.Press then
+		pcall(function()
+			setclipboard(Invite)
+		end)
 	end
 end)
 
@@ -3024,13 +3034,11 @@ game.Players.PlayerRemoving:Connect(function(Player)
 	end
 end)
 
-local Selection = (...)
 LocalPlayer.OnTeleport:Once(function(State)
-	if AutoExec and  queueteleport then
-		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script'))('" .. Selection .. "')")
+	if AutoExec and queueteleport then
+		queueteleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Script"))()')
 	end
 end)
-
 
 for i,v in pairs(PlayersList:GetChildren()) do
 	if v:IsA("Frame") and v:FindFirstChild("name") and v.name:FindFirstChild("TextButton") then
