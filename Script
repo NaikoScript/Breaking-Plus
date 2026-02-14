@@ -18,7 +18,7 @@ end)
 
 -- General variables --
 
-local Version = 5.11
+local Version = 5.2
 local RoundMode = nil
 local UserType = 0
 local LocalPlayer = game.Players.LocalPlayer
@@ -48,9 +48,10 @@ local Porting = loadstring(game:HttpGet("https://raw.githubusercontent.com/Naiko
 local ClientFunctions = loadstring(game:HttpGet("https://raw.githubusercontent.com/NaikoScript/Breaking-Plus/main/Assets/ClientFunctions"))()
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 local PingFreezeEvent = Instance.new("BindableEvent")
 local queueteleport =  queue_on_teleport or queueonteleport or (syn and syn.queue_on_teleport)
-local Modes = {["All game-modes"]=648362523,["Duck Duck Stab"]=834829150,["Duos"]=1410026010,["Kill Row"]=1426048327,["Duel Vote"]=901462028,["Everything"]=694768217,["Breaking Point"]=834827615,["Free for All"]=987684187,["Gunslinger"]=1436726276}
+local Modes = {["All game-modes"]=648362523,["Duck Duck Stab"]=834829150,["Duos"]=1410026010,["Kill Row"]=1426048327,["Duel Vote"]=901462028,["Everything"]=694768217,["Breaking Point"]=834827615,["Free for All"]=987684187,["Gunslinger"]=1436726276,["Crazy Eights"]=0}
 local NotDisabled = true
 local NotDisabled2 = true
 local NotDisabled3 = true
@@ -749,12 +750,17 @@ local function GetTotalPlayers(placeId)
 	TypeUrlInt += 1
 	Debug("Using URL Prefix: " .. urlprefix)
     local url = ("https://%s/v1/games/%s/servers/0?sortOrder=2&excludeFullGames=false&limit=100"):format(urlprefix,placeId)
-    while true do
+    while task.wait() do
+		
         local params = "?limit=100"
         if cursor ~= "" then
             params = params .. "&cursor=" .. HttpService:UrlEncode(cursor)
         end
         local httpRequest = (http and http.request) or http_request or request
+		if not httpRequest then
+			Debug("No HTTP request function found")
+			return nil
+		end
         local response = httpRequest({
             Url = url .. params,
             Method = "GET",
@@ -1483,11 +1489,9 @@ local Tween3 = game:GetService("TweenService"):Create(Scale,TweenInfo.new(0.8,En
 game:GetService("Workspace").disguise.SurfaceGui.noother.Part.ClickDetector.MouseClick:Connect(function()
 	CustomMenu.Visible = false
 	for i,v in pairs(UI:GetChildren()) do
-		task.spawn(function()
-			if v.Name == "setting" or v.Name == "trade" or v.Name == "shop" or v.Name == "inv" or v.Name == "tradelog" then
-				v.Visible = false
-			end
-		end)
+		if v.Name == "setting" or v.Name == "trade" or v.Name == "shop" or v.Name == "inv" or v.Name == "tradelog" then
+			v.Visible = false
+		end
 	end
 	if Animations == true then
 		server.Size = UDim2.new(0,250,0,0)
@@ -1541,7 +1545,7 @@ local function tween(p75, p76, p77, p78)
 		inc = p78
 	}
 	spawn(function()
-		while true do
+		while task.wait() do
 			if game:GetService("RunService").Heartbeat:Wait() then
 				local v219 = table32[u100]
 				local v220 = p75
@@ -1625,6 +1629,7 @@ local function UpdateFriendsList()
 			if not page.IsFinished then 
 				page:AdvanceToNextPageAsync()
 			end
+			task.wait(0.005)
 		until page.IsFinished
 		Friends = table.clone(NewFriends)
 	end
@@ -1633,20 +1638,17 @@ task.spawn(function()
 	UpdateFriendsList()
 	while task.wait(15) do
 		task.spawn(function()
-		UpdateFriendsList()
+			UpdateFriendsList()
 		end)
 	end
 end)
 workspace.disguise.SurfaceGui.noother.Part.ClickDetector.MouseClick:connect(function(Player)
 	local FriendsOnlineFrame = ClonedFriends
-	if Player == LocalPlayer then
-		FriendsOnlineFrame.Visible = true
-	end
 	local Turn2 = workspace.DistributedGameTime
 	Turn = Turn2
 	FriendsOnlineFrame.Visible = false
-	Debug("Active Friends: " .. #Friends)
 	GetAmount(FriendsOnlineFrame, true)
+	Debug("Active Friends: " .. #Friends)
 	local Size = 30
 	local Amount = 0
 	for _, PlayerData in pairs(Friends) do
@@ -1654,7 +1656,9 @@ workspace.disguise.SurfaceGui.noother.Part.ClickDetector.MouseClick:connect(func
 			if Turn ~= Turn2 then continue end
 			task.wait(0.15 / math.clamp(Amount / 2.5,1,5))
 			if Turn ~= Turn2 then continue end
+			if Amount == 0 then
 			FriendsOnlineFrame.Visible = true
+			end
 			local v214 = game:GetService("ReplicatedStorage").model.friendframe:Clone()
 			v214.TextLabel.Text = PlayerData.Username:sub(1, 10)
 			Size += 35
@@ -1678,6 +1682,10 @@ end)
 -- Because of api timeout limitation issues it might not work all of the time (blame roblox with their servers api) (⚠️adding this code is likely to bug out server hop feature⚠️)
 task.spawn(function()
 while task.wait(11) do
+	if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.MouseEnabled then
+		Debug("Disabled player count on server to prevent crashes (mobile detected)")
+		break
+	end
 	for i,v in server.ScrollingFrame:GetChildren() do
 		if v.Name == "trash" then
 			local GameModeName = v:FindFirstChild("TextLabel")
@@ -1735,7 +1743,7 @@ Clone.MouseLeave:Connect(function()
 	game:GetService("TweenService"):Create(Clone.TextLabel,TweenInfo.new(0.25),{TextTransparency = 0.5}):Play()
 end)
 
-Clone.MouseButton1Click:Connect(function()
+Clone.MouseButton1Down:Connect(function()
 	for i,v in pairs(UI:GetChildren()) do
 		if v.Name == "Breaking+" or v.Name == "trade" or v.Name == "shop" or v.Name == "inv" or v.Name == "tradelog" or v.Name == "server1"  then
 			v.Visible = false
@@ -1819,8 +1827,10 @@ end
 
 for i,v in pairs(UI.buttons:GetChildren()) do
 	if v ~= CustomButton then
-		v.MouseButton1Click:Connect(function()
+		v.MouseButton1Down:Connect(function()
 			CustomMenu.Visible = false
+			server.Visible = false
+			ClonedFriends.Visible = false
 		end)
 	end
 end
@@ -1848,7 +1858,7 @@ else
 Connection2:Disconnect()
 end
 end)
-Clone.MouseButton1Click:Once(function()
+Clone.MouseButton1Down:Once(function()
 OpenedSettings = true
 ChangeData("TutSettings.txt","true")
 Tween:Pause()
@@ -1875,6 +1885,7 @@ UI.loading:GetPropertyChangedSignal("GuiState"):Connect(function()
 	if UI.loading.GuiState == Enum.GuiState.Press then
 		pcall(function()
 			setclipboard(Invite)
+			TopNotify("Copied invite link to clipboard")
 		end)
 	end
 end)
@@ -2497,8 +2508,7 @@ Lag.ImageColor3 = Color3.fromRGB(155, 0, 0)
 Lag.TextLabel.Text = "Lag server"
 local Sent = false
 task.spawn(function()
-	while true do
-		task.wait()
+	while task.wait() do
 		if Sent == true then
 			lag(4,false)
 		end
@@ -2992,7 +3002,7 @@ function PlayerExecute()
 				else
 					break
 				end
-			task.wait()
+				task.wait()
 			until Attach.Parent == nil or FloatingHead == false
 			if Attach.Parent ~= nil and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") and LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health ~= 0 then
 				LocalPlayer.Character.Torso.Neck.C0 = CFrame.new(0, 1, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0)
@@ -3033,6 +3043,201 @@ game.Players.PlayerRemoving:Connect(function(Player)
 		end
 	end
 end)
+task.spawn(function()
+	local Chat
+	local EventFire = Instance.new("BindableEvent")
+	EventFire.Event:Once(function()
+		local function tween2(p2, p3, p4, p5, p6, p7)
+			local table22 = {}
+			table22[p3] = p4
+			game:GetService("TweenService"):Create(p2, TweenInfo.new(p5, p6 or Enum.EasingStyle.Quint, p7 or Enum.EasingDirection.Out), table22):Play()
+		end
+		function get(p71)
+			return game.ReplicatedStorage.model[p71]:Clone()
+		end
+		local LOG = {}
+		local Emojis = {
+			bruh = 3226470215,
+			fr = 3226486329,
+			thinking = 3226514216,
+			oof = 3227779790,
+			nou = 3240035371,
+			yt = 3240035692,
+			fist = 3240152511,
+			facepalm = {
+				3240144180,
+				3240144180,
+				3240144180,
+				3240144180,
+				3240144180,
+				3240144180,
+				3240144334,
+				3240144674,
+				3240144777,
+				3240144910,
+				3240146369,
+				3240146369,
+				3240146369,
+				3240146369,
+				3240146369,
+				3240146369,
+				3240146527,
+				3240146690,
+				3240146842
+			},
+			cat = 3364792873,
+			clap = {
+				3364796449,
+				3364796449,
+				3364797127,
+				3364797127
+			},
+			dab = 4168119667
+		}
+		local Lurk = false
+		local function message(p268, p269, p270, p271, p272, p273)
+
+			p269 = p269:sub(1, 500)
+			local v70 = get("chatframe")
+			if p268 then
+				v70.TextButton.Text = p268 .. ": "
+			else
+				v70.TextButton.Text = ""
+			end
+			if p268 == "help=" then
+				v70.TextButton.Text = "       "
+				game.ReplicatedStorage.Model:FindFirstChild("Info"):Clone().Parent = v70.TextButton
+			end
+			if p270 then
+				v70.TextButton.TextColor3 = p270
+			end
+			if p271 then
+				v70.TextLabel.TextColor3 = p271
+			end
+			v70.Parent = Chat
+			v70.TextButton.Size = UDim2.new(0, v70.TextButton.TextBounds.X, 0, 25)
+			v70.TextLabel.Text = p269
+			if p273 then
+				local orgtxt = Instance.new("StringValue", v70.TextLabel)
+				orgtxt.Name = "orgtxt"
+				orgtxt.Value = p273 or p269 or ""
+			end
+			if p272 then
+				local userid = Instance.new("IntValue", v70.TextLabel)
+				userid.Name = "userid"
+				userid.Value = p272 or 0
+			end
+			local find_ret1, find_ret2 = p269:find(":%a*:")
+			if find_ret1 and #p269 == find_ret2 then
+				local u141 = Emojis[p269:lower():sub(2, #p269 - 1)]
+				if u141 then
+					local u167 = get("chatemoji")
+					u167.Position = UDim2.new(0, v70.TextButton.Size.X.Offset + 15 + (u141 == 4168119667 and 0 or 0), 0, 0)
+					if u141 == 4168119667 then
+						u167.Size = UDim2.new(0, 30, 0, 30)
+					end
+					u167.Parent = v70
+					v70.TextLabel.Text = ""
+					if type(u141) == "table" then
+						spawn(function()
+							while u167.Parent do
+								for _, val215 in pairs(u141) do
+									u167.Image = "rbxassetid://" .. val215
+									wait()
+								end
+							end
+						end)
+					else
+						u167.Image = "rbxassetid://" .. u141
+					end
+					if LOG[1] then
+						LOG[1].Size = UDim2.new(1, 0, 0, LOG[1].TextLabel.TextBounds.Y + 20)
+					end
+				end
+			end
+			v70.TextLabel.Position = UDim2.new(0, v70.TextButton.Size.X.Offset, 0, 2)
+			v70.TextLabel.Size = UDim2.new(1, -v70.TextButton.Size.X.Offset, 1, 0)
+			v70.Size = UDim2.new(1, 0, 0, v70.TextLabel.TextBounds.Y)
+			table.insert(LOG, 1, v70)
+			v70.Name = 0
+			v70.Position = UDim2.new(0, 0, 1, 0)
+			local v71 = -5
+			for _, val83 in pairs(LOG) do
+				v71 = v71 - val83.Size.Y.Offset - 3
+				val83:TweenPosition(UDim2.new(0, 0, 1, v71), "Out", "Quint", 0.5, true)
+				val83.Name = tonumber(val83.Name) + 1
+			end
+			if #LOG > 15 then
+				for index34 = 15, #LOG do
+					Chat[tostring(index34)]:Destroy()
+					table.remove(LOG, 15)
+				end
+			end
+			if LOG[15] then
+				Chat["15"]:Destroy()
+				table.remove(LOG, 15)
+			end
+			local v72 = -5
+			for _, val84 in pairs(LOG) do
+				v72 = v72 - val84.Size.Y.Offset - 3
+			end
+			Chat.CanvasSize = UDim2.new(0, 0, 0, -v72)
+			if not Lurk then
+				Chat.CanvasPosition = Vector2.new(0, -v72)
+				return
+			end
+			if #LOG == 14 then
+				tween2(Chat, "CanvasPosition", Chat.CanvasPosition + Vector2.new(0, 5 - v70.Size.Y.Offset - 3), 0.5)
+			end
+		end
+		Chat.MouseEnter:connect(function()
+			Lurk = true
+			tween2(Chat, "ScrollBarImageTransparency", 0.5, 0.5)
+			tween2(Chat, "CanvasPosition", Chat.CanvasPosition, 0.01)
+		end)
+		Chat.MouseLeave:connect(function()
+			Lurk = false
+			tween2(Chat, "ScrollBarImageTransparency", 1, 1)
+			tween2(Chat, "CanvasPosition", Vector2.new(0, Chat.CanvasSize.Y.Offset - Chat.AbsoluteWindowSize.Y), 1)
+		end)
+
+		game.ReplicatedStorage.RemoteEvent.OnClientEvent:Connect(function(...)
+		local DataTable = table.pack(...)
+		if DataTable[1] == 51 then
+			DataTable["n"] = nil
+			table.remove(DataTable,1)
+			local User = game:GetService("Players"):FindFirstChild(DataTable[1]:gsub("[%[%]]",""))
+			if User and User:IsA("Player") and User.Character ~= nil and User.Character:FindFirstChild("Head") then
+				game:GetService("Chat"):Chat(User.Character:FindFirstChild("Head"),DataTable[2] or " ",Enum.ChatColor.White)
+			end
+			message(table.unpack(DataTable))
+		end
+		end)
+		Chat.Visible = not LocalPlayer.settings["Hide Chat"].Value
+		LocalPlayer.settings["Hide Chat"]:GetPropertyChangedSignal("Value"):Connect(function()
+			Chat.Visible = not LocalPlayer.settings["Hide Chat"].Value
+		end)
+	end)
+	if not UI:FindFirstChild("chat") then
+		Chat = game.StarterGui:FindFirstChild("ScreenGui"):FindFirstChild("chat"):Clone()
+		Chat.Parent = LocalPlayer.PlayerGui:FindFirstChild("ScreenGui")
+		Chat.Visible = true
+		EventFire:Fire()
+	else
+		local ConnectionChat; ConnectionChat = UI.ChildRemoved:Connect(function(v)
+			if v.Name == "chat" then
+				Chat = game.StarterGui:FindFirstChild("ScreenGui"):FindFirstChild("chat"):Clone()
+				Chat.Parent = LocalPlayer.PlayerGui:FindFirstChild("ScreenGui")
+				Chat.Visible = true
+				EventFire:Fire()
+				ConnectionChat:Disconnect()
+			end
+		end)
+	end
+end)
+
+
+
 
 LocalPlayer.OnTeleport:Once(function(State)
 	if AutoExec and queueteleport then
@@ -3064,31 +3269,38 @@ PlayersList.ChildAdded:Connect(function(v)
 	end
 end)
 
-task.spawn(function()
-for i,v in pairs(UI.trade.Frame.ScrollingFrame:GetChildren()) do
-	repeat task.wait() until game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned") or task.wait(3)
-	if game.Players:FindFirstChild(v.Name) and game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned") and  game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned").Value == true then
-	v.grad.ImageColor3 = Color3.fromRGB(255, 195, 195)
-	v.TextLabel.TextColor3 = Color3.fromRGB(133, 47, 47)
-	v.ImageLabel.ImageColor3 = Color3.fromRGB(35, 27, 27)
-	end
-end
-end)
-
-UI.trade.Frame.ScrollingFrame.ChildAdded:Connect(function(v)
+local function CheckTradeBanned(v)
 	repeat task.wait() until game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned") or task.wait(3)
 	if game.Players:FindFirstChild(v.Name) and game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned") and game.Players:FindFirstChild(v.Name):FindFirstChild("tradebanned").Value == true then
 		v.grad.ImageColor3 = Color3.fromRGB(255, 195, 195)
 		v.TextLabel.TextColor3 = Color3.fromRGB(133, 47, 47)
 		v.ImageLabel.ImageColor3 = Color3.fromRGB(35, 27, 27)
-		end
-	end)
+		local SendButton = v.send 
+		SendButton.Visible = true
+		SendButton.ImageColor3 = Color3.fromRGB(214, 41, 65)
+		SendButton.TextLabel.Text = "🚫"
+		SendButton.TextLabel.TextTransparency = 0.5
+		SendButton:GetPropertyChangedSignal("Visible"):Connect(function()
+			SendButton.Visible = true
+		end)
+	end
+end
+
+task.spawn(function()
+	for i,v in pairs(UI.trade.Frame.ScrollingFrame:GetChildren()) do
+		CheckTradeBanned(v)
+	end
+end)
+
+UI.trade.Frame.ScrollingFrame.ChildAdded:Connect(function(v)
+	CheckTradeBanned(v)
+end)
 
 CustomMenu.top.TextButton.MouseButton1Click:Connect(function()
 	CustomMenu.Visible = not CustomMenu.Visible
 end)
 
-CustomButton.MouseButton1Click:Connect(function()
+CustomButton.MouseButton1Down:Connect(function()
 	CustomMenu.Visible = not CustomMenu.Visible
 	for i,v in pairs(UI:GetChildren()) do
 		task.spawn(function()
@@ -3133,7 +3345,7 @@ if game.PlaceId == Modes["All game-modes"]  then
 			Icon = "rbxassetid://10698497706"
 		})
 		TopNotify("Breaking + | V" .. tostring(Version) .. " | loaded successfully.", 3.65, true)
-	while true do
+	while task.wait() do
 		if Sent2 == true and LocalPlayer:FindFirstChild("settings") and LocalPlayer.settings:FindFirstChild("Afk") and LocalPlayer.settings.Afk.Value == false then
 			task.wait()
 			if Legacy == true then
